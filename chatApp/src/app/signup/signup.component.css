@@ -1,0 +1,82 @@
+.container{
+   width:500px;
+   margin: 0 auto;
+   background-color:red;
+   margin-top:50px;
+}
+
+.heading{
+   font-family:'Sofia';
+   font-size:35px;
+}
+
+.heading p{
+   display: inline;
+   padding: 10px 20px;
+}
+
+.heading button{
+   display:inline;
+   float:right;
+   height:40px;
+   font-size:25px;
+   text-decoration: none;
+   line-height: 36px;
+   box-sizing: border-box;
+   padding: 1px 10px;
+   text-align: center;
+   background-color: #FFA319;
+   border-radius: 4px;
+   margin-right:10px;
+   margin-top:10px;
+   border:none;
+   opacity:0.9;
+}
+
+.body{
+   background-color:blue;
+}
+
+#formDiv{
+   margin-top: 10px;
+   padding:10px 20px;
+}
+
+label{
+   font-weight: bold;
+   font-size:17px;
+}
+
+#username_text, #email_text, #password_text, #re_password_text, #submit_btn, #forget_pass_btn{
+   border:none;
+   display: block;
+   padding: 10px 30px;
+   width:100%;
+   border-radius:8px;
+   margin-top:6px;
+   background: #f1f1f1;
+}
+
+#username_text:focus, #email_text:focus, #password_text:focus, #re_password_text:focus{
+   background-color: #ddd;
+}
+#submit_btn{
+   border-radius: 0;
+   margin-top:0px;
+   float:left;
+   width:50%;
+   opacity: 0.9;
+}
+
+#forget_pass_btn{
+   border-radius: 0;
+   margin-top:0px;
+   float:left;
+   width:50%;
+   background-color:#f44336;
+   opacity: 0.9;
+}
+
+#forget_pass_btn:hover,#submit_btn:hover, .heading button:hover{
+   opacity: 1;
+}
