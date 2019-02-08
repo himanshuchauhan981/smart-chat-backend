@@ -7,12 +7,12 @@ import { HttpClient } from '@angular/common/http';
 export class AuthService {
    constructor(private _http: HttpClient) { }
 
-   get_user_details(username,email,password){
+   get_user_details = function(username,email,password){
       var data = {
-         'a':username,
-         'b':email,
-         'c':password
+         'username':username,
+         'email':email,
+         'password':password
       }
-      return this._http.post('/chat/save_details',data).subscribe();
+      return this._http.post('/chat/save_details',data);
    }
 }
