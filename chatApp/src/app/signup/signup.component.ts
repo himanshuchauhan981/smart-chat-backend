@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MustMatch } from './confirm-password.validator';
 import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -10,9 +11,17 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit {
+
    registerForm : FormGroup;
    submitted = false;
-   constructor(private formBuilder:FormBuilder, private Auth: AuthService) { }
+   submitError: boolean = false;
+   private usernameErrorText:string;
+
+   constructor(
+      private formBuilder:FormBuilder,
+      private Auth: AuthService,
+      private route: Router
+   ) {}
 
    ngOnInit(){
       this.registerForm = this.formBuilder.group({
@@ -27,15 +36,20 @@ export class SignupComponent implements OnInit {
 
    get f() { return this.registerForm.controls; }
 
-   registerUser(event) {
-        this.submitted = true;
-        // if (this.registerForm.invalid) {
-        //     return;
-        // }
-        const target = event.target;
-        const username = target.querySelector('#username_text').value;
-        const email = target.querySelector('#email_text').value;
-        const password = target.querySelector('#password_text').value;
-        this.Auth.get_user_details(username,email,password);
-    }
+   registerUser(event){
+      this.submitted = true;
+      if(this.registerForm.invalid){
+         console.log('Invalid Submission');
+         return;
+      }
+      const target = event.target;
+      const username = target.querySelector('#username_text').value;
+      const email = target.querySelector('#email_text').value;
+      const password = target.querySelector('#password_text').value;
+
+      this.Auth.get_user_details(username,email,password).subscribe(err =>{
+            this.submitError = true;
+            console.log(err);
+      });
+   }
 }
