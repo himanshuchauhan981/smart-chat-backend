@@ -1,4 +1,4 @@
-/* .container{
+.container{
    width:300px;
    margin: 0 auto;
    margin-top:200px;
@@ -30,4 +30,4 @@ input[type="text"], input[type="password"]{
 }
 .text-center{
    text-align: center;
-} */
+}
