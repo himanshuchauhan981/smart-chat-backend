@@ -1,5 +1,5 @@
 <div class="container">
-   <form>
+   <form #registrationForm ="ngForm" (ngSubmit)="onSubmit()">
       <h1 class="heading">Login</h1>
       <input type="text" placeholder="Enter your username">
       <input type="password" placeholder="Enter your password">
