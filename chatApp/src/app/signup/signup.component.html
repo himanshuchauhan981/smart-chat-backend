@@ -1,3 +1,4 @@
+<div *ngIf = "submitError">{{ usernameErrorText }}</div>
 <div class="container">
    <div class="heading">
       <p>Sign Up</p>
@@ -7,7 +8,6 @@
       <div class="body">
          <div id="formDiv">
             <br>
-
             <label>Username</label>
             <div *ngIf="submitted && f.username.errors">
                <div *ngIf="f.username.errors.required" class="error">Username is required</div>
