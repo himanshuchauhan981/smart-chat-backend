@@ -51,7 +51,7 @@ label{
    border:none;
    display: block;
    padding: 10px 30px;
-   width:100%;
+   width:87%;
    border-radius:8px;
    margin-top:6px;
    background: #f1f1f1;
@@ -79,4 +79,8 @@ label{
 
 #forget_pass_btn:hover,#submit_btn:hover, .heading button:hover{
    opacity: 1;
+}
+
+.error{
+   color:red;
 }
