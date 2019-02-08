@@ -2,8 +2,8 @@
    "/chat":{
       "target":  {
        "host": "localhost",
-       "protocol": "http:",
-       "port": 5000
+       "protocol": "http",
+       "port": 1234
      },
       "secure": false,
       "changeOrigin": true,
