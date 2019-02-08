@@ -1,20 +1,39 @@
 <div class="container">
    <div class="heading">
       <p>Sign Up</p>
-      <button type="submit">Login</button>
+      <a href="/login"><button type="submit">Login</button></a>
    </div>
-   <form>
+   <form [formGroup]="registerForm" (ngSubmit)="registerUser($event)" novalidate>
       <div class="body">
          <div id="formDiv">
             <br>
+
             <label>Username</label>
-            <input type="text" placeholder="Enter Username" id="username_text"><br>
+            <div *ngIf="submitted && f.username.errors">
+               <div *ngIf="f.username.errors.required" class="error">Username is required</div>
+            </div>
+            <input type="text" placeholder="Enter Username" id="username_text" formControlName="username" [ngClass]="{'is-invalid':submitted && f.username.errors}"/><br>
+
             <label>Email</label><br>
-            <input type="text" placeholder="Enter Email ID" id="email_text"><br>
+            <div *ngIf="submitted && f.email_id.errors">
+               <div *ngIf="f.email_id.errors.required" class="error">Email is Required</div>
+               <div *ngIf="f.email_id.errors.email" class="error">Email must be valid Email Address</div>
+            </div>
+            <input type="text" placeholder="Enter Email ID" id="email_text" formControlName="email_id" [ngClass]="{'is-invalid':submitted && f.email_id.errors}"><br>
+
             <label>Password</label><br>
-            <input type="password" placeholder="Enter password" id="password_text"><br>
+            <div *ngIf="submitted && f.pass.errors">
+               <div *ngIf="f.pass.errors.required" class="error">Password is required</div>
+               <div *ngIf="f.pass.errors.minlength" class="error">Password must be of 6 characters</div>
+            </div>
+            <input type="password" placeholder="Enter password" id="password_text" formControlName="pass" [ngClass]="{'is-invalid':submitted && f.pass.errors}"><br>
+
             <label>Confirm Password</label><br>
-            <input type="password" placeholder="Re Enter password" id="re_password_text"><br>
+            <div *ngIf="submitted && f.con_pass.errors">
+               <div *ngIf="f.con_pass.errors.required" class="error">Password is required</div>
+               <div *ngIf="f.con_pass.errors.mustMatch" class="error">Password does not match</div>
+            </div>
+            <input type="password" placeholder="Re Enter password" id="re_password_text" formControlName="con_pass" [ngClass]="{'is=invalid':submitted && f.con_pass.errors}"><br>
          </div>
       </div>
       <div class="footer">
