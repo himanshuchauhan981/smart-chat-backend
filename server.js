@@ -20,7 +20,6 @@ app.use(session({
 }))
 
 app.post('/chat/save_details',function(request,response){
-   console.log('chat')
    const data = new User.database({
       username:request.body.username,
       email:request.body.email,
@@ -28,7 +27,7 @@ app.post('/chat/save_details',function(request,response){
    })
 
    User.checkExistingUser(request.body.username,request.body.email,function(err,user){
-      if(user){
+      if(user.length!=0){
          if(user[0].username == request.body.username && user[0].email != request.body.email){
             response.status(200).json({'message':'Username Exists'});
          }
@@ -38,14 +37,26 @@ app.post('/chat/save_details',function(request,response){
          else if(user[0].username == request.body.username && user[0].email == request.body.email){
             response.status(200).json({'message':'Username Exists'});
          }
-         else{
-            data.save(function(){
-               console.log('User added');
-            })
-         }
+      }
+      else{
+         data.save(function(){
+            console.log('User added');
+            response.status(200).json({'isSignUpSuccessful':true});
+         })
       }
    })
 });
+
+app.post('/chat/check_details',function(request,response){
+   User.checkSavedUser(request.body.loginUsername, request.body.loginPassword, function(err,user){
+      if(user.length == 0){
+         response.status(200).json({'message':'Incorrect username or password'});
+      }
+      else{
+         response.status(200).json({'isUserCorrect':true});
+      }
+   })
+})
 
 const port = process.env.PORT || 1234;
 server.listen(app.listen(port,console.log('Server is running at port 1234')));
