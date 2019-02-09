@@ -17,3 +17,8 @@ module.exports.checkExistingUser = function(username,email,callback){
    const query = { $or : [ { username:username }, { email:email } ] }
    database.find(query,callback);
 }
+
+module.exports.checkSavedUser = function(loginUsername, loginPassword, callback){
+   const query = {$and : [ { username:loginUsername }, { password:loginPassword } ] }
+   database.find(query,callback);
+}
