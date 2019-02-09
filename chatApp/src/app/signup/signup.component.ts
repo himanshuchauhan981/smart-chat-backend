@@ -49,7 +49,10 @@ export class SignupComponent implements OnInit {
 
       this.Auth.get_user_details(username,email,password).subscribe(err =>{
             this.submitError = true;
-            console.log(err);
+            this.usernameErrorText = err.message;
+            if(err.isSignUpSuccessful == true){
+               this.route.navigate(['/login']);
+            }
       });
    }
 }
