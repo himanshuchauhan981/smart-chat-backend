@@ -4,11 +4,10 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash  = require('flash');
+const  socket = require('socket.io');
+const Sockets =require('./sockets.js');
 
 const User = require('./models/users.js');
-
-const server = require('http').createServer(app);
-const io = require('socket.io').listen(server);
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -58,5 +57,14 @@ app.post('/chat/check_details',function(request,response){
    })
 })
 
-const port = process.env.PORT || 1234;
-server.listen(app.listen(port,console.log('Server is running at port 1234')));
+var server = app.listen(1234,function(){
+   console.log('Server is running at port 1234');
+});
+
+module.exports.server = server;
+
+var io = socket(server);
+
+io.on('connection',function(socket){
+   console.log('made socket connection');
+})
