@@ -1,0 +1,45 @@
+body{
+   margin:0;
+   background: #7F7FD5;
+   background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+   background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+}
+.container{
+   margin-top:10vw;
+}
+#search_box{
+   border:none;
+   border-radius:20px;
+   background-color: #337693;
+   text-decoration: none;
+   width:100%;
+   height:6vh;
+   padding:20px;
+   color:white;
+}
+::placeholder{
+   color:white;
+}
+#search_box:focus, #input_box:focus{
+   outline: none;
+   box-shadow: 0 0 10px rgba(66,99,113,1);
+   background-color:#4AC8FF;
+}
+#input_box{
+   width:100%;
+   border: 0;
+   border-radius:30px;
+   padding:20px 0 0 20px ;
+   background-color: #337693;
+   position:relative;
+}
+.search .fa-location-arrow{
+   position:relative;
+   float:right;
+   margin-right:20px;
+   top:-50px;
+   font-size:30px;
+}
+.card-footer{
+   padding: 10px 20px !important;
+}
