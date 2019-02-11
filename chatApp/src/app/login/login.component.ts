@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit {
    loginForm:FormGroup
    loginError: boolean =false
    private loginErrorText:string
+   public room:string
 
    constructor(private formBuilder:FormBuilder, private _auth:AuthService, private router:Router) {}
 
@@ -29,7 +30,7 @@ export class LoginComponent implements OnInit {
          this.loginError = true
          this.loginErrorText = err.message;
          if(err.isUserCorrect == true){
-            return this.router.navigate(['/chatroom']);
+            return this.router.navigate(['/chatroom'],{queryParams:{'user':loginUsername}});
          }
       });
    }
