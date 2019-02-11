@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import * as io from 'socket.io-client';
+
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -9,8 +9,6 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
    constructor(private _http: HttpClient) { }
-
-   private socket = io('http://localhost:1234') ;
 
    get_user_details = function(username,email,password){
       const data = {
