@@ -26,6 +26,7 @@
     "flash": "^1.1.0",
     "mongoose": "^5.4.10",
     "nodemon": "^1.18.9",
+    "normalize-port": "^1.0.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "socket.io": "^2.2.0"
