@@ -4,8 +4,7 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash  = require('flash');
-const  socket = require('socket.io');
-const Sockets =require('./sockets.js');
+const socket = require('socket.io');
 
 const User = require('./models/users.js');
 
@@ -57,14 +56,29 @@ app.post('/chat/check_details',function(request,response){
    })
 })
 
-var server = app.listen(1234,function(){
-   console.log('Server is running at port 1234');
-});
-
-module.exports.server = server;
+const port = process.env.PORT || 1234
+const server = app.listen(port, console.log('Server Started at port 1234'))
 
 var io = socket(server);
 
 io.on('connection',function(socket){
-   console.log('made socket connection');
+   console.log('Made new socket connection on', socket.id);
+   socket.on('join',function(data){
+      // Joining User to the room
+      socket.join("community");
+      console.log(socket.id + " has joined to community room");
+      socket.broadcast.to("community").emit('New user joined',{user:data.user,message:'has joined this room'});
+   });
+
+   //Joined User leaving the room
+   socket.on('leave',function(data){
+      console.log(socket.id + "has left the community room");
+      socket.broadcast.to("community").emit('left room',{user:data.user, message:' has left the room'});
+      socket.leave("community");
+   })
+
+   //Sending Messages to community joinRoom
+   socket.on('message',function(data){
+      io.in("community").emit('new message',{user:data.user, message: data.message})
+   })
 })
