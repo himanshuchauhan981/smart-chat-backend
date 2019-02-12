@@ -1,0 +1,26 @@
+#input_box{
+   width:100%;
+   border: 0;
+   border-radius:30px;
+   padding:20px 0 0 20px ;
+   background-color: #337693;
+   position:relative;
+}
+
+.card-footer{
+   padding: 10px 20px !important;
+}
+
+.search .fa-location-arrow{
+   position:relative;
+   float:right;
+   margin-right:20px;
+   top:-50px;
+   font-size:30px;
+}
+
+#input_box:focus{
+   outline: none;
+   box-shadow: 0 0 10px rgba(66,99,113,1);
+   background-color:#4AC8FF;
+}
