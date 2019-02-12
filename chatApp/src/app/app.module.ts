@@ -9,6 +9,8 @@ import { ChatRoomComponent } from './chat-room/chat-room.component';
 
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ChatBoxComponent } from './chat-room/chat-box/chat-box.component';
+import { OnlineUserBoxComponent } from './chat-room/online-user-box/online-user-box.component';
 
 
 @NgModule({
@@ -16,7 +18,9 @@ import { HttpClientModule } from '@angular/common/http';
     AppComponent,
     LoginComponent,
     SignupComponent,
-    ChatRoomComponent
+    ChatRoomComponent,
+    ChatBoxComponent,
+    OnlineUserBoxComponent
   ],
   imports: [
     BrowserModule,
