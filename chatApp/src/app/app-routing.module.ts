@@ -6,20 +6,20 @@ import { ChatRoomComponent } from './chat-room/chat-room.component';
 
 const routes: Routes = [
    {
-      path:'login',
-      component:LoginComponent
+      path: 'login',
+      component: LoginComponent
    },
    {
-      path:'',
-      component:LoginComponent
+      path: '',
+      component: LoginComponent
    },
    {
-      path:'signup',
-      component:SignupComponent
+      path: 'signup',
+      component: SignupComponent
    },
    {
-      path:'chatroom',
-      component:ChatRoomComponent
+      path: 'chatroom',
+      component: ChatRoomComponent
    }
 
 ];
