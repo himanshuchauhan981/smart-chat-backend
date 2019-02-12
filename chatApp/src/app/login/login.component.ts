@@ -9,12 +9,12 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-   loginForm:FormGroup
-   loginError: boolean =false
-   private loginErrorText:string
-   public room:string
+   loginForm:FormGroup;
+   loginError: boolean = false;
+   private loginErrorText: string;
+   public room: string;
 
-   constructor(private formBuilder:FormBuilder, private _auth:AuthService, private router:Router) {}
+   constructor(private formBuilder: FormBuilder, private _auth: AuthService, private router: Router) {}
 
    ngOnInit(){
       this.loginForm = this.formBuilder.group({
@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
       const target = event.target;
       const loginUsername = target.querySelector('#loginUsernameID').value;
       const loginPassword = target.querySelector('#loginPasswordID').value;
-      this._auth.checkUserDetail(loginUsername,loginPassword).subscribe(err =>{
+      this._auth.checkUserDetail(loginUsername, loginPassword).subscribe(err =>{
          this.loginError = true
          this.loginErrorText = err.message;
          if(err.isUserCorrect == true){
