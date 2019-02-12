@@ -1,0 +1,19 @@
+<div class="card">
+   <div class="card-header">
+      <p>{{user}}</p>
+      <button (click)="leave()">Leave</button>
+      <button (click)="remove()">Sign Out</button>
+   </div>
+   <div class="card-body">
+      <div *ngFor="let item of messageArray">
+         <p>{{item.user}} : {{item.message}}</p>
+      </div>
+   </div>
+   <div class="card-footer">
+      <div class="search">
+         <textarea id="input_box" class="input_box" placeholder="Type your message" [(ngModel)]="messageText"></textarea>
+         <button type="button" (click)="sendMessage()">Send</button>
+         <a><i class="fa fa-location-arrow"></i></a>
+      </div>
+   </div>
+</div>
