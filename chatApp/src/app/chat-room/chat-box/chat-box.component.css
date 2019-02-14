@@ -24,3 +24,12 @@
    box-shadow: 0 0 10px rgba(66,99,113,1);
    background-color:#4AC8FF;
 }
+
+.scroll{
+   max-height: 300px;
+   overflow-y: scroll;
+}
+
+textarea{
+  resize: none;
+}
