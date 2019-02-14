@@ -23,8 +23,8 @@ li{
    list-style: none;
 }
 li img{
-   height:15vh;
-   width:7vw;
+   height:15.5vh;
+   width:7.8vw;
 }
 ul{
    padding:0;
@@ -33,3 +33,4 @@ ul{
 .activeUser{
    float:left;
 }
+
