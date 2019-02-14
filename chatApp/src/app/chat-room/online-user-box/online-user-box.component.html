@@ -2,27 +2,19 @@
   <div class="card-header">
     <input type="text" id="search_box" placeholder="Search">
   </div>
-  <div class="card-body">
+  <div class="card-body scroll" id="scroll">
     <ul>
-      <li>
-        <div class="row">
+      <li *ngFor="let details of usernameDetails">
+        <div class="row" *ngIf="details.username != activeuser">
           <div class="col-md-4">
             <img class="rounded-circle"
                  src="https://i.dailymail.co.uk/i/pix/2017/04/20/13/3F6B966D00000578-4428630-image-m-80_1492690622006.jpg">
           </div>
           <div class="col-md-8">
-            <p class="activeUser">Himanshu Chauhan</p>
+            <p class="activeUser">{{details.username | json}}</p>
           </div>
         </div>
       </li>
-    </ul>
-  </div>
-  <div class="card-footer">
-    <!--<p>{{usernameDetails}}</p>-->
-    <ul>
-      <!--<li *ngFor="let details of usernameDetails">-->
-        <!--<p>{{details}}</p>-->
-      <!--</li>-->
     </ul>
   </div>
 </div>
