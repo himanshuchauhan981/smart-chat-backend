@@ -30,7 +30,8 @@ export class LoginComponent implements OnInit {
          this.loginError = true
          this.loginErrorText = err.message;
          if(err.isUserCorrect == true){
-            return this.router.navigate(['/chatroom'],{queryParams:{'user':loginUsername}});
+           this._auth.makeCurrentUserOnline(loginUsername).subscribe();
+           return this.router.navigate(['/chatroom'],{queryParams:{'user':loginUsername}});
          }
       });
    }
