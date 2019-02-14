@@ -15,11 +15,23 @@ app.use(session({
     cookie: {secure: true}
 }));
 
+app.post('/chat/saveChats', function (request,response) {
+    console.log(request.body);
+    const data = new User.chatDatabase({
+        message: request.body.message,
+        sender: request.body.sender
+    });
+    data.save(function(){
+        console.log('Message added to database');
+    })
+});
+
 app.post('/chat/save_details', function (request, response) {
     const data = new User.database({
         username: request.body.username,
         email: request.body.email,
-        password: request.body.password
+        password: request.body.password,
+        isConnection: false
     });
 
     User.checkExistingUser(request.body.username, request.body.email, function (err, user) {
@@ -56,8 +68,29 @@ app.post('/chat/check_details', function (request, response) {
 
 app.get('/chat/getUsernames', function (request, response) {
     User.getUsername(function (err,user){
-        console.log(user)
         return response.status(200).json(user);
+    })
+});
+
+app.get('/chat/getCommunityChats', function (request,response) {
+    User.showCommunityChats(function (err,user){
+        if(err) throw err;
+        return response.status(200).json(user);
+    })
+});
+
+app.post('/chat/makeOnline',function(request,response){
+    User.makeOnlineConnection(request.body.onlineUserName, function () {
+        return response.status(200);
+    })
+});
+
+app.post('/chat/makeOffline', function(request,response){
+    User.makeUserOffline(request.body.onlineUserName, function (user) {
+        if(user){
+            console.log(user);
+        }
+        return response.status(200);
     })
 });
 
@@ -87,5 +120,9 @@ io.on('connection', function (socket) {
         io.in("community").emit('new message', {user: data.user, message: data.message})
     });
 
+    socket.on('disconnect', () => {
 
+        socket.disconnect(true);
+    })
 });
+
