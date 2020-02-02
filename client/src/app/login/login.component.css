@@ -1,0 +1,69 @@
+
+.login-container{
+    padding: 6em 0em 0em 0em;
+}
+
+.login-card{
+    width: 60vw;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: 0px 0px 11px 4px rgba(179,175,179,1);
+}
+
+.login-title{
+    text-align: center;
+    font-weight: bold;
+    padding:5px 25px 0px;
+    font-family: 'Germania One', cursive;
+    font-size:5vw;
+    margin-bottom : 0px !important;
+}
+
+.login-username input, .login-password input{
+    display: block;
+    margin-top: 4px;
+    padding: 6px 12px;
+    outline: none;
+    width: 100%;
+    border-radius: 26px;
+    border: 1px solid #BFCFD3;
+}
+
+.login-username input:focus, .login-password input:focus{
+    box-shadow: 0px 0px 5px 3px rgba(149,100,221,1);
+}
+
+.login-card-body button{
+    color: #FFF;
+    background-color: #639;
+    border-radius: 26px;
+}
+
+.login-forget-password{
+    font-size: 16px;
+    text-align: center;
+}
+
+.btn-rounded{
+    border-radius: 50px;
+}
+
+.login-forget-password:hover{
+    text-decoration: underline;
+    cursor: pointer;
+    color: #639;
+}
+
+.signup-methods{
+    padding: 3em 2em 0em 0em;
+}
+
+@media only screen and (max-width: 768px){
+    .signup-methods{
+        padding: 0em 1.5em 0em 1.5em;
+    }
+
+    .login-container{
+        margin: 4em 0em;
+    }
+}

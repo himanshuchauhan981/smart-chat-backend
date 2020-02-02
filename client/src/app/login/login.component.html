@@ -1,0 +1,48 @@
+<div class="login-container">
+    <div class="card login-card">
+        <p class="login-title">Smart Chat</p>
+        <div class="row">
+            <div class="col-lg-6 col-md-6">
+                <form name="loginForm">
+                    <div class="login-card-body p-4">
+                        <div class="login-username">
+                            <span class="ml-2">Username</span>
+                            <input
+                                id="loginusername"
+                                type="text"
+                                name="loginusername"
+                                placeholder="Type your Username"
+                                class="mb-2" 
+                            />
+                        </div>
+                        <div class="login-password">
+                            <span class="ml-2">Password</span>
+                            <input
+                                type="password"
+                                id="loginpassword"
+                                name="loginpassword"
+                                placeholder="Type your Password"
+                                class="mb-2"
+                                autoComplete="password"
+                            />
+                        </div>
+                        <button type="submit" class="btn btn-rounded btn-block mt-3">Sign In</button>
+                        <a href="/signup">
+                            <button type="button" class="btn btn-rounded btn-block mt-2">Create an Account</button>
+                        </a>
+                        <p class="login-forget-password mt-2">Forget Password ?</p>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="signup-methods">
+                    <a href="/signup">
+                        <button type="button" class="btn btn-block btn-rounded btn-outline-primary mb-3">
+                            <i class="fa fa-envelope"> Sign Up with Email</i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
