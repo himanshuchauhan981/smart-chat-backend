@@ -22,6 +22,6 @@ export class LoginComponent implements OnInit {
 	get loginpassword(){ return this.loginForm.get('loginpassword') }
 
 	loginUser(loginForm){
-		console.log(loginForm.value)
+		console.log(loginForm)
 	}
 }

@@ -7,11 +7,11 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Username</mat-label>
                         <input matInput placeholder="Type your username" [formControl]="loginusername" name="loginusername">
-                        <mat-error *ngIf="loginusername.hasError('required')">Email is required</mat-error>
+                        <mat-error *ngIf="loginusername.hasError('required')">Username is required</mat-error>
                     </mat-form-field>
                     <mat-form-field appearance="outline">
                         <mat-label>Password</mat-label>
-                        <input matInput placeholder="Type your password" [formControl]="loginpassword" name="loginpassword">
+                        <input matInput type="password" placeholder="Type your password" [formControl]="loginpassword" name="loginpassword">
                         <mat-error *ngIf="loginpassword.hasError('required')">Password is required</mat-error>
                     </mat-form-field>
                     <button mat-raised-button color="primary">Login</button>
