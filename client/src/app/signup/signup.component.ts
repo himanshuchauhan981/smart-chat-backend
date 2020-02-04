@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
+import { Router } from '@angular/router'
 
-import { SignupService } from '../service/signup.service'
+import { UserService } from '../service/user.service'
 import { SignUpValidators } from './signup.validators'
 
 @Component({
@@ -11,10 +12,11 @@ import { SignUpValidators } from './signup.validators'
 })
 export class SignupComponent implements OnInit {
 
-	constructor(private signupService: SignupService) { }
+	signupError: string = null
 
-	ngOnInit() {
-	}
+	constructor(private userService: UserService,private router: Router) { }
+
+	ngOnInit() { }
 
 	signupForm = new FormGroup({
 		signupusername: new FormControl('',Validators.required),
@@ -36,9 +38,15 @@ export class SignupComponent implements OnInit {
 
 	submitUser(signupForm){
 		if(signupForm.status === 'INVALID') return 
-		this.signupService.saveNewUser(signupForm.value)
-		.subscribe(res =>{
-			console.log(res)
+		this.userService.saveNewUser(signupForm.value)
+		.subscribe((res: any) =>{
+			if(!res.signUpStatus){
+				this.signupError = res.msg
+			}
+			else{
+				console.log('hello')
+				this.router.navigate(['login'])
+			}
 		})
 	}
 }

@@ -2,6 +2,7 @@ const bcryptjs = require('bcryptjs')
 
 const { users,userOnlineStatus } = require('../models')
 const { factories } = require('../factories')
+const { tokenUtil } = require('../utils')
 
 checkExistingUsers = async (username,email)=>{
     let existingUserStatus = await users.find({$or:[{"username":username},{"email":email}]})
@@ -12,6 +13,11 @@ generateHashedPassword = async (password) =>{
     let salt = bcryptjs.genSaltSync(10)
     let hashedPassword = bcryptjs.hashSync(password,salt)
     return hashedPassword
+}
+
+checkHashedPassword = async(password,hashedPassword)=>{
+    let status = bcryptjs.compareSync(password,hashedPassword)
+    return status
 }
 
 let userHandler = {
@@ -29,7 +35,20 @@ let userHandler = {
             await loginStatusData.save()
             res.status(200).send({ status: 200, signUpStatus: true })
         }
-        else res.status(200).send({ status: 200, signUpStatus: false })
+        else res.status(200).send({ status: 200, signUpStatus: false, msg:'User already existed' })
+    },
+
+    loginExistingUser : async (req,res)=>{
+        let existingUser = await users.findOne({"username":req.body.loginusername})
+
+        if(existingUser != null){
+            if(checkHashedPassword(req.body.loginpassword,existingUser.password)){
+                let token = tokenUtil.createJWTToken(existingUser._id)
+                await userOnlineStatus.update({username:existingUser.username},{$set:{isActive:'online'}})
+                return { status: 200, loginStatus: true,token: token }
+            }
+        }
+        return { status: 200, loginStatus: false,loginError:'Incorrect Credentials'}
     }
 }
 

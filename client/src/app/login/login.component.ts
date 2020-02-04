@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
+import { Router } from '@angular/router'
+
+import { UserService } from '../service/user.service'
 
 @Component({
 	selector: 'app-login',
@@ -8,7 +11,9 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 })
 export class LoginComponent implements OnInit {
 
-	constructor() { }
+	loginError : string = null
+
+	constructor(private userService : UserService, private router: Router) { }
 
 	ngOnInit() { }
 
@@ -22,6 +27,17 @@ export class LoginComponent implements OnInit {
 	get loginpassword(){ return this.loginForm.get('loginpassword') }
 
 	loginUser(loginForm){
-		console.log(loginForm)
+		if(loginForm.status === 'INVALID') return
+
+		this.userService.loginExistingUser(loginForm.value)
+		.subscribe((res :any)=>{
+			if(!res.loginStatus){
+				this.loginError = res.loginError
+			}
+			else{
+				this.userService.storeJWTToken(res.token)
+				this.router.navigate([''])
+			}
+		})
 	}
 }

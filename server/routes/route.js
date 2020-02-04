@@ -9,5 +9,9 @@ module.exports = () =>{
         userController.saveNewUsers
     )
 
+    router.post('/login',
+        userController.loginExisitngUser
+    )
+
     return router
 }
