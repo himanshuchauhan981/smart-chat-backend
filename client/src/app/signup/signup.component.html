@@ -3,7 +3,13 @@
         <p class="signup-title">Smart Chat</p>
         <div class="row">
             <div class="col-md-12">
-                <form class="form-container" [formGroup]="signupForm">
+                <form class="form-container" [formGroup]="signupForm" (ngSubmit)="submitUser(signupForm)">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input matInput placeholder="Type your Email" [formControl]="signupemail" name="signupemail">
+                        <mat-error *ngIf="signupemail.hasError('required')">Email is required</mat-error>
+                        <mat-error *ngIf="!signupemail.hasError('required') && signupemail.hasError('email')">Invalid Email ID</mat-error>
+                    </mat-form-field>
                     <mat-form-field appearance="outline">
                         <mat-label>Username</mat-label>
                         <input matInput placeholder="Type your username" [formControl]="signupusername" name="signupusername">
@@ -18,8 +24,9 @@
                         <mat-label>Confirm Password</mat-label>
                         <input matInput type="password" placeholder="Type your Confirm password" [formControl]="signupConfirmpassword" name="signupConfirmpassword">
                         <mat-error *ngIf="signupConfirmpassword.hasError('required')">Password is required</mat-error>
+                        <mat-error *ngIf="signupConfirmpassword.hasError('mustMatch')">Password does not matched</mat-error>
                     </mat-form-field>
-                    <button mat-raised-button color="primary">Sign Up</button>
+                    <button mat-raised-button color="primary" class="mb-4">Sign Up</button>
                 </form>
             </div>
         </div>

@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MatInputModule } from '@angular/material/input'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatButtonModule } from '@angular/material/button'
+import { HttpClientModule } from '@angular/common/http'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -24,7 +25,8 @@ import { SignupComponent } from './signup/signup.component'
 		ReactiveFormsModule,
 		MatInputModule,
 		MatButtonModule,
-		BrowserAnimationsModule
+		BrowserAnimationsModule,
+		HttpClientModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

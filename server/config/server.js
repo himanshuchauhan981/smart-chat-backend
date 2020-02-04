@@ -8,6 +8,7 @@ const session = require('express-session')
 const bodyParser = require('body-parser')
 const socket = require('socket.io')
 
+const { route } = require('../routes')
 dotenv.config()
 
 app.use(cors())
@@ -28,7 +29,9 @@ require('../db').connection
 const server = app.listen(process.env.PORT,process.env.HOST,(err)=>{
     if(err) console.log(err)
     else console.log(`Running on ${process.env.HOST}:${process.env.PORT}`)
-}) 
+})
+
+app.use('/api',route())
 
 const io = socket(server)
 
