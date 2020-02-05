@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
 			}
 			else{
 				this.userService.storeJWTToken(res.token)
-				this.router.navigate([''])
+				this.router.navigate(['home'])
 			}
 		})
 	}

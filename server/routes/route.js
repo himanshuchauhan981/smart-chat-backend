@@ -13,5 +13,9 @@ module.exports = () =>{
         userController.loginExisitngUser
     )
 
+    router.get('/validateToken',
+        userController.validateToken
+    )
+
     return router
 }

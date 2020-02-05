@@ -9,6 +9,11 @@ let userController = {
     loginExisitngUser : async (req,res) =>{
         let response = await userHandler.loginExistingUser(req,res)
         res.status(200).send(response)
+    },
+
+    validateToken : async (req,res) =>{
+        let response = await userHandler.validateToken(req,res)
+        res.status(200).send(response)
     }
 }
 

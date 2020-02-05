@@ -44,11 +44,18 @@ let userHandler = {
         if(existingUser != null){
             if(checkHashedPassword(req.body.loginpassword,existingUser.password)){
                 let token = tokenUtil.createJWTToken(existingUser._id)
-                await userOnlineStatus.update({username:existingUser.username},{$set:{isActive:'online'}})
+                await userOnlineStatus.updateOne({username:existingUser.username},{$set:{isActive:'online'}})
                 return { status: 200, loginStatus: true,token: token }
             }
         }
         return { status: 200, loginStatus: false,loginError:'Incorrect Credentials'}
+    },
+
+    validateToken : async (req,res)=>{
+        let token = req.headers.authorization
+        let decodedToken = tokenUtil.decodeJWTToken(token)
+        let usernameObject = await users.findById(decodedToken.id).select({username:1})
+        return { status:200, username: usernameObject.username}
     }
 }
 

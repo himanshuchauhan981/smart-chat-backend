@@ -1,0 +1,88 @@
+.userlist-card{
+    border-radius: 30px;
+    max-height: 650px;
+    background: rgba(73,155,234,1);
+}
+
+.userlist-header{
+    padding: 20px 30px 20px 30px;
+    background: rgba(73,155,234,1);
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+}
+
+.username{
+    border: none;
+    padding: 12px 25px;
+    width: 100%;
+    border-radius: 25px;
+    outline: none;
+    font-size: 16px;
+}
+
+.userlist-body{
+    border-top: 1px solid black;
+    padding: 5px 10px;
+    overflow-y: auto;
+    min-height:432px;
+    max-height:432px;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+.show-users{
+    display: flex;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.userlist-body img{
+    height: 80px;
+    width: 80px;
+}
+
+.userlist-text{
+    padding: 10px 15px;
+    display: inline-block;
+}
+
+.userlist-name{
+    font-family: 'Roboto Mono', monospace;
+    font-size: 15px;
+    margin: 0px !important;
+}
+
+.userlist-status{
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 14px;
+    margin: 0px !important;
+}
+
+.userlist-messageCount{
+    font-family:'Lexend Deca',sans-serif;
+    font-size: 14px;
+    margin :0;
+    font-weight: bold;
+    color: #4DF5E5;
+}
+
+@media (min-width: 300px){
+    .userlist-card{
+        margin-bottom: 6px;
+    }
+}
+
+@media (min-width: 400px){
+    .userlist-body img{
+        margin-top: 3px;
+    }
+}
+
+@media (min-width: 530px){
+    .userlist-name{ font-size: 20px;}
+    .userlist-status{ font-size: 16px}
+    .userlist-body img {
+        height: 90px;
+        width: 90px;
+    }
+}

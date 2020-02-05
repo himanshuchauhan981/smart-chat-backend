@@ -1,0 +1,18 @@
+<div class="card userlist-card">
+    <div class="userlist-header">
+        <input type="text" class="username" placeholder="Enter Username..." alt="" />
+    </div>
+    <div class="userlist-body">
+        <div *ngFor="let activeUser of activeUserList">
+            <div class="show-users">
+                <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                    class="rounded-circle" alt="" />
+                <div class="userlist-text">
+                    <p class="userlist-name">{{ activeUser.username }}</p>
+                    <p class="userlist-messageCount"> 0 new messages</p>
+                    <p class="userlist-status">{{ activeUser.usersInfo[0].isActive }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

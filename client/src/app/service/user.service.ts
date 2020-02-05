@@ -1,11 +1,13 @@
 import { Injectable, Inject } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service'
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
+
+	baseUrl : string = "http://localhost:3000"
 
 	constructor(private http: HttpClient, @Inject(SESSION_STORAGE) private storage: WebStorageService) { }
 
@@ -20,4 +22,17 @@ export class UserService {
 	storeJWTToken  = (token) =>{
 		this.storage.set('token',token)
 	}
+
+	getUsername = ()=>{
+		let token = this.storage.get('token')
+
+		let httpOptions = {
+			headers: new HttpHeaders({
+				'Content-Type':  'application/json',
+				'Authorization': token
+			})
+		}
+		return this.http.get('/api/validateToken',httpOptions)
+	}
+
 }

@@ -10,14 +10,20 @@ import { StorageServiceModule } from 'angular-webstorage-service'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { LoginComponent } from './login/login.component'
-import { SignupComponent } from './signup/signup.component'
+import { SignupComponent } from './signup/signup.component';
+import { HomeComponent } from './home/home.component';
+import { UserlistComponent } from './chatComponents/userlist/userlist.component';
+import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component';
 
 
 @NgModule({
 	declarations: [
 		AppComponent,
 		LoginComponent,
-		SignupComponent
+		SignupComponent,
+		HomeComponent,
+		UserlistComponent,
+		ChatboxComponent,
 	],
 	imports: [
 		BrowserModule,
