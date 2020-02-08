@@ -1,1 +1,27 @@
-<p>chatbox works!</p>
+<div class="card chat-card">
+    <div class="chat-header">
+        <img src="https://www.w3schools.com/howto/img_avatar.png" class="rounded-circle" alt="image">
+        <div class="chat-text">
+            <p class="chat-name">Receiver</p>
+            <p class="chat-length">35 messages</p>
+        </div>
+        <span class="icon-right"><i class="fa fa-ellipsis-v"></i></span>
+        <div class="side-menu">
+            <ul>
+                <li><i class="fa fa-user-circle"></i> View profile</li>
+                <li><i class="fa fa-sign-out"></i> Sign Out</li>
+                <!-- <li onClick={()=>{this.props.logout()}}><i class="fa fa-sign-out"></i>Log Out</li> -->
+            </ul>
+        </div>
+    </div>
+    <div class="chat-body"></div>
+    <form onSubmit="sendMessage()">
+        <div class="chat-footer">
+            <input type="text" 
+                class="send-chat" 
+                placeholder="Type your messsage...."
+            >
+            <span class="send-button" onClick="sendMessage()"><i class="fa fa-send"></i></span>
+        </div>
+    </form>
+</div>

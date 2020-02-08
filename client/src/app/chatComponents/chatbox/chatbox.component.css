@@ -1,0 +1,98 @@
+.chat-card{
+    border-radius: 30px; 
+    background: rgba(73,165,191,1);   
+}
+
+.chat-header{
+    display: flex;
+    padding: 10px 30px 10px 30px;   
+}
+
+.chat-header img{
+    height: 100px;
+    width: 100px;
+}
+
+.chat-text{
+    padding: 16px 10px 16px 25px;
+}
+
+.chat-name{
+    font-family: 'Roboto Mono', monospace;
+    font-size: 23px;
+    margin: 0px !important;
+}
+
+  
+.chat-length{
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 14px;
+}
+
+.icon-right{
+    position: absolute;
+    top: 40px;
+    right: 35px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.chat-body{
+    min-height: 332px;
+    max-height: 332px;
+    overflow-y: auto;
+    border-top: 1px solid black;
+}
+
+.side-menu{
+    z-index: 1;
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    border-radius: 15px;
+    top:75px;
+    right: 40px;
+    display: none;
+}
+
+.side-menu ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.side-menu ul li{
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 5px;
+}
+
+.side-menu ul li i{
+    padding-right: 10px;
+}
+
+.side-menu ul li:hover{
+    cursor: pointer;
+}
+
+.chat-footer{
+    padding: 20px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+.send-chat{
+    border: none;
+    width: 100%;
+    padding: 15px 25px 15px 25px;
+    border-radius: 26px;
+    outline: none;
+}
+
+.send-button{
+    position: absolute;
+    bottom: 26px;
+    right: 40px;
+    font-size:26px;
+    cursor: pointer;
+}

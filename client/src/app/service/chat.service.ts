@@ -4,7 +4,6 @@ import { Subject } from 'rxjs'
 
 import { UserService } from './user.service'
 
-
 interface UserList {
 	name: string,
 	socketId: string
