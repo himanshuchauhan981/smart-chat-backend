@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core'
-import * as io from 'socket.io-client'
 
 import { UserService } from '../service/user.service'
 import { ChatService } from '../service/chat.service'
@@ -13,9 +12,11 @@ export class HomeComponent implements OnInit {
 
 	currentUser : string
 
+	showChatWindow : Boolean = false
+
 	constructor(
 		private userService: UserService,
-		private chatService: ChatService,
+		private chatService: ChatService
 	) {  }
 
 	ngOnInit() {
@@ -23,6 +24,10 @@ export class HomeComponent implements OnInit {
 		.subscribe((res : any)=>{
 			this.currentUser = res.username
 			this.chatService.initiateSocket(this.currentUser)
+		})
+
+		this.chatService.activeChatWindow.subscribe(status =>{
+			this.showChatWindow = status
 		})
 	}
 }

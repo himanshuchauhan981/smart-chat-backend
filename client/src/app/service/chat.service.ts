@@ -18,6 +18,8 @@ export class ChatService {
 
 	userListObservable = new Subject<any>()
 
+	activeChatWindow = new Subject<Boolean>()
+
 	createUser(name,id){
 		return {
 			name: name,
@@ -27,6 +29,7 @@ export class ChatService {
 
 	constructor(private userService: UserService) {
 		this.socket = io(this.userService.baseUrl)
+		this.activeChatWindow.next(false)
 	}
 
 	initiateSocket(currentUser){
@@ -40,5 +43,9 @@ export class ChatService {
 		})
 
 		this.socket.emit('ACTIVE_USERS',currentUser)
+	}
+
+	setActiveChatWindow(){
+		this.activeChatWindow.next(true)
 	}
 }
