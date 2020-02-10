@@ -35,4 +35,20 @@ export class UserService {
 		return this.http.get('/api/validateToken',httpOptions)
 	}
 
+	removeJWTToken = ()=>{
+		this.storage.remove('token')
+	}
+
+	logOutUser = ()=>{
+		let token = this.storage.get('token')
+		let httpOptions = {
+			headers: new HttpHeaders({
+				'Content-Type': 'application/json',
+				'Authorization': token
+			})
+		}
+
+		return this.http.get('/api/logout',httpOptions)
+	}
+
 }

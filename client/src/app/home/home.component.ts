@@ -14,10 +14,14 @@ export class HomeComponent implements OnInit {
 
 	showChatWindow : Boolean = false
 
-	constructor(
-		private userService: UserService,
-		private chatService: ChatService
-	) {  }
+	constructor(private userService: UserService,private chatService: ChatService){
+		console.log('constructor called')
+		// this.userService.getUsername()
+		// .subscribe((res : any)=>{
+		// 	this.currentUser = res.username
+		// 	this.chatService.initiateSocket(this.currentUser)
+		// })
+	}
 
 	ngOnInit() {
 		this.userService.getUsername()

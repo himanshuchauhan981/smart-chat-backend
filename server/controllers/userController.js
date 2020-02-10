@@ -14,6 +14,11 @@ let userController = {
     validateToken : async (req,res) =>{
         let response = await userHandler.validateToken(req,res)
         res.status(200).send(response)
+    },
+
+    logoutExistingUser : async (req,res)=>{
+        let response = await userHandler.logoutExistingUser(req,res)
+        res.status(200).send(response)
     }
 }
 

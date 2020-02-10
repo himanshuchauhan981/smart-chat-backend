@@ -17,5 +17,9 @@ module.exports = () =>{
         userController.validateToken
     )
 
+    router.get('/logout',
+        userController.logoutExistingUser
+    )
+
     return router
 }

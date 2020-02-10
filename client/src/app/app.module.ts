@@ -14,6 +14,7 @@ import { SignupComponent } from './signup/signup.component';
 import { HomeComponent } from './home/home.component';
 import { UserlistComponent } from './chatComponents/userlist/userlist.component';
 import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component';
 		HomeComponent,
 		UserlistComponent,
 		ChatboxComponent,
+		NavbarComponent,
 	],
 	imports: [
 		BrowserModule,

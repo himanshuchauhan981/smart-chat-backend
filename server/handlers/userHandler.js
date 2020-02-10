@@ -3,6 +3,7 @@ const bcryptjs = require('bcryptjs')
 const { users,userOnlineStatus } = require('../models')
 const { factories } = require('../factories')
 const { tokenUtil } = require('../utils')
+const { makeUserOffline } = require('./userListHandler')
 
 checkExistingUsers = async (username,email)=>{
     let existingUserStatus = await users.find({$or:[{"username":username},{"email":email}]})
@@ -56,6 +57,16 @@ let userHandler = {
         let decodedToken = tokenUtil.decodeJWTToken(token)
         let usernameObject = await users.findById(decodedToken.id).select({username:1})
         return { status:200, username: usernameObject.username}
+    },
+
+    logoutExistingUser : async (req,res)=>{
+        let token = req.headers.authorization
+
+        let decodedToken = tokenUtil.decodeJWTToken(token)
+        let usernameObject = await users.findById(decodedToken.id).select({username:1})
+        
+        await makeUserOffline(usernameObject.username)
+        return { status: 200, msg:'User Logout sucessfully' }
     }
 }
 

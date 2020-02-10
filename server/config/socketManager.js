@@ -1,11 +1,20 @@
 const io = require('./server').io
 const { userListController, chatController } = require('../controllers')
 
-let connectedUsers = []
+const connectedUsers = []
 
 addNewUser = (user, username) => {
-    let userData = connectedUsers.find(connectedUser => connectedUser.username === username)
-    if (!userData) connectedUsers.push(user)
+    if(connectedUsers.length != 0){
+        let userData = connectedUsers.find(connectedUser => connectedUser.name === username)
+        if(!userData){
+            connectedUsers.push(user)
+            console.log('connected user')
+        }
+    }
+    else{
+        connectedUsers.push(user)
+        console.log('connected user')
+    }
 }
 
 getAllUsers = async (username) => {
@@ -14,7 +23,6 @@ getAllUsers = async (username) => {
 }
 
 deleteConnectedUser = async(id) =>{
-    console.log('Socket ID : '+id)
     let userObject = await connectedUsers.find(user => user.socketId === id)
     connectedUsers = connectedUsers.filter(user => user.socketId != id)
 
@@ -24,6 +32,7 @@ deleteConnectedUser = async(id) =>{
 
 module.exports.SocketManager = socket => {
     socket.on('CONNECT_USERS', async (user, username) => {
+        console.log('connecting user')
         addNewUser(user, username)
         await userListController.makeUserOnline(username)
 
@@ -35,7 +44,9 @@ module.exports.SocketManager = socket => {
     })
 
     socket.on('disconnect',() =>{
-        deleteConnectedUser(socket.id)
+        console.log('Disconnecting User')
+        console.log(connectedUsers)
+        // deleteConnectedUser(socket.id)
     })
 
     socket.on('JOIN_ROOM',async (roomID, sender, receiver) =>{
@@ -47,6 +58,7 @@ module.exports.SocketManager = socket => {
     })
 
     socket.on('LOGOUT_USER', async ()=>{
+        console.lot('logging out user')
         deleteConnectedUser(socket.id)
     })
 }
