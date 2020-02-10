@@ -1,51 +1,67 @@
 const io = require('./server').io
 const { userListController, chatController } = require('../controllers')
 
-const connectedUsers = []
+// const connectedUsers = []
+let tempUsers = {}
 
-addNewUser = (user, username) => {
-    if(connectedUsers.length != 0){
-        let userData = connectedUsers.find(connectedUser => connectedUser.name === username)
-        if(!userData){
-            connectedUsers.push(user)
-            console.log('connected user')
-        }
-    }
-    else{
-        connectedUsers.push(user)
-        console.log('connected user')
-    }
-}
+// addNewUser = (user, username) => {
+//     if(connectedUsers.length != 0){
+//         let userData = connectedUsers.find(connectedUser => connectedUser.name === username)
+//         if(!userData){
+//             connectedUsers.push(user)
+//             console.log('connected user')
+//         }
+//     }
+//     else{
+//         connectedUsers.push(user)
+//         console.log('connected user')
+//     }
+// }
 
 getAllUsers = async (username) => {
     let data = await userListController.showAllActiveUsers(username)
     io.emit('CONNECTED_USERS',data)
 }
 
-deleteConnectedUser = async(id) =>{
-    let userObject = await connectedUsers.find(user => user.socketId === id)
-    connectedUsers = connectedUsers.filter(user => user.socketId != id)
+deleteConnectedUser = async(socket) =>{
+    // let userObject = await connectedUsers.find(user => user.socketId === id)
+    // connectedUsers = connectedUsers.filter(user => user.socketId != id)
 
-    await userListController.makeUserOffline(userObject.name)
-    getAllUsers(userObject.name)
+    // await userListController.makeUserOffline(userObject.name)
+    // getAllUsers(userObject.name)
+    const { username } = socket
+    delete tempUsers[`${username}`]
+
+    await userListController.makeUserOffline(username)
+    getAllUsers(username)
 }
 
 module.exports.SocketManager = socket => {
-    socket.on('CONNECT_USERS', async (user, username) => {
-        console.log('connecting user')
-        addNewUser(user, username)
-        await userListController.makeUserOnline(username)
 
-        getAllUsers(username)
+    socket.on('SET_USER_SOCKET',async (user) =>{
+        socket.username = user
+        tempUsers[`${user}`] = socket
+
+        await userListController.makeUserOnline(user)
+        getAllUsers(user)
     })
 
-    socket.on('ACTIVE_USERS',(username) =>{
-        getAllUsers(username)
-    })
+    // socket.on('CONNECT_USERS', async (user, username) => {
+    //     console.log('connecting user')
+    //     addNewUser(user, username)
+    //     await userListController.makeUserOnline(username)
 
-    socket.on('disconnect',() =>{
-        console.log('Disconnecting User')
-        console.log(connectedUsers)
+    //     getAllUsers(username)
+    // })
+
+    // socket.on('ACTIVE_USERS',(username) =>{
+    //     getAllUsers(username)
+    // })
+
+    socket.on('disconnect', async () =>{
+        deleteConnectedUser(socket)
+        // console.log('Disconnecting User')
+        // console.log(connectedUsers)
         // deleteConnectedUser(socket.id)
     })
 
@@ -58,7 +74,6 @@ module.exports.SocketManager = socket => {
     })
 
     socket.on('LOGOUT_USER', async ()=>{
-        console.lot('logging out user')
-        deleteConnectedUser(socket.id)
+        deleteConnectedUser(socket)
     })
 }

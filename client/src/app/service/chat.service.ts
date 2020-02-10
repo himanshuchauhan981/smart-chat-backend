@@ -4,11 +4,6 @@ import { Subject } from 'rxjs'
 
 import { UserService } from './user.service'
 
-interface UserList {
-	name: string,
-	socketId: string
-}
-
 @Injectable({
 	providedIn: 'root'
 })
@@ -33,19 +28,24 @@ export class ChatService {
 	}
 
 	initiateSocket(currentUser){
-		this.socket.on('connect',()=>{
-			let createdUser = this.createUser(currentUser,this.socket.id)
-			this.socket.emit('CONNECT_USERS',createdUser, currentUser)
-		})
+		this.socket.emit('SET_USER_SOCKET',currentUser)
+		// this.socket.on('connect',()=>{
+		// 	let createdUser = this.createUser(currentUser,this.socket.id)
+		// 	this.socket.emit('CONNECT_USERS',createdUser, currentUser)
+		// })
 
 		this.socket.on('CONNECTED_USERS',(activeUsers)=>{
 			this.userListObservable.next(activeUsers)
 		})
 
-		this.socket.emit('ACTIVE_USERS',currentUser)
+		// this.socket.emit('ACTIVE_USERS',currentUser)
 	}
 
 	setActiveChatWindow(){
 		this.activeChatWindow.next(true)
+	}
+
+	logoutUser(){
+		this.socket.emit('LOGOUT_USER')
 	}
 }
