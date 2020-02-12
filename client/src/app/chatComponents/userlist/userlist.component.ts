@@ -40,11 +40,12 @@ export class UserlistComponent implements OnInit {
 
 	generateRoomID(receiver){
 		let sender = this.username
-		let socket = this.chatService.socket
+		// let socket = this.chatService.socket
 		let roomID = this.createRoom(sender,receiver)
 		
-		socket.emit('JOIN_ROOM',roomID,sender,receiver)
-		this.chatService.setActiveChatWindow()
+		// socket.emit('JOIN_ROOM',roomID,sender,receiver)
+		// this.chatService.setActiveChatWindow()
+		this.chatService.joinRoom(roomID, sender, receiver)
 	}
 
 }

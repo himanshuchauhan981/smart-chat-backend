@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import * as io from 'socket.io-client'
-import { Subject } from 'rxjs'
+import { Subject, BehaviorSubject } from 'rxjs'
 
 import { UserService } from './user.service'
 
@@ -15,12 +15,20 @@ export class ChatService {
 
 	activeChatWindow = new Subject<Boolean>()
 
-	createUser(name,id){
-		return {
-			name: name,
-			socketId: id
-		}
-	}
+	receiver = new Subject<string>()
+
+	room : string
+
+	// message = new Subject<Array<any>>()
+	message : BehaviorSubject<Array<any>> = new BehaviorSubject([])
+
+
+	// createUser(name,id){
+	// 	return {
+	// 		name: name,
+	// 		socketId: id
+	// 	}
+	// }
 
 	constructor(private userService: UserService) {
 		this.socket = io(this.userService.baseUrl)
@@ -39,6 +47,22 @@ export class ChatService {
 		})
 
 		// this.socket.emit('ACTIVE_USERS',currentUser)
+
+		this.socket.on('SHOW_USER_MESSAGES',(messages,receiver,roomID)=>{
+			this.receiver.next(receiver)
+			this.room = roomID
+			this.message.next(messages)
+			// console.log(messages)
+		})
+
+		this.socket.on('RECEIVE_MESSAGE',messageData =>{
+			// let data : any = this.message.value.push(messageData)
+			// this.message.next(data)
+			// let data : any = this.message.value.push(messageData)
+			let oldMessages = this.message.value;
+			let  updatedMessages = [...oldMessages, messageData];
+			this.message.next(updatedMessages);
+		})
 	}
 
 	setActiveChatWindow(){
@@ -47,5 +71,14 @@ export class ChatService {
 
 	logoutUser(){
 		this.socket.emit('LOGOUT_USER')
+	}
+
+	joinRoom(roomId, sender, receiver){
+		this.activeChatWindow.next(true)
+		this.socket.emit('JOIN_ROOM',roomId, sender, receiver)
+	}
+
+	sendMessage(receiver,message){
+		this.socket.emit('SEND_MESSAGE',receiver,message,this.room)
 	}
 }

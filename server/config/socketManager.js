@@ -4,6 +4,15 @@ const { userListController, chatController } = require('../controllers')
 // const connectedUsers = []
 let tempUsers = {}
 
+makeMessageObject = (messageObject)=>{
+    return {
+        text: messageObject.text,
+        sendDate: messageObject.sendDate,
+        sender: messageObject.sender,
+        _id: messageObject._id
+    }
+}
+
 // addNewUser = (user, username) => {
 //     if(connectedUsers.length != 0){
 //         let userData = connectedUsers.find(connectedUser => connectedUser.name === username)
@@ -68,12 +77,22 @@ module.exports.SocketManager = socket => {
     socket.on('JOIN_ROOM',async (roomID, sender, receiver) =>{
         socket.join(roomID)
         let roomMessages = await chatController.getParticularRoomMessages(roomID,sender,receiver)
-        let data = await userListController.showAllActiveUsers(sender)
+        // console.log(roomMessages)
+        
+        // let data = await userListController.showAllActiveUsers(sender)
         // io.to(roomID).emit('CONNECTED_USERS',data)
-        // io.to(roomID).emit('SHOW_USER_MESSAGES',roomMessages,receiver)
+        io.to(roomID).emit('SHOW_USER_MESSAGES',roomMessages,receiver,roomID)
     })
 
     socket.on('LOGOUT_USER', async ()=>{
         deleteConnectedUser(socket)
+    })
+
+    socket.on('SEND_MESSAGE',async (receiver,message,roomID) =>{
+        const { username } = socket
+        let savedMessage = await chatController.saveNewMessage(roomID,username,receiver,message)
+        
+        let messageObject = makeMessageObject(savedMessage)
+        io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
     })
 }

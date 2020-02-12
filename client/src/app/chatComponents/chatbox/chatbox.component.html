@@ -2,7 +2,7 @@
     <div class="chat-header">
         <img src="https://www.w3schools.com/howto/img_avatar.png" class="rounded-circle" alt="image">
         <div class="chat-text">
-            <p class="chat-name">Receiver</p>
+            <p class="chat-name">{{ receiver }}</p>
             <p class="chat-length">35 messages</p>
         </div>
         <span class="icon-right"><i class="fa fa-ellipsis-v"></i></span>
@@ -14,12 +14,23 @@
             </ul>
         </div>
     </div>
-    <div class="chat-body"></div>
-    <form onSubmit="sendMessage()">
+    <div class="chat-body">
+        <div *ngFor="let message of roomMessages">
+            <div class="chat-username">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="rounded-circle" alt="">
+                <p class="chat-message">{{ message.text }}</p>
+            </div>
+            <p class="chat-sender">{{ message.sender }}</p>
+        </div>
+    </div>
+    <form (ngSubmit)="sendMessage(sendMessageForm)" [formGroup]="sendMessageForm">
         <div class="chat-footer">
             <input type="text" 
                 class="send-chat" 
                 placeholder="Type your messsage...."
+                name="message"
+                [formControl]="message"
+                #clearInput
             >
             <span class="send-button" onClick="sendMessage()"><i class="fa fa-send"></i></span>
         </div>

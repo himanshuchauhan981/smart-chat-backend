@@ -1,9 +1,14 @@
 const { chatHandler } = require('../handlers')
 
 let chatController = {
-    getParticularRoomMessages : async (roomID,sender,reciever)=>{
-        let messageData = await chatHandler.getParticularRoomMessages(roomID, sender, reciever)
+    getParticularRoomMessages : async (roomID,sender,receiver)=>{
+        let messageData = await chatHandler.getParticularRoomMessages(roomID, sender, receiver)
         return messageData
+    },
+
+    saveNewMessage : async (roomID,sender,receiver,message) =>{
+        let savedMessage = await chatHandler.saveNewMessage(roomID,sender,receiver,message)
+        return savedMessage
     }
 }
 
