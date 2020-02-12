@@ -11,6 +11,8 @@ import { ChatService } from '../service/chat.service'
 })
 export class NavbarComponent implements OnInit {
 
+	currentUser : string
+
 	constructor(
 		private userService: UserService,
 		private router: Router,
@@ -18,6 +20,10 @@ export class NavbarComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
+		this.userService.getUsername()
+		.subscribe((res: any)=>{
+			this.currentUser = res.username
+		})
 	}
 
 	logoutUser(){

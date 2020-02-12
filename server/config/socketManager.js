@@ -95,4 +95,8 @@ module.exports.SocketManager = socket => {
         let messageObject = makeMessageObject(savedMessage)
         io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
     })
+
+    socket.on('USER_TYPING_STATUS',(room,typingStatus)=>{
+        io.to(room).emit('USER_TYPING_STATUS',typingStatus)
+    })
 }

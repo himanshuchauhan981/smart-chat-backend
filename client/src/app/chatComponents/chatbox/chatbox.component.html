@@ -3,7 +3,7 @@
         <img src="https://www.w3schools.com/howto/img_avatar.png" class="rounded-circle" alt="image">
         <div class="chat-text">
             <p class="chat-name">{{ receiver }}</p>
-            <p class="chat-length">35 messages</p>
+            <p class="chat-length">{{ typingStatus }}</p>
         </div>
         <span class="icon-right"><i class="fa fa-ellipsis-v"></i></span>
         <div class="side-menu">
@@ -25,7 +25,9 @@
     </div>
     <form (ngSubmit)="sendMessage(sendMessageForm)" [formGroup]="sendMessageForm">
         <div class="chat-footer">
-            <input type="text" 
+            <input
+                type="text"
+                (input)="typingMessage()" 
                 class="send-chat" 
                 placeholder="Type your messsage...."
                 name="message"

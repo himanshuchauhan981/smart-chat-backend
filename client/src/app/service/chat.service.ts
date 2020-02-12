@@ -22,6 +22,8 @@ export class ChatService {
 	// message = new Subject<Array<any>>()
 	message : BehaviorSubject<Array<any>> = new BehaviorSubject([])
 
+	typingStatus = new Subject<Boolean>()
+
 
 	// createUser(name,id){
 	// 	return {
@@ -60,8 +62,12 @@ export class ChatService {
 			// this.message.next(data)
 			// let data : any = this.message.value.push(messageData)
 			let oldMessages = this.message.value;
-			let  updatedMessages = [...oldMessages, messageData];
+			let updatedMessages = [...oldMessages, messageData];
 			this.message.next(updatedMessages);
+		})
+
+		this.socket.on('USER_TYPING_STATUS',(typingStatus)=>{
+			this.typingStatus.next(typingStatus)
 		})
 	}
 
@@ -80,5 +86,9 @@ export class ChatService {
 
 	sendMessage(receiver,message){
 		this.socket.emit('SEND_MESSAGE',receiver,message,this.room)
+	}
+
+	emitTypingStatus(typingStatus){
+		this.socket.emit('USER_TYPING_STATUS',this.room,typingStatus)
 	}
 }

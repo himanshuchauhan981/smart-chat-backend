@@ -18,7 +18,7 @@ export class UserService {
 	loginExistingUser(logindata) {
 		return this.http.post('/api/login', logindata)
 	}
-
+	
 	storeJWTToken  = (token) =>{
 		this.storage.set('token',token)
 	}
