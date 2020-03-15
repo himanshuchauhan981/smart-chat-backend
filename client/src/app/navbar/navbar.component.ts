@@ -33,7 +33,7 @@ export class NavbarComponent implements OnInit {
 		// 	this.router.navigate(['/login'])
 		// })
 		this.chatService.logoutUser()
-		this.userService.removeJWTToken()
+		this.userService.removeToken()
 		this.router.navigate(['/login'])
 	}
 

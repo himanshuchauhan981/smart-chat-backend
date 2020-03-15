@@ -1,13 +1,14 @@
 const { userHandler }  = require('../handlers')
 
 let userController = {
-    saveNewUsers : async (req,res) =>{
-        let response = await userHandler.saveNewUsers(req,res)
+    signUp : async (req,res) =>{
+        let response = await userHandler.signUp(req,res)
         return response
     },
 
-    loginExisitngUser : async (req,res) =>{
-        let response = await userHandler.loginExistingUser(req,res)
+    login : async (req,res) =>{
+        let values = req.body
+        let response = await userHandler.login(values)
         res.status(200).send(response)
     },
 

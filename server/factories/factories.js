@@ -1,14 +1,14 @@
 let factory = {
     createUserObject : (userData) =>{
         let object = {
-            "username": userData.signupusername,
-            "password": userData.signuppassword,
+            "username": userData.username,
+            "password": userData.password,
             "email": userData.signupemail
         }
         return object
     },
 
-    userLoginStatusObject : (name,status) =>{
+    loginStatus : (name,status) =>{
         let object = {
             username: name,
             userStatus: status

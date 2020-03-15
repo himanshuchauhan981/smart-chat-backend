@@ -21,35 +21,44 @@ checkHashedPassword = async(password,hashedPassword)=>{
     return status
 }
 
-let userHandler = {
-    saveNewUsers : async (req,res) =>{
-        let existingUser = await checkExistingUsers(req.body.signupusername,req.body.signupemail)
+saveNewUsers = async (values)=>{
+    let userObject = factories.createUserObject(values)
+    let signupdata = new users(userObject)
+    let userData =await signupdata.save()
+    return userData
+}
 
+saveLoginStatus = async (saveData) =>{
+    let loginData = factories.loginStatus(saveData.username,null)
+    let loginStatus = new userOnlineStatus(loginData)
+    await loginStatus.save()
+}
+
+let userHandler = {
+    signUp : async (req,res) =>{
+        let values = req.body
+
+        let existingUser = await checkExistingUsers(values.username,values.email)
         if(existingUser.length === 0){
-            req.body.signuppassword =await generateHashedPassword(req.body.signuppassword)
-            let userObject = factories.createUserObject(req.body)
-            let signupdata = new users(userObject)
-            let savedUserData =await signupdata.save()
-            
-            let userLoginData = factories.userLoginStatusObject(savedUserData.username,null)
-            let loginStatusData = new userOnlineStatus(userLoginData)
-            await loginStatusData.save()
-            res.status(200).send({ status: 200, signUpStatus: true })
+            values.password =await generateHashedPassword(values.password)
+            let saveData = await saveNewUsers(values)
+            saveLoginStatus(saveData)
+            res.status(200).send({ signUpStatus: true })
         }
-        else res.status(200).send({ status: 200, signUpStatus: false, msg:'User already existed' })
+        else res.status(200).send({ signUpStatus: false, msg:'User already existed' })
     },
 
-    loginExistingUser : async (req,res)=>{
-        let existingUser = await users.findOne({"username":req.body.loginusername})
+    login : async (values)=>{
+        let existingUser = await users.findOne({"username":values.username})
 
         if(existingUser != null){
-            if(checkHashedPassword(req.body.loginpassword,existingUser.password)){
+            if(checkHashedPassword(values.password,existingUser.password)){
                 let token = tokenUtil.createJWTToken(existingUser._id)
                 await userOnlineStatus.updateOne({username:existingUser.username},{$set:{isActive:'online'}})
-                return { status: 200, loginStatus: true,token: token }
+                return { loginStatus: true,token: token }
             }
         }
-        return { status: 200, loginStatus: false,loginError:'Incorrect Credentials'}
+        return { loginStatus: false,loginError:'Incorrect Credentials'}
     },
 
     validateToken : async (req,res)=>{

@@ -6,11 +6,11 @@ module.exports = () =>{
     const router = express.Router()
 
     router.post('/signup',
-        userController.saveNewUsers
+        userController.signUp
     )
 
     router.post('/login',
-        userController.loginExisitngUser
+        userController.login
     )
 
     router.get('/validateToken',
