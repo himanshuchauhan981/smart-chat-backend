@@ -2,14 +2,14 @@ import { AbstractControl } from '@angular/forms'
 
 export class SignUpValidators{
     static MustMatch(control: AbstractControl){
-        const password : string = control.get('signuppassword').value
-        const confirmPassword : string = control.get('signupConfirmpassword').value
+        const password : string = control.get('password').value
+        const confirmPassword : string = control.get('confirmpassword').value
 
         if(password !== confirmPassword){
-            control.get('signupConfirmpassword').setErrors({mustMatch: true})
+            control.get('confirmpassword').setErrors({mustMatch: true})
         }
         else{
-            control.get('signupConfirmpassword').setErrors(null)
+            control.get('confirmpassword').setErrors(null)
         }
         return null
     }

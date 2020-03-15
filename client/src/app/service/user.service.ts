@@ -2,24 +2,26 @@ import { Injectable, Inject } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service'
 
+import { environment } from '../../environments/environment'
+
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
 
-	baseUrl : string = "http://localhost:3000"
+	baseUrl : string = environment.baseUrl
 
 	constructor(private http: HttpClient, @Inject(SESSION_STORAGE) private storage: WebStorageService) { }
 
-	saveNewUser(userdata) {
-		return this.http.post('/api/signup', userdata)
+	signUp(userdata) {
+		return this.http.post(`${this.baseUrl}/api/signup`, userdata)
 	}
 
-	loginExistingUser(logindata) {
-		return this.http.post('/api/login', logindata)
+	login(loginValues) {
+		return this.http.post(`${this.baseUrl}/api/login`, loginValues)
 	}
 	
-	storeJWTToken  = (token) =>{
+	storeToken  = (token) =>{
 		this.storage.set('token',token)
 	}
 
@@ -32,23 +34,10 @@ export class UserService {
 				'Authorization': token
 			})
 		}
-		return this.http.get('/api/validateToken',httpOptions)
+		return this.http.get(`${this.baseUrl}/api/validateToken`,httpOptions)
 	}
 
-	removeJWTToken = ()=>{
+	removeToken = ()=>{
 		this.storage.remove('token')
 	}
-
-	// logOutUser = ()=>{
-	// 	let token = this.storage.get('token')
-	// 	let httpOptions = {
-	// 		headers: new HttpHeaders({
-	// 			'Content-Type': 'application/json',
-	// 			'Authorization': token
-	// 		})
-	// 	}
-
-	// 	return this.http.get('/api/logout',httpOptions)
-	// }
-
 }

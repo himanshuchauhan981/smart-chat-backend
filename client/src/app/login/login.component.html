@@ -3,17 +3,28 @@
         <p class="login-title">Smart Chat</p>
         <div class="row">
             <div class="col-md-12">
-                <form class="form-container" [formGroup]="loginForm" (ngSubmit)="loginUser(loginForm)">
+                <form class="form-container" [formGroup]="loginForm" (ngSubmit)="login(loginForm)">
                     <span class="red-error" *ngIf="loginError">{{'*' + loginError }}</span>
                     <mat-form-field appearance="outline">
                         <mat-label>Username</mat-label>
-                        <input matInput placeholder="Type your username" [formControl]="loginusername" name="loginusername">
-                        <mat-error *ngIf="loginusername.hasError('required')">Username is required</mat-error>
+                        <input
+                            matInput
+                            placeholder="Type your username"
+                            formControlName="username"
+                            name="username"
+                        >
+                        <mat-error *ngIf="loginForm.get('username').hasError('required')">Username is required</mat-error>
                     </mat-form-field>
                     <mat-form-field appearance="outline">
                         <mat-label>Password</mat-label>
-                        <input matInput type="password" placeholder="Type your password" [formControl]="loginpassword" name="loginpassword">
-                        <mat-error *ngIf="loginpassword.hasError('required')">Password is required</mat-error>
+                        <input
+                            matInput
+                            type="password"
+                            placeholder="Type your password"
+                            formControlName="password"
+                            name="password"
+                        >
+                        <mat-error *ngIf="loginForm.get('password').hasError('required')">Password is required</mat-error>
                     </mat-form-field>
                     <button mat-raised-button color="primary">Login</button>
                 </form>

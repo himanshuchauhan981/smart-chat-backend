@@ -18,24 +18,20 @@ export class LoginComponent implements OnInit {
 	ngOnInit() { }
 
 	loginForm = new FormGroup({
-		loginusername : new FormControl('',Validators.required),
-		loginpassword : new FormControl('',Validators.required)
+		username : new FormControl('',Validators.required),
+		password : new FormControl('',Validators.required)
 	})
 
-	get loginusername(){ return this.loginForm.get('loginusername') }
-
-	get loginpassword(){ return this.loginForm.get('loginpassword') }
-
-	loginUser(loginForm){
+	login(loginForm){
 		if(loginForm.status === 'INVALID') return
 
-		this.userService.loginExistingUser(loginForm.value)
+		this.userService.login(loginForm.value)
 		.subscribe((res :any)=>{
 			if(!res.loginStatus){
 				this.loginError = res.loginError
 			}
 			else{
-				this.userService.storeJWTToken(res.token)
+				this.userService.storeToken(res.token)
 				this.router.navigate(['home'])
 			}
 		})
