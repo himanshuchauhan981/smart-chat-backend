@@ -1,6 +1,6 @@
 const bcryptjs = require('bcryptjs')
 
-const { users,userOnlineStatus } = require('../models')
+const { users,userOnlineStatus,userChat } = require('../models')
 const { factories } = require('../factories')
 const { tokenUtil } = require('../utils')
 const { makeUserOffline } = require('./userListHandler')

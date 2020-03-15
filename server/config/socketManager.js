@@ -1,5 +1,6 @@
 const io = require('./server').io
 const { userListController, chatController } = require('../controllers')
+const {factories } = require('../factories')
 
 // const connectedUsers = []
 let tempUsers = {}
@@ -92,11 +93,15 @@ module.exports.SocketManager = socket => {
         const { username } = socket
         let savedMessage = await chatController.saveNewMessage(roomID,username,receiver,message)
         
-        let messageObject = makeMessageObject(savedMessage)
+        let messageObject = factories.newMessage(savedMessage)
         io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
     })
 
     socket.on('USER_TYPING_STATUS',(room,typingStatus)=>{
         io.to(room).emit('USER_TYPING_STATUS',typingStatus)
+    })
+    
+    socket.on('UPDATE_MESSAGE_COUNT',() =>{
+        
     })
 }

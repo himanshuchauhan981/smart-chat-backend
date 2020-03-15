@@ -1,16 +1,39 @@
-const { userOnlineStatus,users } = require('../models')
+const { userOnlineStatus,users,userChat } = require('../models')
 
 let userListHandler = {
     makeUserOnline : async (username)=>{
-        await userOnlineStatus.updateOne({username: username},{$set:{isActive: 'online', "logs.lastLogin":Date.now()}})
+        await userOnlineStatus.updateOne(
+            {
+                username: username
+            },
+            {
+                $set:{
+                    isActive: 'online',
+                    'logs.lastLogin':Date.now()
+                }
+            }
+        )
     },
 
     makeUserOffline : async (username)=>{
-        await userOnlineStatus.updateOne({username: username},{$set:{isActive: 'offline'}})
+        await userOnlineStatus.updateOne(
+            {
+                username: username
+            },
+            {
+                $set:{
+                    isActive: 'offline'
+                }
+            }
+        )
     },
 
     showAllActiveUsers : async (username)=>{
-        let allActiveUsers = await users.aggregate([
+        let userMessages = await userChat.find(
+            {"sender":{$ne:username}
+        }).select({sender:1,sendDate:1,receiver:1})
+        
+        let onlineUsers = await users.aggregate([
             {
                 $lookup:{
                     from: 'onlineStatus',
@@ -24,7 +47,14 @@ let userListHandler = {
             }
         ])
 
-        return allActiveUsers
+        onlineUsers = onlineUsers.map(function(user){
+            let len = userMessages.filter(message => message['sender'] === user['username'] && message['receiver'] === username).length
+            return { ...user,messageCount:len }
+        })
+
+
+
+        return onlineUsers
     }
 }
 

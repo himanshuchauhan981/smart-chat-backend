@@ -14,6 +14,16 @@ let factory = {
             userStatus: status
         }
         return object
+    },
+
+    newMessage : (messageObject)=>{
+        return {
+            text: messageObject.text,
+            sendDate: messageObject.sendDate,
+            sender: messageObject.sender,
+            _id: messageObject._id,
+            room: messageObject.room
+        }
     }
 }
 

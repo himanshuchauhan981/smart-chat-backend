@@ -45,8 +45,6 @@ export class ChatboxComponent implements OnInit {
 		message: new FormControl('')
 	})
 
-	get message(){ return this.sendMessageForm.get('message') }
-
 	sendMessage(sendMessageForm){
 		this.chatService.sendMessage(this.receiver,sendMessageForm.value.message)
 		this.clearInput.nativeElement.value = ''

@@ -1,6 +1,7 @@
 const express = require('express')
 
 const { userController } = require('../controllers')
+const { userHandler } = require('../handlers')
 
 module.exports = () =>{
     const router = express.Router()

@@ -3,6 +3,7 @@ import * as io from 'socket.io-client'
 import { Subject, BehaviorSubject } from 'rxjs'
 
 import { UserService } from './user.service'
+import { Title } from '@angular/platform-browser'
 
 @Injectable({
 	providedIn: 'root'
@@ -32,7 +33,7 @@ export class ChatService {
 	// 	}
 	// }
 
-	constructor(private userService: UserService) {
+	constructor(private userService: UserService,private titleService: Title) {
 		this.socket = io(this.userService.baseUrl)
 		this.activeChatWindow.next(false)
 	}
@@ -55,16 +56,17 @@ export class ChatService {
 			this.receiver.next(receiver)
 			this.room = roomID
 			this.message.next(messages)
-			// console.log(messages)
 		})
 
 		this.socket.on('RECEIVE_MESSAGE',messageData =>{
-			// let data : any = this.message.value.push(messageData)
-			// this.message.next(data)
-			// let data : any = this.message.value.push(messageData)
-			let oldMessages = this.message.value;
-			let updatedMessages = [...oldMessages, messageData];
-			this.message.next(updatedMessages);
+			if(this.room === messageData.room){
+				let oldMessages = this.message.value;
+				let updatedMessages = [...oldMessages, messageData];
+				this.message.next(updatedMessages);
+			}
+			else{
+				// this.socket.emit('UPDATE_MESSAGE_COUNT')
+			}
 		})
 
 		this.socket.on('USER_TYPING_STATUS',(typingStatus)=>{
