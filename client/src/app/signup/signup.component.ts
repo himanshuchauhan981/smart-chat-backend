@@ -4,6 +4,7 @@ import { Router } from '@angular/router'
 
 import { UserService } from '../service/user.service'
 import { SignUpValidators } from './signup.validators'
+import { Title } from '@angular/platform-browser'
 
 @Component({
 	selector: 'app-signup',
@@ -14,9 +15,15 @@ export class SignupComponent implements OnInit {
 
 	signupError: string = null
 
-	constructor(private userService: UserService,private router: Router) { }
+	constructor(
+		private userService: UserService,
+		private router: Router,
+		private titleService: Title
+	) { }
 
-	ngOnInit() { }
+	ngOnInit(){
+		this.titleService.setTitle('Sign Up')
+	}
 
 	signupForm = new FormGroup({
 		username: new FormControl('',Validators.required),

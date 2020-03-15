@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 
 import { UserService } from '../service/user.service'
+import { Title } from '@angular/platform-browser'
 
 @Component({
 	selector: 'app-login',
@@ -13,9 +14,15 @@ export class LoginComponent implements OnInit {
 
 	loginError : string = null
 
-	constructor(private userService : UserService, private router: Router) { }
+	constructor(
+		private userService : UserService,
+		private router: Router,
+		private titleService: Title
+	) { }
 
-	ngOnInit() { }
+	ngOnInit(){
+		this.titleService.setTitle('Login')
+	}
 
 	loginForm = new FormGroup({
 		username : new FormControl('',Validators.required),

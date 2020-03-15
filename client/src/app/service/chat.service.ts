@@ -38,6 +38,7 @@ export class ChatService {
 	}
 
 	initiateSocket(currentUser){
+		
 		this.socket.emit('SET_USER_SOCKET',currentUser)
 		// this.socket.on('connect',()=>{
 		// 	let createdUser = this.createUser(currentUser,this.socket.id)
