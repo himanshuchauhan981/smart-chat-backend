@@ -20,18 +20,11 @@ export class ChatService {
 
 	room : string
 
-	// message = new Subject<Array<any>>()
 	message : BehaviorSubject<Array<any>> = new BehaviorSubject([])
 
 	typingStatus = new Subject<Boolean>()
 
-
-	// createUser(name,id){
-	// 	return {
-	// 		name: name,
-	// 		socketId: id
-	// 	}
-	// }
+	activeUserList = []
 
 	constructor(private userService: UserService,private titleService: Title) {
 		this.socket = io(this.userService.baseUrl)
@@ -41,25 +34,23 @@ export class ChatService {
 	initiateSocket(currentUser){
 		
 		this.socket.emit('SET_USER_SOCKET',currentUser)
-		// this.socket.on('connect',()=>{
-		// 	let createdUser = this.createUser(currentUser,this.socket.id)
-		// 	this.socket.emit('CONNECT_USERS',createdUser, currentUser)
-		// })
 
 		this.socket.on('CONNECTED_USERS',(activeUsers)=>{
 			this.userListObservable.next(activeUsers)
 		})
 
-		// this.socket.emit('ACTIVE_USERS',currentUser)
-
 		this.socket.on('SHOW_USER_MESSAGES',(messages,receiver,roomID)=>{
+			this.setReadingStatus(receiver)
+
 			this.receiver.next(receiver)
 			this.room = roomID
 			this.message.next(messages)
 		})
 
 		this.socket.on('RECEIVE_MESSAGE',messageData =>{
+			
 			if(this.room === messageData.room){
+				
 				let oldMessages = this.message.value;
 				let updatedMessages = [...oldMessages, messageData];
 				this.message.next(updatedMessages);
@@ -93,5 +84,14 @@ export class ChatService {
 
 	emitTypingStatus(typingStatus){
 		this.socket.emit('USER_TYPING_STATUS',this.room,typingStatus)
+	}
+
+	setReadingStatus(receiver){
+		this.activeUserList.filter((key) =>{
+			if(key['username'] === receiver){
+				key['messageCount'] = 0
+			}
+			return true
+		})
 	}
 }

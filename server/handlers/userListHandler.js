@@ -30,8 +30,17 @@ let userListHandler = {
 
     showAllActiveUsers : async (username)=>{
         let userMessages = await userChat.find(
-            {"sender":{$ne:username}
-        }).select({sender:1,sendDate:1,receiver:1})
+            {
+                $and:[
+                    {
+                        "sender":{$ne:username}
+                    },
+                    {
+                        "isRead": false
+                    }
+                ]
+            }
+        ).select({sender:1,sendDate:1,receiver:1})
         
         let onlineUsers = await users.aggregate([
             {

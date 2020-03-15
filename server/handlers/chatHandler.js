@@ -1,12 +1,11 @@
 const { userChat } = require('../models')
 
-const setReadMessagesStatus = async (room,sender,reciever) =>{
+const setReadMessagesStatus = async (room,receiver) =>{
     await userChat.updateMany(
         {
             $and:[
                 {room: room},
-                {reciever: reciever},
-                {sender: reciever.toLowerCase()},
+                {receiver: receiver},
                 {isRead: false}
             ]
         },

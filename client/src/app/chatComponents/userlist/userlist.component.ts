@@ -21,6 +21,7 @@ export class UserlistComponent implements OnInit {
 	ngOnInit() {
 		this.chatService.userListObservable.subscribe((data)=>{
 			this.activeUserList = data
+			this.chatService.activeUserList = data
 		})
 
 		this.userService.getUsername()
