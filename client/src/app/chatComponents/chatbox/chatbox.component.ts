@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 
 import { ChatService } from 'src/app/service/chat.service'
 import { FormGroup, FormControl } from '@angular/forms'
+import { UserService } from 'src/app/service/user.service'
 
 @Component({
 	selector: 'chatbox',
@@ -10,13 +11,15 @@ import { FormGroup, FormControl } from '@angular/forms'
 })
 export class ChatboxComponent implements OnInit {
 
-	constructor(private chatService: ChatService) { }
+	constructor(private chatService: ChatService,private userService: UserService) { }
+
+	sender : string
 
 	receiver : string
 
 	roomMessages = []
 
-	typing : Boolean
+	typing : Boolean = false
 
 	timeout = undefined
 
@@ -25,6 +28,10 @@ export class ChatboxComponent implements OnInit {
 	@ViewChild('clearInput',{static: false}) clearInput: ElementRef
 
 	ngOnInit() {
+		this.userService.getUsername().subscribe((res:any) =>{
+			this.sender = res.username
+		})
+
 		this.chatService.receiver.subscribe(username =>{
 			this.receiver = username
 		})
@@ -34,8 +41,8 @@ export class ChatboxComponent implements OnInit {
 		})
 
 		this.chatService.typingStatus.subscribe(typingStatus =>{
-			if(typingStatus == true){
-				this.typingStatus = `${this.receiver} is typing`
+			if(typingStatus == true && this.chatService.typingUsername === this.sender){
+				this.typingStatus = `${this.chatService.typingUsername} is typing`
 			}
 			else this.typingStatus = ''
 		})
@@ -52,19 +59,19 @@ export class ChatboxComponent implements OnInit {
 
 	timeoutFunction(){
 		this.typing = false
-		console.log('timeout function')
-		this.chatService.emitTypingStatus(false)
+		this.chatService.typingStatus.next(false)
 	}
 
-	typingMessage(){
-		if(this.typing == false){
-			this.typing = true
-			this.chatService.emitTypingStatus(true)
-			this.timeout = setTimeout(this.timeoutFunction.bind(this),5000)
-		}
-		else{
-			clearTimeout(this.timeout)
-			this.timeout = setTimeout(this.timeoutFunction.bind(this),5000)
+	typingMessage(event){
+		if(event.keyCode != 13){
+			if(this.typing === false){
+				this.typing = true
+				this.chatService.emitTypingStatus(true,this.receiver)
+			}
+			else{
+				clearTimeout(this.timeout)
+			}
+			this.timeout = setTimeout(this.timeoutFunction.bind(this),1000)
 		}
 	}
 }

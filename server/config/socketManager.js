@@ -2,7 +2,6 @@ const io = require('./server').io
 const { userListController, chatController } = require('../controllers')
 const {factories } = require('../factories')
 
-// const connectedUsers = []
 let tempUsers = {}
 
 makeMessageObject = (messageObject)=>{
@@ -14,31 +13,12 @@ makeMessageObject = (messageObject)=>{
     }
 }
 
-// addNewUser = (user, username) => {
-//     if(connectedUsers.length != 0){
-//         let userData = connectedUsers.find(connectedUser => connectedUser.name === username)
-//         if(!userData){
-//             connectedUsers.push(user)
-//             console.log('connected user')
-//         }
-//     }
-//     else{
-//         connectedUsers.push(user)
-//         console.log('connected user')
-//     }
-// }
-
 getAllUsers = async (username) => {
     let data = await userListController.showAllActiveUsers(username)
     io.emit('CONNECTED_USERS',data)
 }
 
 deleteConnectedUser = async(socket) =>{
-    // let userObject = await connectedUsers.find(user => user.socketId === id)
-    // connectedUsers = connectedUsers.filter(user => user.socketId != id)
-
-    // await userListController.makeUserOffline(userObject.name)
-    // getAllUsers(userObject.name)
     const { username } = socket
     delete tempUsers[`${username}`]
 
@@ -56,32 +36,13 @@ module.exports.SocketManager = socket => {
         getAllUsers(user)
     })
 
-    // socket.on('CONNECT_USERS', async (user, username) => {
-    //     console.log('connecting user')
-    //     addNewUser(user, username)
-    //     await userListController.makeUserOnline(username)
-
-    //     getAllUsers(username)
-    // })
-
-    // socket.on('ACTIVE_USERS',(username) =>{
-    //     getAllUsers(username)
-    // })
-
     socket.on('disconnect', async () =>{
         deleteConnectedUser(socket)
-        // console.log('Disconnecting User')
-        // console.log(connectedUsers)
-        // deleteConnectedUser(socket.id)
     })
 
     socket.on('JOIN_ROOM',async (roomID, sender, receiver) =>{
         socket.join(roomID)
         let roomMessages = await chatController.getParticularRoomMessages(roomID,sender,receiver)
-        // console.log(roomMessages)
-        
-        // let data = await userListController.showAllActiveUsers(sender)
-        // io.to(roomID).emit('CONNECTED_USERS',data)
         io.to(roomID).emit('SHOW_USER_MESSAGES',roomMessages,receiver,roomID)
     })
 
@@ -97,11 +58,7 @@ module.exports.SocketManager = socket => {
         io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
     })
 
-    socket.on('USER_TYPING_STATUS',(room,typingStatus)=>{
-        io.to(room).emit('USER_TYPING_STATUS',typingStatus)
-    })
-    
-    socket.on('UPDATE_MESSAGE_COUNT',() =>{
-        
+    socket.on('USER_TYPING_STATUS',(room,typingStatus,receiver)=>{       
+        io.to(room).emit('TYPING_STATUS',typingStatus,receiver)
     })
 }

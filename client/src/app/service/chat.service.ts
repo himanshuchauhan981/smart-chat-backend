@@ -24,6 +24,8 @@ export class ChatService {
 
 	typingStatus = new Subject<Boolean>()
 
+	typingUsername : string
+
 	activeUserList = []
 
 	constructor(private userService: UserService,private titleService: Title) {
@@ -48,19 +50,16 @@ export class ChatService {
 		})
 
 		this.socket.on('RECEIVE_MESSAGE',messageData =>{
-			
 			if(this.room === messageData.room){
 				
 				let oldMessages = this.message.value;
 				let updatedMessages = [...oldMessages, messageData];
 				this.message.next(updatedMessages);
 			}
-			else{
-				// this.socket.emit('UPDATE_MESSAGE_COUNT')
-			}
 		})
 
-		this.socket.on('USER_TYPING_STATUS',(typingStatus)=>{
+		this.socket.on('TYPING_STATUS',(typingStatus,receiver)=>{
+			this.typingUsername = receiver
 			this.typingStatus.next(typingStatus)
 		})
 	}
@@ -82,8 +81,8 @@ export class ChatService {
 		this.socket.emit('SEND_MESSAGE',receiver,message,this.room)
 	}
 
-	emitTypingStatus(typingStatus){
-		this.socket.emit('USER_TYPING_STATUS',this.room,typingStatus)
+	emitTypingStatus(typingStatus,receiver){
+		this.socket.emit('USER_TYPING_STATUS',this.room,typingStatus,receiver)
 	}
 
 	setReadingStatus(receiver){

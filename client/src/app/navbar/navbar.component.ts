@@ -27,11 +27,6 @@ export class NavbarComponent implements OnInit {
 	}
 
 	logoutUser(){
-		// this.userService.logOutUser()
-		// .subscribe((res:any) =>{
-		// 	this.userService.removeJWTToken()
-		// 	this.router.navigate(['/login'])
-		// })
 		this.chatService.logoutUser()
 		this.userService.removeToken()
 		this.router.navigate(['/login'])

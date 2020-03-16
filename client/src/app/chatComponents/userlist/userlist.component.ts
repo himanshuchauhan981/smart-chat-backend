@@ -14,7 +14,7 @@ export class UserlistComponent implements OnInit {
 	username: string
 
 	constructor(
-		private chatService: ChatService,
+		public chatService: ChatService,
 		private userService: UserService
 	) { }
 
