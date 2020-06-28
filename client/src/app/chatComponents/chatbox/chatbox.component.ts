@@ -23,8 +23,6 @@ export class ChatboxComponent implements OnInit {
 
 	timeout = undefined
 
-	typingStatus : string = ''
-
 	@ViewChild('clearInput',{static: false}) clearInput: ElementRef
 
 	ngOnInit() {
@@ -39,13 +37,6 @@ export class ChatboxComponent implements OnInit {
 		this.chatService.message.subscribe(messages =>{
 			this.roomMessages = messages
 		})
-
-		this.chatService.typingStatus.subscribe(typingStatus =>{
-			if(typingStatus == true && this.chatService.typingUsername === this.sender){
-				this.typingStatus = `${this.chatService.typingUsername} is typing`
-			}
-			else this.typingStatus = ''
-		})
 	}
 
 	sendMessageForm = new FormGroup({
@@ -55,23 +46,5 @@ export class ChatboxComponent implements OnInit {
 	sendMessage(sendMessageForm){
 		this.chatService.sendMessage(this.receiver,sendMessageForm.value.message)
 		this.clearInput.nativeElement.value = ''
-	}
-
-	timeoutFunction(){
-		this.typing = false
-		this.chatService.typingStatus.next(false)
-	}
-
-	typingMessage(event){
-		if(event.keyCode != 13){
-			if(this.typing === false){
-				this.typing = true
-				this.chatService.emitTypingStatus(true,this.receiver)
-			}
-			else{
-				clearTimeout(this.timeout)
-			}
-			this.timeout = setTimeout(this.timeoutFunction.bind(this),1000)
-		}
 	}
 }
