@@ -22,5 +22,9 @@ module.exports = () =>{
         userController.logoutExistingUser
     )
 
+    router.get('/users',
+        userController.getAllUsers
+    )
+
     return router
 }

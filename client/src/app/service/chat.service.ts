@@ -81,10 +81,6 @@ export class ChatService {
 		this.socket.emit('SEND_MESSAGE',receiver,message,this.room)
 	}
 
-	emitTypingStatus(typingStatus,receiver){
-		this.socket.emit('USER_TYPING_STATUS',this.room,typingStatus,receiver)
-	}
-
 	setReadingStatus(receiver){
 		this.activeUserList.filter((key) =>{
 			if(key['username'] === receiver){

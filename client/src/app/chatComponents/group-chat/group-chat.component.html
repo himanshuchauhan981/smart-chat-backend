@@ -1,0 +1,16 @@
+<h1 mat-dialog-title class="text-center">Create group</h1>
+<div mat-dialog-content>
+  <form [formGroup]="groupForm" (ngSubmit)="login(loginForm)">
+    <mat-form-field appearance="outline" class='w-100'>
+      <mat-label>Group name</mat-label>
+      <input
+          matInput
+          placeholder="Type group name"
+          formControlName="groupName"
+          name="groupName"
+      >
+      <mat-error *ngIf="groupForm.get('groupName').hasError('required')">Username is required</mat-error>
+  </mat-form-field>
+  <span>Select group members</span>
+  </form>
+</div>

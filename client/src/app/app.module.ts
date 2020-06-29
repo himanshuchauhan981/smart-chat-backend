@@ -5,7 +5,8 @@ import { MatInputModule } from '@angular/material/input'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatButtonModule } from '@angular/material/button'
 import { HttpClientModule } from '@angular/common/http'
-import { StorageServiceModule } from 'angular-webstorage-service'
+import { StorageServiceModule } from 'ngx-webstorage-service'
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -15,6 +16,7 @@ import { HomeComponent } from './home/home.component';
 import { UserlistComponent } from './chatComponents/userlist/userlist.component';
 import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { GroupChatComponent } from './chatComponents/group-chat/group-chat.component';
 
 
 @NgModule({
@@ -26,6 +28,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 		UserlistComponent,
 		ChatboxComponent,
 		NavbarComponent,
+		GroupChatComponent,
 	],
 	imports: [
 		BrowserModule,
@@ -36,7 +39,8 @@ import { NavbarComponent } from './navbar/navbar.component';
 		MatButtonModule,
 		BrowserAnimationsModule,
 		HttpClientModule,
-		StorageServiceModule
+		StorageServiceModule,
+		MatDialogModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

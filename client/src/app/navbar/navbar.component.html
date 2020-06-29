@@ -4,10 +4,10 @@
     </button>
     <div class="collapse navbar-collapse" id="mainNav">
         <div class="navbar-nav ml-auto">
-            <a class="nav-item nav-link active" href="#">Welcome {{ currentUser }}</a> 
-            <a class="nav-item nav-link" href="#">Home</a>
-            <a class="nav-item nav-link" href="#">Create Group</a>
-            <a class="nav-item nav-link" href="#">Setting</a>
+            <p class="nav-item nav-link active">Welcome {{ currentUser }}</p> 
+            <p class="nav-item nav-link">Home</p>
+            <p class="nav-item nav-link" (click)="createGroup()">Create Group</p>
+            <p class="nav-item nav-link">Setting</p>
             <p class="nav-item nav-link" (click)="logoutUser()">Log out</p>
         </div>
     </div>

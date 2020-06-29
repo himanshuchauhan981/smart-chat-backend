@@ -1,4 +1,4 @@
-const { userHandler }  = require('../handlers')
+const { userHandler,userListHandler }  = require('../handlers')
 
 let userController = {
     signUp : async (req,res) =>{
@@ -19,6 +19,12 @@ let userController = {
 
     logoutExistingUser : async (req,res)=>{
         let response = await userHandler.logoutExistingUser(req,res)
+        res.status(200).send(response)
+    },
+
+    getAllUsers : async (req,res) =>{
+        let response = await userListHandler.showAllActiveUsers('himanshu')
+        console.log(response)
         res.status(200).send(response)
     }
 }

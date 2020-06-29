@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service'
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service'
 
 import { environment } from '../../environments/environment'
 
@@ -39,5 +39,9 @@ export class UserService {
 
 	removeToken = ()=>{
 		this.storage.remove('token')
+	}
+
+	getAllUsers = (currentUser: String) =>{
+		return this.http.get(`${this.baseUrl}/api/users`)
 	}
 }
