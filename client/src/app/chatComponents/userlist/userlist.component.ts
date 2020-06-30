@@ -11,6 +11,8 @@ export class UserlistComponent implements OnInit {
 
 	activeUserList = []
 
+	activeGroupList = []
+
 	username: string
 
 	constructor(
@@ -22,6 +24,10 @@ export class UserlistComponent implements OnInit {
 		this.chatService.userListObservable.subscribe((data)=>{
 			this.activeUserList = data
 			this.chatService.activeUserList = data
+		})
+		
+		this.chatService.groupListObservable.subscribe((data) =>{
+			this.activeGroupList = data
 		})
 
 		this.userService.getUsername()
@@ -41,11 +47,7 @@ export class UserlistComponent implements OnInit {
 
 	generateRoomID(receiver){
 		let sender = this.username
-		// let socket = this.chatService.socket
 		let roomID = this.createRoom(sender,receiver)
-		
-		// socket.emit('JOIN_ROOM',roomID,sender,receiver)
-		// this.chatService.setActiveChatWindow()
 		this.chatService.joinRoom(roomID, sender, receiver)
 	}
 

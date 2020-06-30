@@ -14,6 +14,8 @@ export class ChatService {
 
 	userListObservable = new Subject<any>()
 
+	groupListObservable = new Subject<any>()
+
 	activeChatWindow = new Subject<Boolean>()
 
 	receiver = new Subject<string>()
@@ -38,7 +40,8 @@ export class ChatService {
 		this.socket.emit('SET_USER_SOCKET',currentUser)
 
 		this.socket.on('CONNECTED_USERS',(activeUsers)=>{
-			this.userListObservable.next(activeUsers)
+			this.userListObservable.next(activeUsers['privateUsers'])
+			this.groupListObservable.next(activeUsers['userGroups'])
 		})
 
 		this.socket.on('SHOW_USER_MESSAGES',(messages,receiver,roomID)=>{

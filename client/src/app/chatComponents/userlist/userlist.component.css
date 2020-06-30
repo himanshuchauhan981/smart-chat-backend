@@ -22,7 +22,6 @@
 
 .userlist-body{
     border-top: 1px solid black;
-    padding: 5px 10px;
     overflow-y: auto;
     min-height:460px;
     max-height:460px;
