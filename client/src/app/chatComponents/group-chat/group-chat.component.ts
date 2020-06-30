@@ -3,7 +3,6 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 
 import { UserService } from '../../service/user.service'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
-import { group } from 'console'
 
 @Component({
   selector: 'app-group-chat',
@@ -52,6 +51,10 @@ export class GroupChatComponent implements OnInit {
     let userCheckedValue = this.userList.filter(user => user.checked == true)
     let groupName = this.groupForm.get('groupName').value
     if (groupName != '' && userCheckedValue.length != 0){
+      let groupUsers = this.userList.filter(user => user.checked == true)
+      this.userService.createGroup(groupName, groupUsers, this.currentUser).subscribe((data) =>{
+        
+      })
       this.dialogRef.close()
     }
     else{

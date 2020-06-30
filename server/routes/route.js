@@ -1,7 +1,6 @@
 const express = require('express')
 
-const { userController } = require('../controllers')
-const { userHandler } = require('../handlers')
+const { userController, groupController } = require('../controllers')
 
 module.exports = () =>{
     const router = express.Router()
@@ -24,6 +23,10 @@ module.exports = () =>{
 
     router.get('/users',
         userController.getAllUsersNames
+    )
+
+    router.post('/group',
+        groupController.createGroup
     )
 
     return router

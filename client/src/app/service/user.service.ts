@@ -46,4 +46,12 @@ export class UserService {
 			params: { currentUser: currentUser}
 		})
 	}
+
+	createGroup = (groupName: string, groupUsers:any, admin: string) =>{
+		return this.http.post(`${this.baseUrl}/api/group`,{
+			groupName: groupName,
+			groupUsers: groupUsers,
+			admin: admin
+		})
+	}
 }

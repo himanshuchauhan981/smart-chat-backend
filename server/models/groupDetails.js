@@ -10,6 +10,9 @@ const groupDetails = new Schema({
         name:{
             type: String
         },
+        memberId: {
+            type: String
+        },
         memberCreatedDate:{
             type: Date,
             default: Date.now
