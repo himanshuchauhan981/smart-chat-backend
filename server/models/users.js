@@ -18,7 +18,12 @@ const users = new Schema({
     createdDate: {
         type: Date,
         default: Date.now
-    }
+    },
+    groupIds:[{
+        groupId : {
+            type: String
+        }
+    }]
 })
 
 module.exports = mongoose.model('users',users)

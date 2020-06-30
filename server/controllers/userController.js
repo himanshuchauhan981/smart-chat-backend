@@ -22,7 +22,7 @@ let userController = {
         res.status(200).send(response)
     },
 
-    getAllUsersNames : async (req,res) =>{
+    getAllUsersName : async (req,res) =>{
         let response = await userListHandler.showAllUserNames(req,res)
         res.status(200).send(response)
     }

@@ -1,5 +1,5 @@
 const io = require('./server').io
-const { userListController, chatController } = require('../controllers')
+const { userListController, chatController, groupController } = require('../controllers')
 const {factories } = require('../factories')
 
 let tempUsers = {}
@@ -14,7 +14,9 @@ makeMessageObject = (messageObject)=>{
 }
 
 getAllUsers = async (username) => {
-    let data = await userListController.showAllActiveUsers(username)
+    let privateUsers = await userListController.showAllActiveUsers(username)
+    let userGroups = await groupController.getUserGroups(username)
+    let data = {privateUsers: privateUsers, userGroups: userGroups}
     io.emit('CONNECTED_USERS',data)
 }
 

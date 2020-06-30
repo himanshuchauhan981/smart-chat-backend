@@ -22,7 +22,7 @@ module.exports = () =>{
     )
 
     router.get('/users',
-        userController.getAllUsersNames
+        userController.getAllUsersName
     )
 
     router.post('/group',
