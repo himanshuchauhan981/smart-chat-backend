@@ -1,9 +1,9 @@
-const { users, groupDetails } = require("../models")
+const { groupDetails } = require("../models")
 
 let groupHandler = {
   createGroup : async (req,res) =>{
-    let admin  = req.body.admin
-    let existingGroup = await users.find({'admin': admin})
+    let groupName  = req.body.groupName
+    let existingGroup = await groupDetails.find({'room': groupName})
     if(existingGroup.length == 0){
       let members = req.body.groupUsers.map(({_id: memberId, username: name}) => ({memberId,name}))
       let groupObject = new groupDetails({
@@ -14,10 +14,10 @@ let groupHandler = {
         groupImage: 'No Image'
       })
       await groupObject.save()
-      return {msg: 'New group created successfully' }
+      return { status: true,  msg: 'New group created' }
     }
     else{
-      return { msg: 'Group name already existed' }
+      return { status: false, msg: 'Group name already existed' }
     }
   }
 }

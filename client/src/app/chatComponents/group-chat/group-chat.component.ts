@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 
 import { UserService } from '../../service/user.service'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'app-group-chat',
@@ -20,10 +21,13 @@ export class GroupChatComponent implements OnInit {
 
   allChecked : boolean = false
 
+  errorMessage: String
+
   constructor(
     private userService: UserService,
     @Inject(MAT_DIALOG_DATA) public currentUser: string,
-    public dialogRef:MatDialogRef<GroupChatComponent>
+    public dialogRef:MatDialogRef<GroupChatComponent>,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -52,10 +56,17 @@ export class GroupChatComponent implements OnInit {
     let groupName = this.groupForm.get('groupName').value
     if (groupName != '' && userCheckedValue.length != 0){
       let groupUsers = this.userList.filter(user => user.checked == true)
-      this.userService.createGroup(groupName, groupUsers, this.currentUser).subscribe((data) =>{
-        
+      this.userService.createGroup(groupName, groupUsers, this.currentUser)
+      .subscribe((response) =>{
+        this.snackBar.open(response['msg'],'Close',{
+          duration: 5000
+        })
+        this.dialogRef.close()
+      },(error) =>{
+        this.errorMessage = error['error']['msg']
+        this.groupForm.controls.groupName.setErrors({existingGroupName: true})
       })
-      this.dialogRef.close()
+      
     }
     else{
       this.groupForm.markAllAsTouched()

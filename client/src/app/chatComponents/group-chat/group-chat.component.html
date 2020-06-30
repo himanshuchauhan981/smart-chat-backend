@@ -9,6 +9,7 @@
         formControlName="groupName"
         name="groupName"
       >
+      <mat-error *ngIf="groupForm.get('groupName').hasError('existingGroupName')">{{ errorMessage }}</mat-error>
       <mat-error *ngIf="groupForm.get('groupName').hasError('required')">Group name is required</mat-error>
     </mat-form-field>
     <span>Select group members</span>

@@ -7,7 +7,8 @@ import { MatButtonModule } from '@angular/material/button'
 import { HttpClientModule } from '@angular/common/http'
 import { StorageServiceModule } from 'ngx-webstorage-service'
 import { MatDialogModule } from '@angular/material/dialog'
-import {MatCheckboxModule} from '@angular/material/checkbox'
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -42,7 +43,8 @@ import { GroupChatComponent } from './chatComponents/group-chat/group-chat.compo
 		HttpClientModule,
 		StorageServiceModule,
 		MatDialogModule,
-		MatCheckboxModule
+		MatCheckboxModule,
+		MatSnackBarModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]
