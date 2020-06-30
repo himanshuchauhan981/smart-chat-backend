@@ -22,9 +22,8 @@ let userController = {
         res.status(200).send(response)
     },
 
-    getAllUsers : async (req,res) =>{
-        let response = await userListHandler.showAllActiveUsers('himanshu')
-        console.log(response)
+    getAllUsersNames : async (req,res) =>{
+        let response = await userListHandler.showAllUserNames(req,res)
         res.status(200).send(response)
     }
 }

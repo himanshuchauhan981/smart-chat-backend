@@ -12,5 +12,16 @@
       <mat-error *ngIf="groupForm.get('groupName').hasError('required')">Username is required</mat-error>
   </mat-form-field>
   <span>Select group members</span>
+  <div *ngFor="let user of userList" class="d-flex align-items-center justify-content-between">
+    <div class="py-2">
+      <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" class="rounded-circle" alt="" />
+      <span class=ml-3>{{ user.username }}</span>
+    </div>
+      <input type="checkbox">
+  </div>
   </form>
+  <div class="d-flex justify-content-end">
+    <button mat-raised-button color="primary">Create</button>
+    <button mat-raised-button color="warn" class="ml-2" (click)="close()">Cancel</button>
+  </div>
 </div>

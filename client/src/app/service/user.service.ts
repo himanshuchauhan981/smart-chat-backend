@@ -41,7 +41,9 @@ export class UserService {
 		this.storage.remove('token')
 	}
 
-	getAllUsers = (currentUser: String) =>{
-		return this.http.get(`${this.baseUrl}/api/users`)
+	getAllUsers = (currentUser: string) =>{
+		return this.http.get(`${this.baseUrl}/api/users`,{
+			params: { currentUser: currentUser}
+		})
 	}
 }

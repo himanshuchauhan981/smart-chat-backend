@@ -23,7 +23,7 @@ module.exports = () =>{
     )
 
     router.get('/users',
-        userController.getAllUsers
+        userController.getAllUsersNames
     )
 
     return router

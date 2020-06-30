@@ -60,10 +60,15 @@ let userListHandler = {
             let len = userMessages.filter(message => message['sender'] === user['username'] && message['receiver'] === username).length
             return { ...user,messageCount:len }
         })
-
-
-
         return onlineUsers
+    },
+
+    showAllUserNames : async (req,res) =>{
+        let username = req.query.currentUser
+        let userDetails = await users.find({
+            'username': {$ne: username}
+        }).select({username:1})
+        return userDetails
     }
 }
 

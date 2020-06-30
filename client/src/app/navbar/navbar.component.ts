@@ -38,7 +38,8 @@ export class NavbarComponent implements OnInit {
 	createGroup(){
 		this.dialog.open(GroupChatComponent,{
 			width: '400px',
-			data: this.currentUser
+			data: this.currentUser,
+			autoFocus: false
 		})
 	}
 
