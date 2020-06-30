@@ -6,17 +6,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatButtonModule } from '@angular/material/button'
 import { HttpClientModule } from '@angular/common/http'
 import { StorageServiceModule } from 'ngx-webstorage-service'
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog'
+import {MatCheckboxModule} from '@angular/material/checkbox'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { LoginComponent } from './login/login.component'
-import { SignupComponent } from './signup/signup.component';
-import { HomeComponent } from './home/home.component';
-import { UserlistComponent } from './chatComponents/userlist/userlist.component';
-import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component';
-import { NavbarComponent } from './navbar/navbar.component';
-import { GroupChatComponent } from './chatComponents/group-chat/group-chat.component';
+import { SignupComponent } from './signup/signup.component'
+import { HomeComponent } from './home/home.component'
+import { UserlistComponent } from './chatComponents/userlist/userlist.component'
+import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component'
+import { NavbarComponent } from './navbar/navbar.component'
+import { GroupChatComponent } from './chatComponents/group-chat/group-chat.component'
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { GroupChatComponent } from './chatComponents/group-chat/group-chat.compo
 		BrowserAnimationsModule,
 		HttpClientModule,
 		StorageServiceModule,
-		MatDialogModule
+		MatDialogModule,
+		MatCheckboxModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]
