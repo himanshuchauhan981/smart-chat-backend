@@ -65,8 +65,13 @@ let userHandler = {
     validateToken : async (req,res)=>{
         let token = req.headers.authorization
         let decodedToken = tokenUtil.decodeJWTToken(token)
-        let usernameObject = await users.findById(decodedToken.id).select({username:1})
-        return { status:200, username: usernameObject.username}
+        let usernameObject = await users.findById(decodedToken.id).select({username: 1, firstName: 1, lastName: 1})
+        return { 
+            status:200,
+            username: usernameObject.username,
+            firstName: usernameObject.firstName,
+            lastName: usernameObject.lastName
+        }
     },
 
     logoutExistingUser : async (req,res)=>{

@@ -42,10 +42,10 @@ module.exports.SocketManager = socket => {
         deleteConnectedUser(socket)
     })
 
-    socket.on('JOIN_ROOM',async (roomID, sender, receiver) =>{
+    socket.on('JOIN_ROOM',async (roomID, sender, receiver, fullName) =>{
         socket.join(roomID)
         let roomMessages = await chatController.getParticularRoomMessages(roomID,sender,receiver)
-        io.to(roomID).emit('SHOW_USER_MESSAGES',roomMessages,receiver,roomID)
+        io.to(roomID).emit('SHOW_USER_MESSAGES',roomMessages,receiver,roomID, fullName)
     })
 
     socket.on('LOGOUT_USER', async ()=>{

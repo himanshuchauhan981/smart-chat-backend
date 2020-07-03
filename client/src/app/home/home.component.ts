@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
 		this.userService.getUsername()
 		.subscribe((res : any)=>{
 			this.currentUser = res.username
-			this.titleService.setTitle(this.currentUser)
+			this.titleService.setTitle(`${res.firstName} ${res.lastName}`)
 			this.chatService.initiateSocket(this.currentUser)
 		})
 

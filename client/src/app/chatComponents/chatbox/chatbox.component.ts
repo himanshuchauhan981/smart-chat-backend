@@ -15,7 +15,9 @@ export class ChatboxComponent implements OnInit {
 
 	sender : string
 
-	receiver : string
+	receiverFullName : string
+
+	receiverId : string
 
 	roomMessages = []
 
@@ -30,8 +32,9 @@ export class ChatboxComponent implements OnInit {
 			this.sender = res.username
 		})
 
-		this.chatService.receiver.subscribe(username =>{
-			this.receiver = username
+		this.chatService.receiver.subscribe(data =>{
+			this.receiverFullName = data.receiverFullName
+			this.receiverId = data.receiverId
 		})
 
 		this.chatService.message.subscribe(messages =>{
@@ -44,7 +47,7 @@ export class ChatboxComponent implements OnInit {
 	})
 
 	sendMessage(sendMessageForm){
-		this.chatService.sendMessage(this.receiver,sendMessageForm.value.message)
+		this.chatService.sendMessage(this.receiverId,sendMessageForm.value.message)
 		this.clearInput.nativeElement.value = ''
 	}
 }

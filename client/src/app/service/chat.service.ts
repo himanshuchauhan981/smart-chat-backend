@@ -18,7 +18,7 @@ export class ChatService {
 
 	activeChatWindow = new Subject<Boolean>()
 
-	receiver = new Subject<string>()
+	receiver = new Subject<any>()
 
 	room : string
 
@@ -44,10 +44,9 @@ export class ChatService {
 			this.groupListObservable.next(activeUsers['userGroups'])
 		})
 
-		this.socket.on('SHOW_USER_MESSAGES',(messages,receiver,roomID)=>{
+		this.socket.on('SHOW_USER_MESSAGES',(messages,receiver: string,roomID: string, fullName: string)=>{
 			this.setReadingStatus(receiver)
-
-			this.receiver.next(receiver)
+			this.receiver.next({'receiverId': receiver, 'receiverFullName': fullName})
 			this.room = roomID
 			this.message.next(messages)
 		})
@@ -75,9 +74,9 @@ export class ChatService {
 		this.socket.emit('LOGOUT_USER')
 	}
 
-	joinRoom(roomId, sender, receiver){
+	joinRoom(roomId: string, sender: string, receiver: string, fullName: string){
 		this.activeChatWindow.next(true)
-		this.socket.emit('JOIN_ROOM',roomId, sender, receiver)
+		this.socket.emit('JOIN_ROOM',roomId, sender, receiver, fullName)
 	}
 
 	sendMessage(receiver,message){

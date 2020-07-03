@@ -6,10 +6,10 @@
         <mat-tab-group mat-align-tabs="center" dynamicHeight>
             <mat-tab label="Private chat">
                 <div *ngFor="let activeUser of chatService.activeUserList">
-                    <div class="show-users" *ngIf="activeUser.username != username" (click)="generateRoomID(activeUser.username)">
+                    <div class="show-users" *ngIf="activeUser.username != username" (click)="generateRoomID(activeUser)">
                         <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" class="rounded-circle" alt="" />
                         <div class="userlist-text">
-                            <p class="userlist-name">{{ activeUser.username }}</p>
+                            <p class="userlist-name">{{ activeUser.firstName }} {{ activeUser.lastName }}</p>
                             <p class="userlist-messageCount">{{ activeUser.messageCount }} new messages</p>
                             <p class="userlist-status">{{ activeUser.usersInfo[0].isActive }}</p>
                         </div>

@@ -45,10 +45,11 @@ export class UserlistComponent implements OnInit {
 		return roomID
 	}
 
-	generateRoomID(receiver){
+	generateRoomID(user){
 		let sender = this.username
-		let roomID = this.createRoom(sender,receiver)
-		this.chatService.joinRoom(roomID, sender, receiver)
+		let fullName = `${user.firstName} ${user.lastName}`
+		let roomID = this.createRoom(sender,user.username)
+		this.chatService.joinRoom(roomID, sender, user.username, fullName)
 	}
 
 }

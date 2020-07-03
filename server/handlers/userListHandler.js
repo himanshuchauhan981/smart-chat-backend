@@ -52,7 +52,7 @@ let userListHandler = {
                 }
             },
             {
-                $project: { username:1, "usersInfo.isActive":1 }
+                $project: { username: 1, "usersInfo.isActive": 1, firstName: 1, lastName: 1 }
             }
         ])
 
