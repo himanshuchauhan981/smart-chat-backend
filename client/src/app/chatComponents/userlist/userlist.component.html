@@ -20,7 +20,7 @@
                 <div *ngFor="let group of activeGroupList">
                     <div class="show-users">
                         <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" class="rounded-circle" alt="" />
-                        <div class="userlist-text">
+                        <div class="userlist-text" (click)="generateGroupId(group.room)">
                             <p class="userlist-name">{{ group.room }}</p>
                             <p class="userlist-messageCount">0 new messages</p>
                         </div>

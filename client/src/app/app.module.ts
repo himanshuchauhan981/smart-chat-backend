@@ -49,6 +49,7 @@ import { GroupChatComponent } from './chatComponents/group-chat/group-chat.compo
 		StorageServiceModule
 	],
 	providers: [],
-	bootstrap: [AppComponent]
+	bootstrap: [AppComponent],
+	entryComponents: [GroupChatComponent]
 })
 export class AppModule { }

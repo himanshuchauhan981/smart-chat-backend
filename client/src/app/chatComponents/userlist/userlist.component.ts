@@ -52,4 +52,8 @@ export class UserlistComponent implements OnInit {
 		this.chatService.joinRoom(roomID, sender, user.username, fullName)
 	}
 
+	generateGroupId(groupName: string){
+		this.chatService.joinGroup(groupName, this.username)
+	}
+
 }

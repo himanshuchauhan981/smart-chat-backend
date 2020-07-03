@@ -18,7 +18,9 @@ export class ChatService {
 
 	activeChatWindow = new Subject<Boolean>()
 
-	receiver = new Subject<any>()
+	userChatObservable = new Subject<any>()
+
+	groupChatObservable = new Subject<any>()
 
 	room : string
 
@@ -46,14 +48,13 @@ export class ChatService {
 
 		this.socket.on('SHOW_USER_MESSAGES',(messages,receiver: string,roomID: string, fullName: string)=>{
 			this.setReadingStatus(receiver)
-			this.receiver.next({'receiverId': receiver, 'receiverFullName': fullName})
+			this.userChatObservable.next({'receiverId': receiver, 'receiverFullName': fullName})
 			this.room = roomID
 			this.message.next(messages)
 		})
 
 		this.socket.on('RECEIVE_MESSAGE',messageData =>{
 			if(this.room === messageData.room){
-				
 				let oldMessages = this.message.value;
 				let updatedMessages = [...oldMessages, messageData];
 				this.message.next(updatedMessages);
@@ -63,6 +64,12 @@ export class ChatService {
 		this.socket.on('TYPING_STATUS',(typingStatus,receiver)=>{
 			this.typingUsername = receiver
 			this.typingStatus.next(typingStatus)
+		})
+
+		this.socket.on('SHOW_GROUP_MESSAGES',(data) =>{
+			this.room = data.groupName
+			this.groupChatObservable.next({'groupName': data.groupData})
+			this.message.next(data.groupMessages)
 		})
 	}
 
@@ -79,8 +86,8 @@ export class ChatService {
 		this.socket.emit('JOIN_ROOM',roomId, sender, receiver, fullName)
 	}
 
-	sendMessage(receiver,message){
-		this.socket.emit('SEND_MESSAGE',receiver,message,this.room)
+	sendMessage(sender: string,receiver: string, message: string, messageType: string){
+		this.socket.emit('SEND_MESSAGE',sender,receiver, message, this.room, messageType)
 	}
 
 	setReadingStatus(receiver){
@@ -90,5 +97,10 @@ export class ChatService {
 			}
 			return true
 		})
+	}
+
+	joinGroup(groupName: string, sender: string){
+		this.activeChatWindow.next(true)
+		this.socket.emit('JOIN_GROUP', groupName, sender)
 	}
 }

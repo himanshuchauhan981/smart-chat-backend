@@ -70,6 +70,11 @@ export class GroupChatComponent implements OnInit {
     }
     else{
       this.groupForm.markAllAsTouched()
+      if(userCheckedValue.length == 0){
+        this.snackBar.open('Select any one participant','Close',{
+          duration: 5000
+        })
+      }
     }
   }
 

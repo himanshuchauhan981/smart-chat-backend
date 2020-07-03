@@ -23,7 +23,7 @@ export class ChatboxComponent implements OnInit {
 
 	typing : Boolean = false
 
-	timeout = undefined
+	messageType : string
 
 	@ViewChild('clearInput',{static: false}) clearInput: ElementRef
 
@@ -32,13 +32,19 @@ export class ChatboxComponent implements OnInit {
 			this.sender = res.username
 		})
 
-		this.chatService.receiver.subscribe(data =>{
+		this.chatService.userChatObservable.subscribe(data =>{
 			this.receiverFullName = data.receiverFullName
 			this.receiverId = data.receiverId
+			this.messageType = 'PRIVATE'
 		})
 
 		this.chatService.message.subscribe(messages =>{
 			this.roomMessages = messages
+		})
+
+		this.chatService.groupChatObservable.subscribe(data => {
+			this.messageType = 'GROUP'
+			this.receiverFullName = this.receiverId = data.groupName
 		})
 	}
 
@@ -47,7 +53,7 @@ export class ChatboxComponent implements OnInit {
 	})
 
 	sendMessage(sendMessageForm){
-		this.chatService.sendMessage(this.receiverId,sendMessageForm.value.message)
-		this.clearInput.nativeElement.value = ''
+		this.chatService.sendMessage(this.sender,this.receiverId,sendMessageForm.value.message,this.messageType)
+		this.clearInput.nativeElement.value = ''		
 	}
 }

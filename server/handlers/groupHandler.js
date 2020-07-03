@@ -1,4 +1,4 @@
-const { users, groupDetails } = require("../models")
+const { users, groupDetails, groupChat } = require("../models")
 
 async function addGroupId(groupUsers){
   for(let i in groupUsers['members']){
@@ -53,6 +53,22 @@ let groupHandler = {
       }
     }
     return groupNameList
+  },
+
+  getGroupMessages : async (groupName) =>{
+    let groupMessages = await groupChat.find({'room':groupName})
+    return groupMessages
+  },
+
+  saveNewMessage : async (sender,roomID,message) =>{
+    let messageObject = new groupChat({
+      'room': roomID,
+      'sender': sender,
+      'text': message
+    })
+
+    let savedMessage = await messageObject.save()
+    return savedMessage
   }
 }
 

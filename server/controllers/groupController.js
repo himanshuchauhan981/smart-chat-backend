@@ -10,6 +10,16 @@ let groupController = {
   getUserGroups : async (username) =>{
     let response = await groupHandler.getUserGroups(username)
     return response
+  },
+
+  getGroupMessages : async (groupName) =>{
+    let response  = await groupHandler.getGroupMessages(groupName)
+    return response
+  },
+
+  saveNewMessage : async (sender,roomID,message) =>{
+    let response = await groupHandler.saveNewMessage(sender,roomID,message)
+    return response
   }
 }
 

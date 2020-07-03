@@ -52,15 +52,29 @@ module.exports.SocketManager = socket => {
         deleteConnectedUser(socket)
     })
 
-    socket.on('SEND_MESSAGE',async (receiver,message,roomID) =>{
+    socket.on('SEND_MESSAGE',async (sender,receiver,message,roomID,messageType) =>{
         const { username } = socket
-        let savedMessage = await chatController.saveNewMessage(roomID,username,receiver,message)
+        if(messageType == 'PRIVATE'){
+            let savedMessage = await chatController.saveNewMessage(roomID,sender,receiver,message)
+            
+            let messageObject = factories.newMessage(savedMessage)
+            io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
+        }
+        else{
+            let savedMessage = await groupController.saveNewMessage(sender, roomID,message)
+            let messageObject = factories.newMessage(savedMessage)
+            io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
+        }
         
-        let messageObject = factories.newMessage(savedMessage)
-        io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
     })
 
     socket.on('USER_TYPING_STATUS',(room,typingStatus,receiver)=>{       
         io.to(room).emit('TYPING_STATUS',typingStatus,receiver)
+    })
+
+    socket.on('JOIN_GROUP', async (groupName, sender) =>{
+        socket.join(groupName)
+        let groupMessages = await groupController.getGroupMessages(groupName)
+        io.to(groupName).emit('SHOW_GROUP_MESSAGES',{'groupName': groupName, 'groupMessages': groupMessages})
     })
 }
