@@ -29,7 +29,8 @@ export class SignupComponent implements OnInit {
 		username: new FormControl('',Validators.required),
 		password: new FormControl('',Validators.required),
 		confirmpassword: new FormControl('',Validators.required),
-		email: new FormControl('',[Validators.required, Validators.email])
+		firstName: new FormControl('',Validators.required),
+		lastName: new FormControl('',Validators.required)
 	},
 	{
 		validators: SignUpValidators.MustMatch

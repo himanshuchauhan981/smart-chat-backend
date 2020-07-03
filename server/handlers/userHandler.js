@@ -5,8 +5,8 @@ const { factories } = require('../factories')
 const { tokenUtil } = require('../utils')
 const { makeUserOffline } = require('./userListHandler')
 
-checkExistingUsers = async (username,email)=>{
-    let existingUserStatus = await users.find({$or:[{"username":username},{"email":email}]})
+checkExistingUsers = async (username)=>{
+    let existingUserStatus = await users.find({"username":username})
     return existingUserStatus
 }
 
@@ -38,9 +38,10 @@ let userHandler = {
     signUp : async (req,res) =>{
         let values = req.body
 
-        let existingUser = await checkExistingUsers(values.username,values.email)
+        let existingUser = await checkExistingUsers(values.username)
         if(existingUser.length === 0){
-            values.password =await generateHashedPassword(values.password)
+            values.password = await generateHashedPassword(values.password)
+            console.log(values)
             let saveData = await saveNewUsers(values)
             saveLoginStatus(saveData)
             res.status(200).send({ signUpStatus: true })

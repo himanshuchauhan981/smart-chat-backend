@@ -1,9 +1,13 @@
 let factory = {
     createUserObject : (userData) =>{
+        let firstName = userData.firstName
+        let lastName = userData.lastName
         let object = {
             "username": userData.username,
             "password": userData.password,
-            "email": userData.signupemail
+            "email": userData.signupemail,
+            "firstName": firstName[0].toUpperCase() + firstName.slice(1),
+            "lastName": lastName[0].toUpperCase() + lastName.slice(1),
         }
         return object
     },
