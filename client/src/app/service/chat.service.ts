@@ -26,9 +26,7 @@ export class ChatService {
 
 	message : BehaviorSubject<Array<any>> = new BehaviorSubject([])
 
-	typingStatus = new Subject<Boolean>()
-
-	typingUsername : string
+	messageCount  =  new Subject<any>()
 
 	activeUserList = []
 
@@ -54,6 +52,7 @@ export class ChatService {
 		})
 
 		this.socket.on('RECEIVE_MESSAGE',messageData =>{
+			console.log('receiving message')
 			if(this.room === messageData.room){
 				let oldMessages = this.message.value;
 				let updatedMessages = [...oldMessages, messageData];
@@ -61,15 +60,14 @@ export class ChatService {
 			}
 		})
 
-		this.socket.on('TYPING_STATUS',(typingStatus,receiver)=>{
-			this.typingUsername = receiver
-			this.typingStatus.next(typingStatus)
-		})
-
 		this.socket.on('SHOW_GROUP_MESSAGES',(data) =>{
 			this.room = data.groupName
-			this.groupChatObservable.next({'groupName': data.groupData})
+			this.groupChatObservable.next({'groupName': this.room})
 			this.message.next(data.groupMessages)
+		})
+
+		this.socket.on('MESSAGE_COUNT',() =>{
+			console.log('yes yes')
 		})
 	}
 
@@ -102,5 +100,11 @@ export class ChatService {
 	joinGroup(groupName: string, sender: string){
 		this.activeChatWindow.next(true)
 		this.socket.emit('JOIN_GROUP', groupName, sender)
+	}
+
+	updateMessageCount(message){
+		this.userListObservable.subscribe(data =>{
+			console.log(data)
+		})
 	}
 }

@@ -4,15 +4,6 @@ const {factories } = require('../factories')
 
 let tempUsers = {}
 
-makeMessageObject = (messageObject)=>{
-    return {
-        text: messageObject.text,
-        sendDate: messageObject.sendDate,
-        sender: messageObject.sender,
-        _id: messageObject._id
-    }
-}
-
 getAllUsers = async (username) => {
     let privateUsers = await userListController.showAllActiveUsers(username)
     let userGroups = await groupController.getUserGroups(username)
@@ -53,19 +44,17 @@ module.exports.SocketManager = socket => {
     })
 
     socket.on('SEND_MESSAGE',async (sender,receiver,message,roomID,messageType) =>{
-        const { username } = socket
+        let savedMessage
         if(messageType == 'PRIVATE'){
-            let savedMessage = await chatController.saveNewMessage(roomID,sender,receiver,message)
-            
-            let messageObject = factories.newMessage(savedMessage)
-            io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
+            savedMessage = await chatController.saveNewMessage(roomID,sender,receiver,message)
         }
         else{
-            let savedMessage = await groupController.saveNewMessage(sender, roomID,message)
-            let messageObject = factories.newMessage(savedMessage)
-            io.to(roomID).emit('RECEIVE_MESSAGE',messageObject)
+            savedMessage = await groupController.saveNewMessage(sender, roomID,message)    
         }
-        
+        messageObject = factories.newMessage(savedMessage)
+        io.in(roomID).emit('RECEIVE_MESSAGE',messageObject)
+        socket.broadcast.to(tempUsers[receiver]).emit('MESSAGE_COUNT')
+
     })
 
     socket.on('USER_TYPING_STATUS',(room,typingStatus,receiver)=>{       

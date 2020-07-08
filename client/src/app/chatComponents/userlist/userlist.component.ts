@@ -34,6 +34,11 @@ export class UserlistComponent implements OnInit {
 		.subscribe((res:any)=>{
 			this.username = res.username
 		})
+
+		this.chatService.messageCount
+		.subscribe((data) =>{
+			console.log(data)
+		})
 	}
 
 	createRoom(sender:string, reciever:string){
