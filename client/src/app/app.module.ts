@@ -10,6 +10,7 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatTabsModule } from '@angular/material/tabs'
+import {MatMenuModule} from '@angular/material/menu'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -46,7 +47,8 @@ import { GroupChatComponent } from './chatComponents/group-chat/group-chat.compo
 		MatSnackBarModule,
 		MatTabsModule,
 		ReactiveFormsModule,		
-		StorageServiceModule
+		StorageServiceModule,
+		MatMenuModule
 	],
 	providers: [],
 	bootstrap: [AppComponent],
