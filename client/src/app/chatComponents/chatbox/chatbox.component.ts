@@ -17,7 +17,7 @@ export class ChatboxComponent implements OnInit {
 
 	receiverFullName : string
 
-	receiverId : string
+	receiverUsername : string
 
 	roomMessages = []
 
@@ -34,7 +34,7 @@ export class ChatboxComponent implements OnInit {
 
 		this.chatService.userChatObservable.subscribe(data =>{
 			this.receiverFullName = data.receiverFullName
-			this.receiverId = data.receiverId
+			this.receiverUsername = data.receiverId
 			this.messageType = 'PRIVATE'
 		})
 
@@ -44,7 +44,7 @@ export class ChatboxComponent implements OnInit {
 
 		this.chatService.groupChatObservable.subscribe(data => {
 			this.messageType = 'GROUP'
-			this.receiverFullName = this.receiverId = data.groupName
+			this.receiverFullName = this.receiverUsername = data.groupName
 		})
 	}
 
@@ -53,7 +53,7 @@ export class ChatboxComponent implements OnInit {
 	})
 
 	sendMessage(sendMessageForm){
-		this.chatService.sendMessage(this.sender,this.receiverId,sendMessageForm.value.message,this.messageType)
+		this.chatService.sendMessage(this.sender,this.receiverUsername,sendMessageForm.value.message,this.messageType)
 		this.clearInput.nativeElement.value = ''		
 	}
 }

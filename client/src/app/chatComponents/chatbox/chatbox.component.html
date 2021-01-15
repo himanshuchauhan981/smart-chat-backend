@@ -14,7 +14,7 @@
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="rounded-circle" alt="">
                 <p class="chat-message">{{ message.text }}</p>
             </div>
-            <p class="chat-sender">{{ message.sender }}</p>
+            <p class="chat-sender">{{ message.userInfo.firstName }}</p>
         </div>
     </div>
     <form (ngSubmit)="sendMessage(sendMessageForm)" [formGroup]="sendMessageForm">

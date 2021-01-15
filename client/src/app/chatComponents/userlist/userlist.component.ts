@@ -9,8 +9,6 @@ import { UserService } from 'src/app/service/user.service'
 })
 export class UserlistComponent implements OnInit {
 
-	activeUserList = []
-
 	activeGroupList = []
 
 	username: string
@@ -22,7 +20,6 @@ export class UserlistComponent implements OnInit {
 
 	ngOnInit() {
 		this.chatService.userListObservable.subscribe((data)=>{
-			this.activeUserList = data
 			this.chatService.activeUserList = data
 		})
 		

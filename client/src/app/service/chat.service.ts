@@ -52,7 +52,6 @@ export class ChatService {
 		})
 
 		this.socket.on('RECEIVE_MESSAGE',messageData =>{
-			console.log('receiving message')
 			if(this.room === messageData.room){
 				let oldMessages = this.message.value;
 				let updatedMessages = [...oldMessages, messageData];
