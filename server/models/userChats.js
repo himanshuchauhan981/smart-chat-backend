@@ -34,7 +34,27 @@ class UserChat {
 	};
 
 	findMessagesByRoomId = (roomID) => {
-		return this.userChat.find({ room: roomID });
+		return this.userChat.aggregate([
+			{
+				$match: { room: roomID },
+			},
+			{
+				$lookup: {
+					from: 'users',
+					localField: 'sender',
+					foreignField: '_id',
+					as: 'userInfo',
+				},
+			},
+			{ $unwind: '$userInfo' },
+			{
+				$project: {
+					text: 1,
+					sendDate: 1,
+					'userInfo.firstName': 1,
+				},
+			},
+		]);
 	};
 }
 

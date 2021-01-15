@@ -10,9 +10,7 @@ const setReadMessagesStatus = async (room, receiver) => {
 
 let chatHandler = {
 	getParticularRoomMessages: async (roomID, sender, reciever) => {
-		let messageData = await userChatsModel
-			.findMessagesByRoomId(roomID)
-			.select({ text: 1, sendDate: 1, sender: 1 });
+		let messageData = await userChatsModel.findMessagesByRoomId(roomID);
 
 		await setReadMessagesStatus(roomID, sender, reciever);
 		return messageData;
@@ -21,7 +19,7 @@ let chatHandler = {
 	saveNewMessage: async (roomID, sender, receiver, message) => {
 		let senderData = await userModel
 			.findByUsername(sender)
-			.select({ _id: 1 });
+			.select({ _id: 1, firstName: 1 });
 
 		let receiverData = await userModel
 			.findByUsername(receiver)
@@ -33,7 +31,7 @@ let chatHandler = {
 			roomID,
 			message
 		);
-		return savedMsg;
+		return { savedMsg, senderData };
 	},
 };
 

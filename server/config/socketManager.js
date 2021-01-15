@@ -19,8 +19,10 @@ deleteConnectedUser = async (socket) => {
 	const { username } = socket;
 	delete tempUsers[`${username}`];
 
-	await userListController.makeUserOffline(username);
-	getAllUsers(username);
+	if (username) {
+		await userListController.makeUserOffline(username);
+		getAllUsers(username);
+	}
 };
 
 module.exports.SocketManager = (socket) => {
@@ -59,22 +61,22 @@ module.exports.SocketManager = (socket) => {
 	socket.on(
 		'SEND_MESSAGE',
 		async (sender, receiver, message, roomID, messageType) => {
-			let savedMessage;
+			let data;
 			if (messageType == 'PRIVATE') {
-				savedMessage = await chatController.saveNewMessage(
+				data = await chatController.saveNewMessage(
 					roomID,
 					sender,
 					receiver,
 					message
 				);
 			} else {
-				savedMessage = await groupController.saveNewMessage(
+				data = await groupController.saveNewMessage(
 					sender,
 					roomID,
 					message
 				);
 			}
-			messageObject = factories.newMessage(savedMessage);
+			messageObject = factories.newMessage(data);
 			io.in(roomID).emit('RECEIVE_MESSAGE', messageObject);
 			socket.broadcast.to(tempUsers[receiver]).emit('MESSAGE_COUNT');
 		}

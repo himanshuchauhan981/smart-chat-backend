@@ -1,32 +1,15 @@
 const { userOnlineStatus, users, userChat } = require('../schemas');
-const { userModel } = require('../models');
+const { userModel, onlineStatusModel } = require('../models');
 
 let userListHandler = {
 	makeUserOnline: async (username) => {
-		await userOnlineStatus.updateOne(
-			{
-				username: username,
-			},
-			{
-				$set: {
-					isActive: 'online',
-					'logs.lastLogin': Date.now(),
-				},
-			}
-		);
+		let userData = await userModel.findByUsername(username);
+		await onlineStatusModel.updateUserOnlineStatus(userData._id, true);
 	},
 
 	makeUserOffline: async (username) => {
-		await userOnlineStatus.updateOne(
-			{
-				username: username,
-			},
-			{
-				$set: {
-					isActive: 'offline',
-				},
-			}
-		);
+		let userData = await userModel.findByUsername(username);
+		await onlineStatusModel.updateUserOnlineStatus(userData._id, false);
 	},
 
 	showAllActiveUsers: async (username) => {

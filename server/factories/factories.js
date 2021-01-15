@@ -20,13 +20,14 @@ let factory = {
 		return object;
 	},
 
-	newMessage: (messageObject) => {
+	newMessage: (data) => {
 		return {
-			text: messageObject.text,
-			sendDate: messageObject.sendDate,
-			sender: messageObject.sender,
-			_id: messageObject._id,
-			room: messageObject.room,
+			text: data.savedMsg.text,
+			sendDate: data.savedMsg.sendDate,
+			sender: data.savedMsg.sender,
+			_id: data.savedMsg._id,
+			room: data.savedMsg.room,
+			userInfo: { firstName: data.senderData.firstName },
 		};
 	},
 };
