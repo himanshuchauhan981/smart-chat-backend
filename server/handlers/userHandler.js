@@ -1,6 +1,7 @@
 const bcryptjs = require('bcryptjs');
 
 const { users, userOnlineStatus } = require('../schemas');
+const { userModel } = require('../models');
 const { factories } = require('../factories');
 const { tokenUtil } = require('../utils');
 const { makeUserOffline } = require('./userListHandler');
@@ -23,13 +24,12 @@ checkHashedPassword = async (password, hashedPassword) => {
 
 saveNewUsers = async (values) => {
 	let userObject = factories.createUserObject(values);
-	let signupdata = new users(userObject);
-	let userData = await signupdata.save();
+	let userData = await userModel.create(userObject);
 	return userData;
 };
 
-saveLoginStatus = async (saveData) => {
-	let loginData = factories.loginStatus(saveData.username, null);
+saveLoginStatus = async (id) => {
+	let loginData = factories.loginStatus(id, null);
 	let loginStatus = new userOnlineStatus(loginData);
 	await loginStatus.save();
 };
@@ -38,12 +38,11 @@ let userHandler = {
 	signUp: async (req, res) => {
 		let values = req.body;
 
-		let existingUser = await checkExistingUsers(values.username);
-		if (existingUser.length === 0) {
+		let existingUser = await userModel.findByUsername(values.username);
+		if (!existingUser) {
 			values.password = await generateHashedPassword(values.password);
-			console.log(values);
-			let saveData = await saveNewUsers(values);
-			saveLoginStatus(saveData);
+			let newUser = await saveNewUsers(values);
+			saveLoginStatus(newUser._id);
 			res.status(200).send({ signUpStatus: true });
 		} else
 			res.status(200).send({

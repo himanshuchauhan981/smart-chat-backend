@@ -1,4 +1,5 @@
 const { userOnlineStatus, users, userChat } = require('../schemas');
+const { userModel } = require('../models');
 
 let userListHandler = {
 	makeUserOnline: async (username) => {
@@ -29,47 +30,19 @@ let userListHandler = {
 	},
 
 	showAllActiveUsers: async (username) => {
-		let userMessages = await userChat
-			.find({
-				$and: [
-					{
-						sender: { $ne: username },
-					},
-					{
-						isRead: false,
-					},
-				],
-			})
-			.select({ sender: 1, sendDate: 1, receiver: 1 });
-
-		let onlineUsers = await users.aggregate([
-			{
-				$lookup: {
-					from: 'onlineStatus',
-					localField: 'username',
-					foreignField: 'username',
-					as: 'usersInfo',
-				},
-			},
-			{
-				$project: {
-					username: 1,
-					'usersInfo.isActive': 1,
-					firstName: 1,
-					lastName: 1,
-				},
-			},
-		]);
-
-		onlineUsers = onlineUsers.map(function (user) {
-			let len = userMessages.filter(
+		let userChats = await userModel.findUserChats(username);
+		let onlineUsers = await userModel.findAllUsers();
+		let sender = userChats[0]._id;
+		let activeUsers = onlineUsers.map((user) => {
+			let len = userChats[0].chatsInfo.filter(
 				(message) =>
-					message['sender'] === user['username'] &&
-					message['receiver'] === username
+					message.receiver.toString() === sender.toString() &&
+					message.sender.toString() === user._id.toString()
 			).length;
-			return { ...user, messageCount: len };
+			user.messageCount = len;
+			return user;
 		});
-		return onlineUsers;
+		return activeUsers;
 	},
 
 	showAllUserNames: async (req, res) => {
