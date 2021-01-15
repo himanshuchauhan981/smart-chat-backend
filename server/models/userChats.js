@@ -52,6 +52,7 @@ class UserChat {
 					text: 1,
 					sendDate: 1,
 					'userInfo.firstName': 1,
+					'userInfo.username': 1,
 				},
 			},
 		]);

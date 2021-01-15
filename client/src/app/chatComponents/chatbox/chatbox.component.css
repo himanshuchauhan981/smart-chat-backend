@@ -14,11 +14,6 @@
   margin: 0px !important;
 }
 
-.chat-length {
-  font-family: "Lexend Deca", sans-serif;
-  font-size: 14px;
-}
-
 .icon-position {
   position: absolute;
   top: 40px;
@@ -56,26 +51,29 @@
   cursor: pointer;
 }
 
-.chat-username {
-  display: flex;
-  padding: 10px 0px 0px 26px;
+.msg-container {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 10px;
+  border-radius: 25px;
+  background-color: #82ccdd;
+  padding: 10px;
+  position: relative;
+  font-size: 15px;
 }
 
-.chat-username img {
-  width: 50px;
-  height: 50px;
-  margin-right: 5px;
+.msg-time {
+  position: absolute;
+  left: 10px;
+  bottom: -15px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
 }
 
-.chat-message {
-  padding: 15px 18px 7px 18px;
-  font-size: 16px;
-  margin-bottom: 0px !important;
-  background: rgba(179, 220, 237, 1);
-  border-radius: 26px;
-}
-
-.chat-sender {
-  margin: 0px 0px 0px 95px !important;
-  font-size: 12px;
+.msg-time-send {
+  position: absolute;
+  right: 10px;
+  bottom: -15px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
 }

@@ -21,6 +21,7 @@ import { UserlistComponent } from './chatComponents/userlist/userlist.component'
 import { ChatboxComponent } from './chatComponents/chatbox/chatbox.component'
 import { NavbarComponent } from './navbar/navbar.component'
 import { GroupChatComponent } from './chatComponents/group-chat/group-chat.component'
+import { MomentModule } from 'angular2-moment'
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { GroupChatComponent } from './chatComponents/group-chat/group-chat.compo
 		MatTabsModule,
 		ReactiveFormsModule,		
 		StorageServiceModule,
-		MatMenuModule
+		MatMenuModule,
+		MomentModule
 	],
 	providers: [],
 	bootstrap: [AppComponent],
