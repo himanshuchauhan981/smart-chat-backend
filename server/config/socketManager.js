@@ -78,7 +78,7 @@ module.exports.SocketManager = (socket) => {
 			}
 			messageObject = factories.newMessage(data);
 			io.in(roomID).emit('RECEIVE_MESSAGE', messageObject);
-			socket.broadcast.to(tempUsers[receiver]).emit('MESSAGE_COUNT');
+			tempUsers[receiver].emit('MESSAGE_COUNT', data['savedMsg']);
 		}
 	);
 

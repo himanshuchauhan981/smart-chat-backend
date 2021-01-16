@@ -40,8 +40,6 @@ export class ChatboxComponent implements OnInit {
 
 		this.chatService.message.subscribe(messages =>{
 			this.roomMessages = messages
-			console.log(messages);
-			
 		})
 
 		this.chatService.groupChatObservable.subscribe(data => {

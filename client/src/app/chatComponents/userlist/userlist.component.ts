@@ -32,9 +32,11 @@ export class UserlistComponent implements OnInit {
 			this.username = res.username
 		})
 
-		this.chatService.messageCount
+		this.chatService.messageCountObservable
 		.subscribe((data) =>{
-			console.log(data)
+			let index = this.chatService.activeUserList.findIndex(user => user._id === data.sender);
+			let messageCount = this.chatService.activeUserList[index].messageCount; 
+			this.chatService.activeUserList[index].messageCount = messageCount + 1;
 		})
 	}
 

@@ -19,7 +19,7 @@ let chatHandler = {
 	saveNewMessage: async (roomID, sender, receiver, message) => {
 		let senderData = await userModel
 			.findByUsername(sender)
-			.select({ _id: 1, firstName: 1 });
+			.select({ _id: 1, firstName: 1, username: 1 });
 
 		let receiverData = await userModel
 			.findByUsername(receiver)

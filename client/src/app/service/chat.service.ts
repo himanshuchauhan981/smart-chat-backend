@@ -22,11 +22,11 @@ export class ChatService {
 
 	groupChatObservable = new Subject<any>()
 
+	messageCountObservable = new Subject<any>()
+
 	room : string
 
 	message : BehaviorSubject<Array<any>> = new BehaviorSubject([])
-
-	messageCount  =  new Subject<any>()
 
 	activeUserList = []
 
@@ -65,8 +65,8 @@ export class ChatService {
 			this.message.next(data.groupMessages)
 		})
 
-		this.socket.on('MESSAGE_COUNT',() =>{
-			console.log('yes yes')
+		this.socket.on('MESSAGE_COUNT',(data) =>{
+			this.messageCountObservable.next(data);
 		})
 	}
 
