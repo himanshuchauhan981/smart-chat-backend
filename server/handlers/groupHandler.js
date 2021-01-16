@@ -1,45 +1,24 @@
-const { users, groupDetails, groupChat } = require('../schemas');
-
-async function addGroupId(groupUsers) {
-	for (let i in groupUsers['members']) {
-		await users.findByIdAndUpdate(groupUsers['members'][i]['memberId'], {
-			$push: {
-				groupIds: {
-					groupId: groupUsers['_id'],
-				},
-			},
-		});
-	}
-	await users.findOneAndUpdate(
-		{ username: groupUsers['admin'] },
-		{
-			$push: {
-				groupIds: {
-					groupId: groupUsers['_id'],
-				},
-			},
-		}
-	);
-}
+const { users, groupChat } = require('../schemas');
+const { groupDetails, userModel } = require('../models');
 
 let groupHandler = {
 	createGroup: async (req, res) => {
-		let groupName = req.body.groupName;
-		let existingGroup = await groupDetails.find({ room: groupName });
-		if (existingGroup.length == 0) {
-			let members = req.body.groupUsers.map(
-				({ _id: memberId, username: name }) => ({ memberId, name })
-			);
-			let groupObject = new groupDetails({
-				room: req.body.groupName,
-				members: members,
-				admin: req.body.admin,
+		let groupData = req.body;
+		let existingGroup = await groupDetails.findByGroupRoom(groupData.name);
+		if (existingGroup.length === 0) {
+			let adminDetails = await userModel
+				.findByUsername(groupData.admin)
+				.select({ _id: 1 });
+			let groupObject = {
+				room: groupData.name,
+				members: groupData.members.map(({ _id: memberId }) => ({
+					memberId,
+				})),
+				admin: adminDetails._id,
 				groupStatus: 'New Group',
-				groupImage: 'No Image',
-			});
-			await groupObject.save((err, data) => {
-				addGroupId(data);
-			});
+				groupImage: 'No image',
+			};
+			await groupDetails.create(groupObject);
 			return { status: true, msg: 'New group created' };
 		} else {
 			return { status: false, msg: 'Group name already existed' };
@@ -47,20 +26,11 @@ let groupHandler = {
 	},
 
 	getUserGroups: async (username) => {
-		groupNameList = [];
-		let groupList = await users
-			.findOne({ username: username })
-			.select({ groupIds: 1 });
-		if (groupList != null) {
-			let groupIdList = groupList['groupIds'];
-			for (let i in groupIdList) {
-				let groupName = await groupDetails
-					.findById(groupIdList[i]['groupId'])
-					.select({ room: 1 });
-				groupNameList.push(groupName);
-			}
-		}
-		return groupNameList;
+		let userDetails = await userModel.findByUsername(username);
+		let groupList = await groupDetails
+			.findParticularUserGroups(userDetails._id)
+			.select({ room: 1 });
+		return groupList;
 	},
 
 	getGroupMessages: async (groupName) => {

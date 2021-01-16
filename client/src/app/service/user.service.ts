@@ -49,8 +49,8 @@ export class UserService {
 
 	createGroup = (groupName: string, groupUsers:any, admin: string) =>{
 		return this.http.post(`${this.baseUrl}/api/group`,{
-			groupName: groupName,
-			groupUsers: groupUsers,
+			name: groupName,
+			members: groupUsers,
 			admin: admin
 		})
 	}
