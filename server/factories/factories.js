@@ -20,7 +20,7 @@ let factory = {
 		return object;
 	},
 
-	newMessage: (data) => {
+	newPrivateMessage: (data) => {
 		return {
 			text: data.savedMsg.text,
 			sendDate: data.savedMsg.sendDate,
@@ -28,6 +28,16 @@ let factory = {
 			_id: data.savedMsg._id,
 			room: data.savedMsg.room,
 			userInfo: { firstName: data.senderData.firstName },
+		};
+	},
+
+	newGroupMessage: (data) => {
+		return {
+			text: data.savedMessage.text,
+			sendDate: data.savedMessage.sendDate,
+			_id: data.savedMessage._id,
+			userInfo: { firstName: data.senderDetails.firstName },
+			room: data.groupNameDetails.room,
 		};
 	},
 };

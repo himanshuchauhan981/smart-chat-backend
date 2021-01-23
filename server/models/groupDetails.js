@@ -13,7 +13,7 @@ class GroupDetails {
 	}
 
 	findByGroupRoom(room) {
-		return this.groupDetailsModel.find({ room });
+		return this.groupDetailsModel.findOne({ room });
 	}
 
 	findParticularUserGroups(userId) {

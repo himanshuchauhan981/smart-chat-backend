@@ -1,10 +1,9 @@
-const { users, groupChat } = require('../schemas');
-const { groupDetails, userModel } = require('../models');
+const { groupDetailModel, userModel, groupChatModel } = require('../models');
 
 let groupHandler = {
 	createGroup: async (req, res) => {
 		let groupData = req.body;
-		let existingGroup = await groupDetails.findByGroupRoom(groupData.name);
+		let existingGroup = await groupDetailModel.findByGroupRoom(groupData.name);
 		if (existingGroup.length === 0) {
 			let adminDetails = await userModel
 				.findByUsername(groupData.admin)
@@ -18,7 +17,7 @@ let groupHandler = {
 				groupStatus: 'New Group',
 				groupImage: 'No image',
 			};
-			await groupDetails.create(groupObject);
+			await groupDetailModel.create(groupObject);
 			return { status: true, msg: 'New group created' };
 		} else {
 			return { status: false, msg: 'Group name already existed' };
@@ -27,26 +26,36 @@ let groupHandler = {
 
 	getUserGroups: async (username) => {
 		let userDetails = await userModel.findByUsername(username);
-		let groupList = await groupDetails
+		let groupList = await groupDetailModel
 			.findParticularUserGroups(userDetails._id)
 			.select({ room: 1 });
 		return groupList;
 	},
 
 	getGroupMessages: async (groupName) => {
-		let groupMessages = await groupChat.find({ room: groupName });
+		let groupDetails = await groupDetailModel
+			.findByGroupRoom(groupName)
+			.select({ _id: 1 });
+		let groupMessages = await groupChatModel.findByRoom(groupDetails._id);
 		return groupMessages;
 	},
 
 	saveNewMessage: async (sender, roomID, message) => {
-		let messageObject = new groupChat({
-			room: roomID,
-			sender: sender,
-			text: message,
-		});
+		let groupNameDetails = await groupDetailModel
+			.findByGroupRoom(roomID)
+			.select({ _id: 1, room: 1 });
 
-		let savedMessage = await messageObject.save();
-		return savedMessage;
+		let senderDetails = await userModel
+			.findByUsername(sender)
+			.select({ firstName: 1 });
+		let messageObject = {
+			room: groupNameDetails._id,
+			sender: senderDetails._id,
+			text: message,
+		};
+
+		let savedMessage = await groupChatModel.create(messageObject);
+		return { savedMessage, senderDetails, groupNameDetails };
 	},
 };
 

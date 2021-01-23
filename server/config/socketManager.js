@@ -61,24 +61,26 @@ module.exports.SocketManager = (socket) => {
 	socket.on(
 		'SEND_MESSAGE',
 		async (sender, receiver, message, roomID, messageType) => {
-			let data;
+			let messageData;
+			let messageObject;
 			if (messageType == 'PRIVATE') {
-				data = await chatController.saveNewMessage(
+				messageData = await chatController.saveNewMessage(
 					roomID,
 					sender,
 					receiver,
 					message
 				);
+				messageObject = factories.newPrivateMessage(messageData);
+				tempUsers[receiver].emit('MESSAGE_COUNT', data['savedMsg']);
 			} else {
-				data = await groupController.saveNewMessage(
+				messageData = await groupController.saveNewMessage(
 					sender,
 					roomID,
 					message
 				);
+				messageObject = factories.newGroupMessage(messageData);
 			}
-			messageObject = factories.newMessage(data);
 			io.in(roomID).emit('RECEIVE_MESSAGE', messageObject);
-			tempUsers[receiver].emit('MESSAGE_COUNT', data['savedMsg']);
 		}
 	);
 
@@ -86,7 +88,7 @@ module.exports.SocketManager = (socket) => {
 		io.to(room).emit('TYPING_STATUS', typingStatus, receiver);
 	});
 
-	socket.on('JOIN_GROUP', async (groupName, sender) => {
+	socket.on('JOIN_GROUP', async (groupName) => {
 		socket.join(groupName);
 		let groupMessages = await groupController.getGroupMessages(groupName);
 		io.to(groupName).emit('SHOW_GROUP_MESSAGES', {
