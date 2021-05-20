@@ -11,34 +11,34 @@ import { UserService } from 'src/app/service/user.service'
 })
 export class ChatboxComponent implements OnInit {
 
-	constructor(private chatService: ChatService,private userService: UserService) { }
+	constructor(private chatService: ChatService, private userService: UserService) { }
 
-	sender : string
+	sender: string
 
-	receiverFullName : string
+	receiverFullName: string
 
-	receiverUsername : string
+	receiverUsername: string
 
 	roomMessages = []
 
-	typing : Boolean = false
+	typing: Boolean = false
 
-	messageType : string
+	messageType: string
 
-	@ViewChild('clearInput',{static: false}) clearInput: ElementRef
+	@ViewChild('clearInput', { static: false }) clearInput: ElementRef
 
 	ngOnInit() {
-		this.userService.getUsername().subscribe((res:any) =>{
-			this.sender = res.username
-		})
+		// this.userService.getUsername().subscribe((res:any) =>{
+		// 	this.sender = res.username
+		// })
 
-		this.chatService.userChatObservable.subscribe(data =>{
+		this.chatService.userChatObservable.subscribe(data => {
 			this.receiverFullName = data.receiverFullName
 			this.receiverUsername = data.receiverId
 			this.messageType = 'PRIVATE'
 		})
 
-		this.chatService.message.subscribe(messages =>{
+		this.chatService.message.subscribe(messages => {
 			this.roomMessages = messages
 		})
 
@@ -52,8 +52,8 @@ export class ChatboxComponent implements OnInit {
 		message: new FormControl('')
 	})
 
-	sendMessage(sendMessageForm){
-		this.chatService.sendMessage(this.sender,this.receiverUsername,sendMessageForm.value.message,this.messageType)
-		this.clearInput.nativeElement.value = ''		
+	sendMessage(sendMessageForm) {
+		this.chatService.sendMessage(this.sender, this.receiverUsername, sendMessageForm.value.message, this.messageType)
+		this.clearInput.nativeElement.value = ''
 	}
 }

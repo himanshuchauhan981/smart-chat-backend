@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import{ Router } from '@angular/router'
+import { Router } from '@angular/router'
 import { MatDialog } from '@angular/material/dialog'
 
 import { UserService } from '../service/user.service'
@@ -13,7 +13,7 @@ import { GroupChatComponent } from '../chatComponents/group-chat/group-chat.comp
 })
 export class NavbarComponent implements OnInit {
 
-	currentUser : string
+	currentUser: string
 
 	constructor(
 		private userService: UserService,
@@ -22,21 +22,16 @@ export class NavbarComponent implements OnInit {
 		private dialog: MatDialog
 	) { }
 
-	ngOnInit() {
-		this.userService.getUsername()
-		.subscribe((res: any)=>{
-			this.currentUser = res.username
-		})
-	}
+	ngOnInit() { }
 
-	logoutUser(){
+	logoutUser() {
 		this.chatService.logoutUser()
 		this.userService.removeToken()
 		this.router.navigate(['/login'])
 	}
 
-	createGroup(){
-		this.dialog.open(GroupChatComponent,{
+	createGroup() {
+		this.dialog.open(GroupChatComponent, {
 			width: '400px',
 			data: this.currentUser,
 			autoFocus: false

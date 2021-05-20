@@ -1,10 +1,70 @@
-.userlist-card{
-    border-radius: 30px;
-    max-height: 650px;
-    background: rgba(73,155,234,1);
+.navigation {
+  border-right: 1px solid #eaeaea;
 }
 
-.userlist-header{
+ul {
+  height: 100%;
+  position: relative;
+}
+
+ul.no-bullets {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+ul li:last-child {
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+}
+
+.nav-group {
+  width: 100px;
+  height: 100vh;
+  padding: 15px 0px;
+  background-color: white;
+}
+
+.private-chat-icon {
+  padding: 16px 30px;
+}
+
+.private-chat-icon:hover {
+  background-color: #eaeaea;
+}
+
+.user-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.userlist-container {
+  background-color: white;
+  padding: 20px 30px;
+  width: 350px;
+  border-right: 1px solid #eaeaea;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.add-icon {
+  border: 1px solid #eaeaea;
+  padding: 4px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.add-icon:hover {
+  background-color: #eaeaea;
+}
+/* ---------------------------- */
+
+/*.userlist-header{
     padding: 20px 30px 20px 30px;
     background: rgba(73,155,234,1);
     border-top-left-radius: 30px;
@@ -84,4 +144,4 @@
         height: 90px;
         width: 90px;
     }
-}
+} */
