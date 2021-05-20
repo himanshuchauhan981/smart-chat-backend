@@ -1,1 +1,2 @@
-exports.connection = require('./connection')
+exports.connection = require('./connection');
+exports.queries = require('./queries');

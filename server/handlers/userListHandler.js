@@ -1,10 +1,26 @@
+const mongoose = require('mongoose');
+const moment = require('moment');
+
 const { userOnlineStatus, users, userChat } = require('../schemas');
 const { userModel, onlineStatusModel } = require('../models');
+const { queries } = require('../db');
+const Schema = require('../schemas');
+const APP_DEFAULTS = require('../config/app-defaults');
 
 let userListHandler = {
-	makeUserOnline: async (username) => {
-		let userData = await userModel.findByUsername(username);
-		await onlineStatusModel.updateUserOnlineStatus(userData._id, true);
+	makeUserOnline: async (userId) => {
+		let conditions = { _id: mongoose.Types.ObjectId(userId) };
+		let toUpdate = {
+			$set: {
+				isActive: APP_DEFAULTS.ACTIVE_STATUS.ONLINE,
+				lastLogin: moment().valueOf(),
+			},
+		};
+		let options = { lean: true };
+
+		await queries.findAndUpdate(Schema.users, conditions, toUpdate, options);
+		// let userData = await userModel.findByUsername(username);
+		// await onlineStatusModel.updateUserOnlineStatus(userData._id, true);
 	},
 
 	makeUserOffline: async (username) => {

@@ -4,7 +4,9 @@ const {
 	chatController,
 	groupController,
 } = require('../controllers');
+const { userListHandler } = require('../handlers');
 const { factories } = require('../factories');
+const APP_DEFAULTS = require('./app-defaults');
 
 let tempUsers = {};
 
@@ -26,12 +28,12 @@ deleteConnectedUser = async (socket) => {
 };
 
 module.exports.SocketManager = (socket) => {
-	socket.on('SET_USER_SOCKET', async (user) => {
-		socket.username = user;
-		tempUsers[`${user}`] = socket;
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.CREATE_USER_SOCKET, async (userId) => {
+		tempUsers[userId] = socket;
+		await userListHandler.makeUserOnline(userId);
 
-		await userListController.makeUserOnline(user);
-		getAllUsers(user);
+		// await userListController.makeUserOnline(userId);
+		// getAllUsers(user);
 	});
 
 	socket.on('disconnect', async () => {

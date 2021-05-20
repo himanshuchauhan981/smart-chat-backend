@@ -1,84 +1,126 @@
 const bcryptjs = require('bcryptjs');
+const moment = require('moment');
+const mongoose = require('mongoose');
 
 const { users, userOnlineStatus } = require('../schemas');
 const { userModel } = require('../models');
 const { factories } = require('../factories');
 const { tokenUtil } = require('../utils');
 const { makeUserOffline } = require('./userListHandler');
+const { queries } = require('../db');
+const Schema = require('../schemas');
+// const { APP_DEFAULTS, RESPONSE_MESSAGES } = require('../config');
+const APP_DEFAULTS = require('../config/app-defaults');
+const RESPONSE_MESSAGES = require('../config/response-messages');
 
-checkExistingUsers = async (username) => {
-	let existingUserStatus = await users.find({ username: username });
-	return existingUserStatus;
-};
-
-generateHashedPassword = async (password) => {
+const generateHashedPassword = async (password) => {
 	let salt = bcryptjs.genSaltSync(10);
 	let hashedPassword = bcryptjs.hashSync(password, salt);
 	return hashedPassword;
 };
 
-checkHashedPassword = async (password, hashedPassword) => {
+const checkHashedPassword = async (password, hashedPassword) => {
 	let status = bcryptjs.compareSync(password, hashedPassword);
 	return status;
 };
 
-saveNewUsers = async (values) => {
-	let userObject = factories.createUserObject(values);
-	let userData = await userModel.create(userObject);
-	return userData;
-};
-
-saveLoginStatus = async (id) => {
-	let loginData = factories.loginStatus(id, null);
-	let loginStatus = new userOnlineStatus(loginData);
-	await loginStatus.save();
-};
-
 let userHandler = {
-	signUp: async (req, res) => {
-		let values = req.body;
+	signUp: async (userData) => {
+		try {
+			let query = { username: userData.username };
+			let projections = {};
+			let options = { lean: true };
 
-		let existingUser = await userModel.findByUsername(values.username);
-		if (!existingUser) {
-			values.password = await generateHashedPassword(values.password);
-			let newUser = await saveNewUsers(values);
-			saveLoginStatus(newUser._id);
-			res.status(200).send({ signUpStatus: true });
-		} else
-			res.status(200).send({
-				signUpStatus: false,
-				msg: 'User already existed',
-			});
-	},
+			let existingUser = await queries.findOne(
+				Schema.users,
+				query,
+				projections,
+				options
+			);
 
-	login: async (values) => {
-		let existingUser = await users.findOne({ username: values.username });
-
-		if (existingUser != null) {
-			if (checkHashedPassword(values.password, existingUser.password)) {
-				let token = tokenUtil.createJWTToken(existingUser._id);
-				await userOnlineStatus.updateOne(
-					{ username: existingUser.username },
-					{ $set: { isActive: 'online' } }
-				);
-				return { loginStatus: true, token: token };
+			if (existingUser) {
+				return {
+					status: RESPONSE_MESSAGES.EXISTING_USER.STATUS_CODE,
+					data: { msg: RESPONSE_MESSAGES.EXISTING_USER.MSG },
+				};
+			} else {
+				userData.password = await generateHashedPassword(userData.password);
+				await queries.create(Schema.users, userData);
+				return { status: 200, data: {} };
 			}
+		} catch (err) {
+			throw err;
 		}
-		return { loginStatus: false, loginError: 'Incorrect Credentials' };
 	},
 
-	validateToken: async (req, res) => {
-		let token = req.headers.authorization;
-		let decodedToken = tokenUtil.decodeJWTToken(token);
-		let usernameObject = await users
-			.findById(decodedToken.id)
-			.select({ username: 1, firstName: 1, lastName: 1 });
-		return {
-			status: 200,
-			username: usernameObject.username,
-			firstName: usernameObject.firstName,
-			lastName: usernameObject.lastName,
-		};
+	login: async (userData) => {
+		try {
+			let query = { username: userData.username };
+			let projections = { password: 1, username: 1 };
+			let options = { lean: true };
+
+			let existingUser = await queries.findOne(
+				Schema.users,
+				query,
+				projections,
+				options
+			);
+
+			if (existingUser) {
+				let passwordStatus = await checkHashedPassword(
+					userData.password,
+					existingUser.password
+				);
+				if (passwordStatus) {
+					let token = tokenUtil.createJWTToken(existingUser._id);
+
+					let conditions = { username: existingUser._id };
+					let toUpdate = {
+						$set: {
+							isActive: APP_DEFAULTS.ACTIVE_STATUS.ONLINE,
+							lastLogin: moment().valueOf(),
+						},
+					};
+					options = {};
+
+					await queries.findAndUpdate(Schema.users, conditions, toUpdate);
+
+					return { status: 200, data: { token: token } };
+				} else
+					return {
+						status: RESPONSE_MESSAGES.INVALID_CREDENTIALS.STATUS_CODE,
+						data: { msg: RESPONSE_MESSAGES.INVALID_CREDENTIALS.MSG },
+					};
+			} else {
+				return {
+					status: RESPONSE_MESSAGES.NO_USER_FOUND.STATUS_CODE,
+					data: { msg: RESPONSE_MESSAGES.NO_USER_FOUND.MSG },
+				};
+			}
+		} catch (err) {
+			throw err;
+		}
+	},
+
+	getUserDetails: async (token) => {
+		try {
+			let decodedToken = tokenUtil.decodeJWTToken(token);
+
+			let query = { _id: mongoose.Types.ObjectId(decodedToken.id) };
+			let projections = { username: 1, firstName: 1, lastName: 1 };
+			let options = { lean: true };
+
+			let userDetails = await queries.findOne(
+				Schema.users,
+				query,
+				projections,
+				options
+			);
+
+			return { status: 200, data: { userDetails } };
+		} catch (err) {
+			throw err;
+		}
 	},
 
 	logoutExistingUser: async (req, res) => {
