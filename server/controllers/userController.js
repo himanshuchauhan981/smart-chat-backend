@@ -21,16 +21,6 @@ let userController = {
 		}
 	},
 
-	getUserDetails: async (req, res) => {
-		try {
-			let authorization = req.headers.authorization;
-			let response = await userHandler.getUserDetails(authorization);
-			res.status(response.status).send(response.data);
-		} catch (err) {
-			throw err;
-		}
-	},
-
 	logoutExistingUser: async (req, res) => {
 		let response = await userHandler.logoutExistingUser(req, res);
 		res.status(200).send(response);

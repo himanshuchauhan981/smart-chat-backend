@@ -1,15 +1,17 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 let tokenUtil = {
-    createJWTToken : (id)=>{
-        var token = jwt.sign({ id, expiresIn: '24h' }, new Buffer(process.env.SECRET, 'base64'));
-        return token
-    },
+	createJWTToken: (id) => {
+		let token = jwt.sign({ id: id }, process.env.JWT_SECRET, {
+			expiresIn: 60 * 60 * 60 * 60,
+		});
+		return token;
+	},
 
-    decodeJWTToken : (token)=>{
-        let tokenStatus = jwt.verify(token,new Buffer(process.env.SECRET,'base64'))
-        return tokenStatus
-    }    
-}
+	decodeJWTToken: (token) => {
+		let tokenStatus = jwt.verify(token, process.env.JWT_SECRET);
+		return tokenStatus;
+	},
+};
 
-module.exports = tokenUtil
+module.exports = tokenUtil;

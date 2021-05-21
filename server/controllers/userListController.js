@@ -1,21 +1,25 @@
 const { userListHandler } = require('../handlers');
 
 let userListController = {
-	makeUserOnline: async (username) => {
-		await userListHandler.makeUserOnline(username);
+	makeUserOnline: async (userId) => {
+		await userListHandler.makeUserOnline(userId);
 	},
 
-	makeUserOffline: async (username) => {
-		await userListHandler.makeUserOffline(username);
+	makeUserOffline: async (userId) => {
+		await userListHandler.makeUserOffline(userId);
 	},
 
 	showAllActiveUsers: async (username) => {
 		if (username) {
-			let activeUserData = await userListHandler.showAllActiveUsers(
-				username
-			);
+			let activeUserData = await userListHandler.showAllActiveUsers(username);
 			return activeUserData;
 		}
+	},
+
+	getAllFriendsList: async (req, res) => {
+		let userDetails = req.user;
+		let response = await userListHandler.getAllFriendsList(userDetails);
+		res.status(response.status).send(response.data);
 	},
 };
 

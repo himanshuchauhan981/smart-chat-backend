@@ -19,6 +19,12 @@ let chatController = {
 		);
 		return savedMessage;
 	},
+
+	getPrivateChats: async (req, res) => {
+		let userDetails = req.user;
+		let response = await chatHandler.getPrivateChats(userDetails);
+		res.status(response.status).send(response.data);
+	},
 };
 
 module.exports = chatController;

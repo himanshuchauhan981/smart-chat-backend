@@ -12,6 +12,14 @@ const RESPONSE_MESSAGES = {
 		STATUS_CODE: 400,
 		MSG: 'No user found',
 	},
+	NO_TOKEN: {
+		STATUS_CODE: 401,
+		MSG: 'Token is required',
+	},
+	INVALID_TOKEN: {
+		STATUS_CODE: 401,
+		MSG: 'Invalid token',
+	},
 };
 
 module.exports = RESPONSE_MESSAGES;

@@ -2,22 +2,30 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const userChat = new Schema({
+const chats = new Schema({
 	sender: {
 		type: Schema.Types.ObjectId,
+		required: true,
+		ref: 'users',
 	},
 	receiver: {
 		type: Schema.Types.ObjectId,
+		ref: 'users',
 	},
 	text: {
 		type: String,
 	},
-	sendDate: {
-		type: Date,
+	createdDate: {
+		type: Number,
+		default: Date.now,
+	},
+	modifiedDate: {
+		type: Number,
 		default: Date.now,
 	},
 	room: {
 		type: String,
+		required: true,
 	},
 	isRead: {
 		type: Boolean,
@@ -25,4 +33,4 @@ const userChat = new Schema({
 	},
 });
 
-module.exports = mongoose.model('userChat', userChat);
+module.exports = mongoose.model('chats', chats);

@@ -1,15 +1,11 @@
 const bcryptjs = require('bcryptjs');
 const moment = require('moment');
-const mongoose = require('mongoose');
 
-const { users, userOnlineStatus } = require('../schemas');
-const { userModel } = require('../models');
-const { factories } = require('../factories');
+const { users } = require('../schemas');
 const { tokenUtil } = require('../utils');
 const { makeUserOffline } = require('./userListHandler');
 const { queries } = require('../db');
 const Schema = require('../schemas');
-// const { APP_DEFAULTS, RESPONSE_MESSAGES } = require('../config');
 const APP_DEFAULTS = require('../config/app-defaults');
 const RESPONSE_MESSAGES = require('../config/response-messages');
 
@@ -97,27 +93,6 @@ let userHandler = {
 					data: { msg: RESPONSE_MESSAGES.NO_USER_FOUND.MSG },
 				};
 			}
-		} catch (err) {
-			throw err;
-		}
-	},
-
-	getUserDetails: async (token) => {
-		try {
-			let decodedToken = tokenUtil.decodeJWTToken(token);
-
-			let query = { _id: mongoose.Types.ObjectId(decodedToken.id) };
-			let projections = { username: 1, firstName: 1, lastName: 1 };
-			let options = { lean: true };
-
-			let userDetails = await queries.findOne(
-				Schema.users,
-				query,
-				projections,
-				options
-			);
-
-			return { status: 200, data: { userDetails } };
 		} catch (err) {
 			throw err;
 		}

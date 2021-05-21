@@ -1,6 +1,12 @@
 const express = require('express');
 
-const { userController, groupController } = require('../controllers');
+const {
+	userController,
+	groupController,
+	userListController,
+	chatController,
+} = require('../controllers');
+const { validateAuth } = require('../middleware');
 
 module.exports = () => {
 	const router = express.Router();
@@ -9,11 +15,19 @@ module.exports = () => {
 
 	router.post('/login', userController.login);
 
-	router.get('/friendsList');
+	router.get(
+		'/friendsList',
+		validateAuth.validateToken,
+		userListController.getAllFriendsList
+	);
+
+	router.get(
+		'/privateChats',
+		validateAuth.validateToken,
+		chatController.getPrivateChats
+	);
 
 	// ---------------------------------------------------
-
-	router.get('/user/details', userController.getUserDetails);
 
 	router.get('/logout', userController.logoutExistingUser);
 
