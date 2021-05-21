@@ -14,6 +14,7 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatBadgeModule } from "@angular/material/badge";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -56,6 +57,7 @@ import { MomentModule } from "angular2-moment";
     MatCardModule,
     MatIconModule,
     MatTooltipModule,
+    MatBadgeModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

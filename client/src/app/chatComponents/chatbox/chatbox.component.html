@@ -1,96 +1,27 @@
-<!-- <div class="w-100 d-flex flex-row"> -->
 <div class="chat-header">
     <img class="user-image cursor-pointer"
         src="https://neilpatel.com/wp-content/uploads/2017/09/image-editing-tools.jpg" />
     <div class="header-text">
-        <p class="mb-0">Byrom Guittet</p>
+        <p class="mb-0">{{receiverName}}</p>
         <span class="writing-status text-success">writing...</span>
     </div>
 </div>
 <div class="chat-body pb-3">
-    <div class="d-flex flex-row px-4 pt-3">
-        <div class="message-avatar">H</div>
-        <div class="d-flex flex-column ml-2">
-            <span class="message-sender">Himanshu</span>
-            <span class="message-time mb-2">1:30 pm</span>
-            <div class="message bg-success text-white">Hello! How are you</div>
-        </div>
-    </div>
-    <div class="d-flex flex-row px-4 pt-3">
-        <div class="message-avatar">H</div>
-        <div class="d-flex flex-column ml-2">
-            <span class="message-sender">Himanshu</span>
-            <span class="message-time mb-2">1:30 pm</span>
-            <div class="message bg-success text-white">Hello! How are you</div>
-        </div>
-    </div>
-    <div class="d-flex flex-row px-4 pt-3">
-        <div class="message-avatar">H</div>
-        <div class="d-flex flex-column ml-2">
-            <span class="message-sender">Himanshu</span>
-            <span class="message-time mb-2">1:30 pm</span>
-            <div class="message bg-success text-white">Hello! How are you</div>
-        </div>
-    </div>
-    <div class="d-flex flex-row px-4 pt-3">
-        <div class="message-avatar">H</div>
-        <div class="d-flex flex-column ml-2">
-            <span class="message-sender">Himanshu</span>
-            <span class="message-time mb-2">1:30 pm</span>
-            <div class="message bg-success text-white">Hello! How are you</div>
-        </div>
-    </div>
-    <div class="d-flex flex-row px-4 pt-3">
-        <div class="message-avatar">H</div>
-        <div class="d-flex flex-column ml-2">
-            <span class="message-sender">Himanshu</span>
-            <span class="message-time mb-2">1:30 pm</span>
-            <div class="message bg-success text-white">Hello! How are you</div>
-        </div>
-    </div>
-    <div class="d-flex flex-row px-4 pt-3">
-        <div class="message-avatar">H</div>
-        <div class="d-flex flex-column ml-2">
-            <span class="message-sender">Himanshu</span>
-            <span class="message-time mb-2">1:30 pm</span>
-            <div class="message bg-success text-white">Hello! How are you</div>
+    <div *ngFor="let message of roomMessages">
+        <div class="d-flex flex-row px-4 pt-3">
+            <div class="message-avatar">{{message.sender.firstName[0] | titlecase}}</div>
+            <div class="d-flex flex-column ml-2">
+                <span class="message-sender">{{message.sender.firstName | titlecase}} {{message.sender.lastName |
+                    titlecase}}</span>
+                <span class="message-time mb-2">{{message.createdDate | amTimeAgo}}</span>
+                <div class="message bg-success text-white">{{message.text}}</div>
+            </div>
         </div>
     </div>
 </div>
 <div class="chat-footer">
-    <input type="text" class="w-100 write-message" />
-</div>
-<!-- <div class="card chat-card">
-    <div class="px-3 py-2 d-flex align-items-center">
-        <img src="https://www.w3schools.com/howto/img_avatar.png" class="rounded-circle userImage" alt="image">
-        <p class="chat-name px-3">{{ receiverFullName }}</p>
-        <span class="icon-position"><i mat-button class="fa fa-ellipsis-v" [matMenuTriggerFor]='sideMenu'></i></span>
-        <mat-menu #sideMenu='matMenu'>
-            <button mat-menu-item>View profile</button>
-            <button mat-menu-item>Sign out</button>
-        </mat-menu>
-    </div>
-    <div class="chat-body px-3 pt-4">
-        <div *ngFor="let message of roomMessages">
-            <div class="d-flex mb-4" [ngClass]="message.userInfo.username === receiverUsername ? 'justify-content-start' : 'justify-content-end' ">
-                <div class="msg-container px-3">
-                    {{message.text}}
-                    <span [ngClass]="message.userInfo.username === receiverUsername ? 'msg-time' : 'msg-time-send'">{{message.sendDate | amTimeAgo}}</span>
-                </div>
-            </div>         
-        </div>
-    </div>
-    <form (ngSubmit)="sendMessage(sendMessageForm)" [formGroup]="sendMessageForm">
-        <div class="chat-footer">
-            <input
-                type="text" 
-                class="send-chat" 
-                placeholder="Type your messsage...."
-                name="message"
-                formControlName="message"
-                #clearInput
-            >
-            <span class="send-button" onClick="sendMessage()"><i class="fa fa-send"></i></span>
-        </div>
+    <form [formGroup]="sendMessageForm">
+        <input type="text" name="message" formControlName="message" class="w-100 write-message"
+            (keyup.enter)="sendMessage(sendMessageForm)" #clearMessage />
     </form>
-</div> -->
+</div>

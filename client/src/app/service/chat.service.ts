@@ -4,7 +4,12 @@ import { Subject, BehaviorSubject } from "rxjs";
 
 import { UserService } from "./user.service";
 import { Title } from "@angular/platform-browser";
-import { DecodedToken } from "../chat-interface";
+import {
+  DecodedToken,
+  ReceiverDetails,
+  RECEIVE_MESSAGES,
+  RoomMessages,
+} from "../chat-interface";
 import { Router } from "@angular/router";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { environment } from "src/environments/environment";
@@ -15,12 +20,12 @@ import { environment } from "src/environments/environment";
 export class ChatService {
   socket: SocketIOClient.Socket;
   baseUrl: string = environment.baseUrl;
+  receiverDetails = new Subject<ReceiverDetails>();
+  roomMessages: BehaviorSubject<Array<RoomMessages>> = new BehaviorSubject([]);
 
   userListObservable = new Subject<any>();
 
   groupListObservable = new Subject<any>();
-
-  activeChatWindow = new Subject<Boolean>();
 
   userChatObservable = new Subject<any>();
 
@@ -29,8 +34,6 @@ export class ChatService {
   messageCountObservable = new Subject<any>();
 
   room: string;
-
-  message: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
 
   activeUserList = [];
 
@@ -55,8 +58,36 @@ export class ChatService {
     return this.http.get(`${this.baseUrl}/api/friendsList`, httpOptions);
   }
 
+  getPrivateChats() {
+    let token = this.userService.getToken();
+
+    let httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        Authorization: token,
+      }),
+    };
+    return this.http.get(`${this.baseUrl}/api/privateChats`, httpOptions);
+  }
+
   initiateSocket(decodeToken: DecodedToken) {
     this.socket.emit("CREATE_USER_SOCKET", decodeToken.id);
+
+    this.socket.on("RECEIVE_MESSAGES", (socketData: RECEIVE_MESSAGES) => {
+      this.receiverDetails.next({
+        ...socketData.receiverDetails,
+        roomId: socketData.roomID,
+      });
+
+      this.roomMessages.next(socketData.roomMessages);
+      // this.setReadingStatus(receiver);
+      // this.userChatObservable.next({
+      //   receiverId: receiver,
+      //   receiverFullName: fullName,
+      // });
+      // this.room = roomID;
+      // this.message.next(messages);
+    });
 
     // ---------------------------------------------------------
 
@@ -65,31 +96,18 @@ export class ChatService {
       this.groupListObservable.next(activeUsers["userGroups"]);
     });
 
-    this.socket.on(
-      "SHOW_USER_MESSAGES",
-      (messages, receiver: string, roomID: string, fullName: string) => {
-        this.setReadingStatus(receiver);
-        this.userChatObservable.next({
-          receiverId: receiver,
-          receiverFullName: fullName,
-        });
-        this.room = roomID;
-        this.message.next(messages);
-      }
-    );
-
-    this.socket.on("RECEIVE_MESSAGE", (messageData) => {
-      if (this.room === messageData.room) {
-        let oldMessages = this.message.value;
-        let updatedMessages = [...oldMessages, messageData];
-        this.message.next(updatedMessages);
-      }
-    });
+    // this.socket.on("RECEIVE_MESSAGE", (messageData) => {
+    //   if (this.room === messageData.room) {
+    //     let oldMessages = this.message.value;
+    //     let updatedMessages = [...oldMessages, messageData];
+    //     this.message.next(updatedMessages);
+    //   }
+    // });
 
     this.socket.on("SHOW_GROUP_MESSAGES", (data) => {
       this.room = data.groupName;
       this.groupChatObservable.next({ groupName: this.room });
-      this.message.next(data.groupMessages);
+      // this.message.next(data.groupMessages);
     });
 
     this.socket.on("MESSAGE_COUNT", (data) => {
@@ -97,33 +115,20 @@ export class ChatService {
     });
   }
 
-  setActiveChatWindow() {
-    this.activeChatWindow.next(true);
-  }
-
   logoutUser() {
     this.socket.emit("LOGOUT_USER");
   }
 
-  joinRoom(roomId: string, sender: string, receiver: string, fullName: string) {
-    this.activeChatWindow.next(true);
-    this.socket.emit("JOIN_ROOM", roomId, sender, receiver, fullName);
+  joinRoom(roomId: string, sender: string, receiver: string) {
+    this.socket.emit("JOIN_ROOM", roomId, sender, receiver);
   }
 
-  sendMessage(
-    sender: string,
-    receiver: string,
-    message: string,
-    messageType: string
-  ) {
-    this.socket.emit(
-      "SEND_MESSAGE",
-      sender,
-      receiver,
-      message,
-      this.room,
-      messageType
-    );
+  sendMessage(receiver: string, text: string, room: string) {
+    let decodedToken = this.userService.decodeToken();
+    let sender = decodedToken["id"];
+    let socketData = { sender, receiver, text, room };
+
+    this.socket.emit("SEND_MESSAGE", socketData);
   }
 
   setReadingStatus(receiver) {
@@ -136,7 +141,7 @@ export class ChatService {
   }
 
   joinGroup(groupName: string, sender: string) {
-    this.activeChatWindow.next(true);
+    // this.activeChatWindow.next(true);
     this.socket.emit("JOIN_GROUP", groupName, sender);
   }
 

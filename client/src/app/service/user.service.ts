@@ -44,23 +44,6 @@ export class UserService {
     }
   };
 
-  getUsername = () => {
-    let token = this.storage.get("token");
-
-    let httpOptions = {
-      headers: new HttpHeaders({
-        "Content-Type": "application/json",
-        Authorization: token,
-      }),
-    };
-    this.http
-      .get(`${this.baseUrl}/api/user/details`, httpOptions)
-      .subscribe((res: any) => {
-        console.log(res.userDetails);
-        this.userDetails = res.userDetails;
-      });
-  };
-
   removeToken = () => {
     this.storage.remove("token");
   };

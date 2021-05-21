@@ -1,59 +1,75 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 
-import { ChatService } from 'src/app/service/chat.service'
-import { FormGroup, FormControl } from '@angular/forms'
-import { UserService } from 'src/app/service/user.service'
+import { ChatService } from "src/app/service/chat.service";
+import { FormGroup, FormControl } from "@angular/forms";
+import { UserService } from "src/app/service/user.service";
+import { RoomMessages } from "src/app/chat-interface";
 
 @Component({
-	selector: 'chatbox',
-	templateUrl: './chatbox.component.html',
-	styleUrls: ['./chatbox.component.css']
+  selector: "chatbox",
+  templateUrl: "./chatbox.component.html",
+  styleUrls: ["./chatbox.component.css"],
 })
 export class ChatboxComponent implements OnInit {
+  constructor(
+    private chatService: ChatService,
+    private userService: UserService
+  ) {}
 
-	constructor(private chatService: ChatService, private userService: UserService) { }
+  receiverName: string;
+  roomId: string;
+  receiverId: string;
+  roomMessages: RoomMessages[] = [];
 
-	sender: string
+  sender: string;
 
-	receiverFullName: string
+  receiverUsername: string;
 
-	receiverUsername: string
+  typing: Boolean = false;
 
-	roomMessages = []
+  messageType: string;
 
-	typing: Boolean = false
+  @ViewChild("clearMessage", { static: false }) clearMessage: ElementRef;
 
-	messageType: string
+  sendMessageForm = new FormGroup({
+    message: new FormControl(""),
+  });
 
-	@ViewChild('clearInput', { static: false }) clearInput: ElementRef
+  ngOnInit() {
+    // this.userService.getUsername().subscribe((res:any) =>{
+    // 	this.sender = res.username
+    // })
 
-	ngOnInit() {
-		// this.userService.getUsername().subscribe((res:any) =>{
-		// 	this.sender = res.username
-		// })
+    this.chatService.receiverDetails.subscribe((data) => {
+      this.receiverName = `${data.firstName} ${data.lastName}`;
+      this.roomId = data.roomId;
+      this.receiverId = data._id;
 
-		this.chatService.userChatObservable.subscribe(data => {
-			this.receiverFullName = data.receiverFullName
-			this.receiverUsername = data.receiverId
-			this.messageType = 'PRIVATE'
-		})
+      // this.receiverFullName = data.receiverFullName
+      // this.receiverUsername = data.receiverId
+      // this.messageType = 'PRIVATE'
+    });
 
-		this.chatService.message.subscribe(messages => {
-			this.roomMessages = messages
-		})
+    this.chatService.roomMessages.subscribe((messages) => {
+      this.roomMessages = messages;
+    });
 
-		this.chatService.groupChatObservable.subscribe(data => {
-			this.messageType = 'GROUP'
-			this.receiverFullName = this.receiverUsername = data.groupName
-		})
-	}
+    // this.chatService.message.subscribe((messages) => {
+    //   this.roomMessages = messages;
+    // });
 
-	sendMessageForm = new FormGroup({
-		message: new FormControl('')
-	})
+    this.chatService.groupChatObservable.subscribe((data) => {
+      this.messageType = "GROUP";
+      // this.receiverFullName = this.receiverUsername = data.groupName
+    });
+  }
 
-	sendMessage(sendMessageForm) {
-		this.chatService.sendMessage(this.sender, this.receiverUsername, sendMessageForm.value.message, this.messageType)
-		this.clearInput.nativeElement.value = ''
-	}
+  sendMessage(sendMessageForm: FormGroup) {
+    this.chatService.sendMessage(
+      this.receiverId,
+      sendMessageForm.value.message,
+      this.roomId
+    );
+    this.clearMessage.nativeElement.value = "";
+  }
 }

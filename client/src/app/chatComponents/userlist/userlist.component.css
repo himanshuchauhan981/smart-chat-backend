@@ -43,9 +43,12 @@ ul li:last-child {
 
 .userlist-container {
   background-color: white;
-  padding: 20px 30px;
   width: 350px;
   border-right: 1px solid #eaeaea;
+}
+
+.userlist-sidebar {
+  padding: 20px 30px;
 }
 
 .cursor-pointer {
@@ -62,6 +65,38 @@ ul li:last-child {
 .add-icon:hover {
   background-color: #eaeaea;
 }
+
+.friend-box {
+  border-bottom: 1px solid #eaeaea;
+}
+
+.friend-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.friend-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.friend-status {
+  font-size: 12px;
+}
+
+.mat-badge-small .mat-badge-content {
+  width: 10px;
+  height: 10px;
+}
+
+.mat-badge-small .mat-badge-content {
+  right: 0px;
+}
+.mat-badge-small.mat-badge-above .mat-badge-content {
+  top: 0px;
+}
+
 /* ---------------------------- */
 
 /*.userlist-header{

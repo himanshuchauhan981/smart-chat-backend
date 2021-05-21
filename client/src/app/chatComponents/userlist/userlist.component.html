@@ -7,8 +7,9 @@
                         class="fa fa-user-o fa-lg cursor-pointer" aria-hidden="true"></i></li>
                 <li class="private-chat-icon cursor-pointer" matTooltip="Group" matTooltipPosition="below"><i
                         class="fa fa-users fa-lg cursor-pointer" aria-hidden="true"></i></li>
-                <li class="private-chat-icon cursor-pointer" matTooltip="Friends" matTooltipPosition="below"><i
-                        class="fa fa-user-plus fa-lg cursor-pointer" aria-hidden="true"></i></li>
+                <li class="private-chat-icon cursor-pointer" matTooltip="Friends" matTooltipPosition="below"
+                    (click)="getFriendsList()"><i class="fa fa-user-plus fa-lg cursor-pointer" aria-hidden="true"></i>
+                </li>
                 <li class="private-chat-icon cursor-pointer" matTooltip="Settings" matTooltipPosition="below"><i
                         class="fa fa-cog fa-lg cursor-pointer" aria-hidden="true"></i></li>
                 <li class="private-chat-icon cursor-pointer" matTooltip="Logout" (click)="logoutUser()"
@@ -19,7 +20,7 @@
             </ul>
         </div>
     </nav>
-    <div class="userlist-container">
+    <div class="userlist-container" *ngIf="activeUserListType === 'private'">
         <div class="userlist-sidebar">
             <div class="d-flex flex-row justify-content-between ">
                 <h4 class="align-self-center mb-0">Private</h4>
@@ -28,38 +29,45 @@
                 </div>
             </div>
         </div>
+        <div *ngFor="let chat of privateChatsList">
+            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateRoomID(user._id)">
+
+                <span [matBadgeColor]="chat.receiver.isActive === 'offline' ? 'warn':'primary'" matBadge="&#8288;"
+                    matBadgeOverlap="true" matBadgeSize="small">
+                    <img class="friend-image cursor-pointer align-self-center"
+                        src="https://neilpatel.com/wp-content/uploads/2017/09/image-editing-tools.jpg" />
+                </span>
+
+                <div class="d-flex flex-column ml-2">
+                    <div class="d-flex flex-row justify-content-between">
+                        <span class="friend-name">{{chat.receiver.firstName}} {{chat.receiver.lastName}}</span>
+                        <span class="float-right">{{chat.unReadCount}}</span>
+                    </div>
+                    <span class="friend-status text-truncate">{{chat.text}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="userlist-container" *ngIf="activeUserListType === 'friends'">
+        <div class="userlist-sidebar">
+            <div class="d-flex flex-row justify-content-between mb-3">
+                <h4 class="align-self-center mb-0">Friends</h4>
+                <div class="add-icon" matTooltip="New chat" matTooltipPosition="below">
+                    <i class="fa fa-plus-circle align-self-center" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+        <div *ngFor="let user of userList">
+            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateRoomID(user._id)">
+                <span [matBadgeColor]="user.isActive === 'offline' ? 'warn':'primary'" matBadge="&#8288;"
+                    matBadgeOverlap="true" matBadgeSize="small">
+                    <img class="friend-image cursor-pointer align-self-center"
+                        src="https://neilpatel.com/wp-content/uploads/2017/09/image-editing-tools.jpg" /></span>
+                <div class="d-flex flex-column ml-2 align-self-center">
+                    <span class="friend-name">{{user.firstName}} {{user.lastName}}</span>
+                    <span class="friend-status text-truncate">{{user.userStatus}}</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<!-- <div class="card userlist-card">
-        <div class="userlist-header">
-            <input type="text" class="username" placeholder="Enter Username..." alt="" />
-        </div>
-        <div class="userlist-body px-2">
-            <mat-tab-group mat-align-tabs="center" dynamicHeight>
-                <mat-tab label="Private chat">
-                    <div *ngFor="let activeUser of chatService.activeUserList">
-                        <div class="show-users" *ngIf="activeUser.username != username" (click)="generateRoomID(activeUser)">
-                            <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" class="rounded-circle" alt="" />
-                            <div class="userlist-text">
-                                <p class="userlist-name">{{ activeUser.firstName }} {{ activeUser.lastName }}</p>
-                                <p class="userlist-messageCount">{{ activeUser.messageCount }} new messages</p>
-                                <p class="userlist-status">{{ activeUser.userInfo.isActive }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </mat-tab>
-                <mat-tab label="Group chat">
-                    <div *ngFor="let group of activeGroupList">
-                        <div class="show-users">
-                            <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" class="rounded-circle" alt="" />
-                            <div class="userlist-text" (click)="generateGroupId(group.room)">
-                                <p class="userlist-name">{{ group.room }}</p>
-                                <p class="userlist-messageCount">0 new messages</p>
-                            </div>
-                        </div>
-                    </div>
-                </mat-tab>
-            </mat-tab-group>
-            
-        </div>-->
