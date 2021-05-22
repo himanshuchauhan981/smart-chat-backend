@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 
 import { ChatService } from "src/app/service/chat.service";
 import { FormGroup, FormControl } from "@angular/forms";
-import { UserService } from "src/app/service/user.service";
 import { RoomMessages } from "src/app/chat-interface";
 
 @Component({
@@ -11,10 +10,7 @@ import { RoomMessages } from "src/app/chat-interface";
   styleUrls: ["./chatbox.component.css"],
 })
 export class ChatboxComponent implements OnInit {
-  constructor(
-    private chatService: ChatService,
-    private userService: UserService
-  ) {}
+  constructor(private chatService: ChatService) {}
 
   receiverName: string;
   roomId: string;
@@ -36,20 +32,12 @@ export class ChatboxComponent implements OnInit {
   });
 
   ngOnInit() {
-    // this.userService.getUsername().subscribe((res:any) =>{
-    // 	this.sender = res.username
-    // })
-
     this.chatService.receiverDetails.subscribe((data) => {
       if (data) {
         this.receiverName = `${data.firstName} ${data.lastName}`;
         this.roomId = data.roomId;
         this.receiverId = data._id;
       }
-
-      // this.receiverFullName = data.receiverFullName
-      // this.receiverUsername = data.receiverId
-      // this.messageType = 'PRIVATE'
     });
 
     this.chatService.roomMessages.subscribe((messages) => {

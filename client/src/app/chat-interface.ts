@@ -59,3 +59,8 @@ export interface OnlineStatus {
   userId: string;
   status: string;
 }
+
+export interface MESSAGE_COUNT {
+  id: string;
+  newMessagesCount: number;
+}

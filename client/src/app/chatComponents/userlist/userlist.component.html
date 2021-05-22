@@ -3,8 +3,9 @@
         <div class="nav-group">
             <ul class="no-bullets">
                 <li><i class="fa fa-commenting-o fa-3x mb-4 cursor-pointer" aria-hidden="true"></i></li>
-                <li class="private-chat-icon cursor-pointer" matTooltip="Private" matTooltipPosition="below"><i
-                        class="fa fa-user-o fa-lg cursor-pointer" aria-hidden="true"></i></li>
+                <li class="private-chat-icon cursor-pointer" matTooltip="Private" matTooltipPosition="below"
+                    (click)="getPrivateChatsList()"><i class="fa fa-user-o fa-lg cursor-pointer" aria-hidden="true"></i>
+                </li>
                 <li class="private-chat-icon cursor-pointer" matTooltip="Group" matTooltipPosition="below"><i
                         class="fa fa-users fa-lg cursor-pointer" aria-hidden="true"></i></li>
                 <li class="private-chat-icon cursor-pointer" matTooltip="Friends" matTooltipPosition="below"

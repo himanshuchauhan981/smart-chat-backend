@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 
-import { PrivateChats } from "src/app/chat-interface";
+import { MESSAGE_COUNT, PrivateChats } from "src/app/chat-interface";
 import { ChatService } from "src/app/service/chat.service";
 import { UserService } from "src/app/service/user.service";
 
@@ -53,6 +53,21 @@ export class UserlistComponent implements OnInit {
       }
     });
 
+    this.chatService.socket.on(
+      "PRIVATE_MESSAGES_COUNT",
+      (socketData: MESSAGE_COUNT) => {
+        if (socketData) {
+          let objIndex = this.privateChatsList.findIndex(
+            (obj) => obj.receiver._id === socketData.id
+          );
+
+          if (objIndex !== -1) {
+            this.privateChatsList[objIndex].unReadCount =
+              socketData.newMessagesCount;
+          }
+        }
+      }
+    );
     // -----------------------------------------------------
 
     this.chatService.userListObservable.subscribe((data) => {
@@ -88,6 +103,7 @@ export class UserlistComponent implements OnInit {
   getPrivateChatsList() {
     this.chatService.getPrivateChats().subscribe((res) => {
       this.privateChatsList = res["privateChats"];
+      this.activeUserListType = "private";
     });
   }
 

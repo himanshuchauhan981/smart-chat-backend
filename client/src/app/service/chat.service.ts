@@ -88,13 +88,6 @@ export class ChatService {
       this.onlineStatus.next(socketData);
     });
 
-    // ---------------------------------------------------------
-
-    this.socket.on("CONNECTED_USERS", (activeUsers) => {
-      this.userListObservable.next(activeUsers["privateUsers"]);
-      this.groupListObservable.next(activeUsers["userGroups"]);
-    });
-
     this.socket.on("RECEIVE_NEW_MESSAGE", (socketData) => {
       let { newMessage } = socketData;
       let roomId = this.receiverDetails.value.roomId;
@@ -105,6 +98,12 @@ export class ChatService {
         let updatedMessages = [...oldMessages, newMessage];
         this.roomMessages.next(updatedMessages);
       }
+    });
+    // ---------------------------------------------------------
+
+    this.socket.on("CONNECTED_USERS", (activeUsers) => {
+      this.userListObservable.next(activeUsers["privateUsers"]);
+      this.groupListObservable.next(activeUsers["userGroups"]);
     });
 
     this.socket.on("SHOW_GROUP_MESSAGES", (data) => {

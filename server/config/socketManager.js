@@ -112,6 +112,13 @@ module.exports.SocketManager = (socket) => {
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
 				socketArgs
 			);
+
+			socketArgs = { newMessagesCount: 0, id: receiver };
+
+			io.to(roomID).emit(
+				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
+				socketArgs
+			);
 		}
 	);
 
@@ -143,12 +150,34 @@ module.exports.SocketManager = (socket) => {
 			collectionOptions
 		);
 
+		let conditions = {
+			room: newMessage[0].room,
+			sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
+			isRead: false,
+		};
+
+		let count = await queries.countDocuments(Schema.chats, conditions);
+
 		let newSocketData = { newMessage: newMessage[0] };
 
 		io.to(message.room).emit(
 			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
 			newSocketData
 		);
+
+		let receiverSocket = connectedUsers[newMessage[0].receiver._id];
+
+		if (receiverSocket) {
+			let receiverSocketData = {
+				newMessagesCount: count,
+				id: newMessage[0].sender._id,
+			};
+			io.to(receiverSocket.id).emit(
+				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
+				receiverSocketData
+			);
+		}
+
 		// let messageData;
 		// let messageObject;
 		// if (messageType == 'PRIVATE') {
