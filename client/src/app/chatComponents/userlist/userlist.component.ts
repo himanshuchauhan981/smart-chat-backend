@@ -59,7 +59,6 @@ export class UserlistComponent implements OnInit {
 
   getPrivateChatsList() {
     this.chatService.getPrivateChats().subscribe((res) => {
-      console.log(res["privateChats"]);
       this.privateChatsList = res["privateChats"];
     });
   }

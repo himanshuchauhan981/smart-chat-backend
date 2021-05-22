@@ -30,7 +30,7 @@
             </div>
         </div>
         <div *ngFor="let chat of privateChatsList">
-            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateRoomID(user._id)">
+            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateRoomID(chat.receiver._id)">
 
                 <span [matBadgeColor]="chat.receiver.isActive === 'offline' ? 'warn':'primary'" matBadge="&#8288;"
                     matBadgeOverlap="true" matBadgeSize="small">
@@ -38,12 +38,12 @@
                         src="https://neilpatel.com/wp-content/uploads/2017/09/image-editing-tools.jpg" />
                 </span>
 
-                <div class="d-flex flex-column ml-2">
+                <div class="ml-2 friend-data">
                     <div class="d-flex flex-row justify-content-between">
                         <span class="friend-name">{{chat.receiver.firstName}} {{chat.receiver.lastName}}</span>
-                        <span class="float-right">{{chat.unReadCount}}</span>
+                        <span class="unReadCount bg-primary" *ngIf="chat.unReadCount !== 0">{{chat.unReadCount}}</span>
                     </div>
-                    <span class="friend-status text-truncate">{{chat.text}}</span>
+                    <span class="friend-status">{{chat.text}}</span>
                 </div>
             </div>
         </div>

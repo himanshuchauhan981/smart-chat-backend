@@ -20,7 +20,8 @@ import { environment } from "src/environments/environment";
 export class ChatService {
   socket: SocketIOClient.Socket;
   baseUrl: string = environment.baseUrl;
-  receiverDetails = new Subject<ReceiverDetails>();
+  // receiverDetails = new Subject<ReceiverDetails>();
+  receiverDetails: BehaviorSubject<ReceiverDetails> = new BehaviorSubject(null);
   roomMessages: BehaviorSubject<Array<RoomMessages>> = new BehaviorSubject([]);
 
   userListObservable = new Subject<any>();
@@ -96,13 +97,17 @@ export class ChatService {
       this.groupListObservable.next(activeUsers["userGroups"]);
     });
 
-    // this.socket.on("RECEIVE_MESSAGE", (messageData) => {
-    //   if (this.room === messageData.room) {
-    //     let oldMessages = this.message.value;
-    //     let updatedMessages = [...oldMessages, messageData];
-    //     this.message.next(updatedMessages);
-    //   }
-    // });
+    this.socket.on("RECEIVE_NEW_MESSAGE", (socketData) => {
+      let { newMessage } = socketData;
+      let roomId = this.receiverDetails.value.roomId;
+      console.log(socketData);
+
+      if (roomId === newMessage.room) {
+        let oldMessages = this.roomMessages.value;
+        let updatedMessages = [...oldMessages, newMessage];
+        this.roomMessages.next(updatedMessages);
+      }
+    });
 
     this.socket.on("SHOW_GROUP_MESSAGES", (data) => {
       this.room = data.groupName;

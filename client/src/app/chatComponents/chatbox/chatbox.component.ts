@@ -41,9 +41,11 @@ export class ChatboxComponent implements OnInit {
     // })
 
     this.chatService.receiverDetails.subscribe((data) => {
-      this.receiverName = `${data.firstName} ${data.lastName}`;
-      this.roomId = data.roomId;
-      this.receiverId = data._id;
+      if (data) {
+        this.receiverName = `${data.firstName} ${data.lastName}`;
+        this.roomId = data.roomId;
+        this.receiverId = data._id;
+      }
 
       // this.receiverFullName = data.receiverFullName
       // this.receiverUsername = data.receiverId
