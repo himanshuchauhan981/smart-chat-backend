@@ -31,6 +31,10 @@ const chats = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	isReadDate: {
+		type: Number,
+		default: null,
+	},
 });
 
 module.exports = mongoose.model('chats', chats);

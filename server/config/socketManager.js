@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const io = require('./server').io;
-const {
-	userListController,
-	chatController,
-	groupController,
-} = require('../controllers');
+const { userListController, groupController } = require('../controllers');
 const { userListHandler } = require('../handlers');
-const { factories } = require('../factories');
 const APP_DEFAULTS = require('./app-defaults');
 const Schema = require('../schemas');
 
@@ -54,11 +50,7 @@ module.exports.SocketManager = (socket) => {
 		APP_DEFAULTS.SOCKET_EVENT.JOIN_ROOM,
 		async (roomID, sender, receiver) => {
 			socket.join(roomID);
-			// let roomMessages = await chatController.getParticularRoomMessages(
-			// 	roomID,
-			// 	sender,
-			// 	receiver
-			// );
+
 			let query = { _id: mongoose.Types.ObjectId(receiver) };
 			let projections = { firstName: 1, lastName: 1 };
 			let options = { lean: true };
@@ -91,6 +83,18 @@ module.exports.SocketManager = (socket) => {
 				collectionOptions
 			);
 
+			let conditions = {
+				room: roomID,
+				isRead: false,
+				sender: mongoose.Types.ObjectId(receiver),
+			};
+			let toUpdate = {
+				isRead: true,
+				isReadDate: moment().valueOf(),
+				modifiedDate: moment().valueOf(),
+			};
+			await queries.findAndUpdate(Schema.chats, conditions, toUpdate, options);
+
 			let socketArgs = { receiverDetails, roomID, roomMessages };
 			io.to(roomID).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
@@ -102,7 +106,38 @@ module.exports.SocketManager = (socket) => {
 	socket.on('SEND_MESSAGE', async (socketData) => {
 		let newMessage = socketData;
 
-		await queries.create(Schema.chats, newMessage);
+		let message = await queries.create(Schema.chats, newMessage);
+
+		let query = { _id: mongoose.Types.ObjectId(message._id) };
+		let projections = {
+			text: 1,
+			createdDate: 1,
+			sender: 1,
+			receiver: 1,
+			isRead: 1,
+			room: 1,
+		};
+		let options = { lean: true };
+		let collectionOptions = [
+			{ path: 'sender', select: 'firstName lastName' },
+			{ path: 'receiver', select: 'firstName lastName' },
+		];
+
+		newMessage = await queries.populateData(
+			Schema.chats,
+			query,
+			projections,
+			options,
+			collectionOptions
+		);
+
+		let newSocketData = { newMessage: newMessage[0] };
+		console.log(message.room);
+
+		io.to(message.room).emit(
+			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
+			newSocketData
+		);
 		// let messageData;
 		// let messageObject;
 		// if (messageType == 'PRIVATE') {

@@ -41,13 +41,33 @@ let chatHandler = {
 	getPrivateChats: async (userDetails) => {
 		// let query = { sender: mongoose.Types.ObjectId(userDetails) };
 		let aggregateArray = [
-			{ $match: { sender: mongoose.Types.ObjectId(userDetails.id) } },
+			{
+				$match: {
+					$or: [
+						{ sender: mongoose.Types.ObjectId(userDetails.id) },
+						{ receiver: mongoose.Types.ObjectId(userDetails.id) },
+					],
+				},
+			},
 			{
 				$project: {
 					receiver: 1,
 					text: 1,
 					createdDate: 1,
-					unreadMessages: { $cond: [{ $eq: ['$isRead', false] }, 1, 0] },
+					unreadMessages: {
+						$cond: [
+							{
+								$and: [
+									{ $eq: ['$isRead', false] },
+									{
+										$eq: ['$receiver', mongoose.Types.ObjectId(userDetails.id)],
+									},
+								],
+							},
+							1,
+							0,
+						],
+					},
 				},
 			},
 			{
