@@ -18,14 +18,15 @@ getAllUsers = async (username) => {
 	io.emit('CONNECTED_USERS', data);
 };
 
-deleteConnectedUser = async (socket) => {
+const deleteConnectedUser = async (socket) => {
 	const { userId } = socket;
 	delete connectedUsers[userId];
 
 	if (userId) {
 		await userListController.makeUserOffline(userId);
-		// getAllUsers(username);
+		return userId;
 	}
+	return null;
 };
 
 module.exports.SocketManager = (socket) => {
@@ -34,16 +35,28 @@ module.exports.SocketManager = (socket) => {
 		connectedUsers[userId] = socket;
 		await userListHandler.makeUserOnline(userId);
 
-		// await userListController.makeUserOnline(userId);
-		// getAllUsers(user);
+		let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.ONLINE };
+
+		io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
 	});
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.LOGOUT_USER, async () => {
-		deleteConnectedUser(socket);
+		let userId = await deleteConnectedUser(socket);
+		if (userId) {
+			let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
+
+			io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+		}
 	});
 
 	socket.on('disconnect', async () => {
-		deleteConnectedUser(socket);
+		let userId = await deleteConnectedUser(socket);
+
+		if (userId) {
+			let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
+
+			io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+		}
 	});
 
 	socket.on(
@@ -82,7 +95,6 @@ module.exports.SocketManager = (socket) => {
 				options,
 				collectionOptions
 			);
-
 			let conditions = {
 				room: roomID,
 				isRead: false,
@@ -93,7 +105,7 @@ module.exports.SocketManager = (socket) => {
 				isReadDate: moment().valueOf(),
 				modifiedDate: moment().valueOf(),
 			};
-			await queries.findAndUpdate(Schema.chats, conditions, toUpdate, options);
+			await queries.updateMany(Schema.chats, conditions, toUpdate, options);
 
 			let socketArgs = { receiverDetails, roomID, roomMessages };
 			io.to(roomID).emit(
@@ -132,7 +144,6 @@ module.exports.SocketManager = (socket) => {
 		);
 
 		let newSocketData = { newMessage: newMessage[0] };
-		console.log(message.room);
 
 		io.to(message.room).emit(
 			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,

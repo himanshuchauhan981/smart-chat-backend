@@ -49,6 +49,10 @@ const queries = {
 
 		return aggregation.exec();
 	},
+
+	updateMany: (model, conditions, update, options) => {
+		return model.updateMany(conditions, update, options);
+	},
 };
 
 module.exports = queries;

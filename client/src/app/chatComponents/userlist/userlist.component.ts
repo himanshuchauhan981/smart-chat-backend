@@ -27,6 +27,34 @@ export class UserlistComponent implements OnInit {
   ngOnInit() {
     this.getPrivateChatsList();
 
+    this.chatService.onlineStatus.subscribe((onlineUser) => {
+      if (onlineUser && this.privateChatsList.length !== 0) {
+        let objIndex = this.privateChatsList.findIndex(
+          (obj) =>
+            obj.receiver._id === onlineUser.userId ||
+            obj.sender._id === onlineUser.userId
+        );
+
+        if (objIndex !== -1) {
+          this.privateChatsList[objIndex].receiver.isActive = onlineUser.status;
+          this.privateChatsList[objIndex].sender.isActive = onlineUser.status;
+        }
+      }
+
+      if (onlineUser && this.userList.length !== 0) {
+        let objIndex = this.userList.findIndex(
+          (obj) => obj._id === onlineUser.userId
+        );
+
+        if (objIndex !== -1) {
+          this.userList[objIndex].isActive = onlineUser.status;
+          this.userList[objIndex].isActive = onlineUser.status;
+        }
+      }
+    });
+
+    // -----------------------------------------------------
+
     this.chatService.userListObservable.subscribe((data) => {
       this.chatService.activeUserList = data;
     });

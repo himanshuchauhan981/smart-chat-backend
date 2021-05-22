@@ -39,7 +39,6 @@ let chatHandler = {
 	},
 
 	getPrivateChats: async (userDetails) => {
-		// let query = { sender: mongoose.Types.ObjectId(userDetails) };
 		let aggregateArray = [
 			{
 				$match: {
@@ -51,9 +50,11 @@ let chatHandler = {
 			},
 			{
 				$project: {
+					sender: 1,
 					receiver: 1,
 					text: 1,
 					createdDate: 1,
+					room: 1,
 					unreadMessages: {
 						$cond: [
 							{
@@ -72,26 +73,40 @@ let chatHandler = {
 			},
 			{
 				$group: {
-					_id: { id: '$receiver' },
+					_id: { id: '$room' },
 					text: { $last: '$text' },
 					receiver: { $last: '$receiver' },
-					createdDate: { $last: '$createdDate' },
+					sender: { $last: '$sender' },
 					unReadCount: { $sum: '$unreadMessages' },
 				},
 			},
 			{ $sort: { createdDate: -1 } },
 			{ $project: { _id: 0 } },
 		];
-		let populateOptions = {
-			path: 'receiver',
-			select: 'firstName lastName isActive',
-		};
+		let populateOptions = [
+			{
+				path: 'receiver',
+				select: 'firstName lastName isActive',
+			},
+			{
+				path: 'sender',
+				select: 'firstName lastName isActive',
+			},
+		];
 
 		let privateChats = await queries.aggregateDataWithPopulate(
 			Schema.chats,
 			aggregateArray,
 			populateOptions
 		);
+
+		for (let i = 0; i < privateChats.length; i++) {
+			if (privateChats[i].receiver._id == userDetails.id) {
+				let newReceiver = privateChats[i].receiver;
+				privateChats[i].receiver = privateChats[i].sender;
+				privateChats[i].sender = newReceiver;
+			}
+		}
 
 		return { status: 200, data: { privateChats } };
 	},

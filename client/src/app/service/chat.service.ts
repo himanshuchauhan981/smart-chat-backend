@@ -6,6 +6,7 @@ import { UserService } from "./user.service";
 import { Title } from "@angular/platform-browser";
 import {
   DecodedToken,
+  OnlineStatus,
   ReceiverDetails,
   RECEIVE_MESSAGES,
   RoomMessages,
@@ -20,9 +21,9 @@ import { environment } from "src/environments/environment";
 export class ChatService {
   socket: SocketIOClient.Socket;
   baseUrl: string = environment.baseUrl;
-  // receiverDetails = new Subject<ReceiverDetails>();
   receiverDetails: BehaviorSubject<ReceiverDetails> = new BehaviorSubject(null);
   roomMessages: BehaviorSubject<Array<RoomMessages>> = new BehaviorSubject([]);
+  onlineStatus: BehaviorSubject<OnlineStatus> = new BehaviorSubject(null);
 
   userListObservable = new Subject<any>();
 
@@ -81,13 +82,10 @@ export class ChatService {
       });
 
       this.roomMessages.next(socketData.roomMessages);
-      // this.setReadingStatus(receiver);
-      // this.userChatObservable.next({
-      //   receiverId: receiver,
-      //   receiverFullName: fullName,
-      // });
-      // this.room = roomID;
-      // this.message.next(messages);
+    });
+
+    this.socket.on("ONLINE_STATUS", (socketData) => {
+      this.onlineStatus.next(socketData);
     });
 
     // ---------------------------------------------------------

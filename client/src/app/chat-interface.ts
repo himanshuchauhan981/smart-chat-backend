@@ -28,12 +28,14 @@ export interface Sender {
   _id: string;
   firstName: string;
   lastName: string;
+  isActive: string;
 }
 
 export interface Receiver {
   _id: string;
   firstName: string;
   lastName: string;
+  isActive: string;
 }
 
 export interface RoomMessages {
@@ -48,7 +50,12 @@ export interface RoomMessages {
 export interface PrivateChats {
   text: string;
   receiver: Receiver;
-  createdDate: string;
+  sender: Sender;
+  // createdDate: string;
   unReadCount: number;
-  isActive: boolean;
+}
+
+export interface OnlineStatus {
+  userId: string;
+  status: string;
 }
