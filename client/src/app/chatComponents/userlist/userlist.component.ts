@@ -48,7 +48,6 @@ export class UserlistComponent implements OnInit {
 
         if (objIndex !== -1) {
           this.userList[objIndex].isActive = onlineUser.status;
-          this.userList[objIndex].isActive = onlineUser.status;
         }
       }
     });
@@ -64,10 +63,37 @@ export class UserlistComponent implements OnInit {
           if (objIndex !== -1) {
             this.privateChatsList[objIndex].unReadCount =
               socketData.newMessagesCount;
+            this.privateChatsList[objIndex].createdDate =
+              socketData.createdDate;
+            this.privateChatsList[objIndex].text = socketData.text;
+
+            this.privateChatsList.sort((a, b) =>
+              a.createdDate < b.createdDate ? 1 : -1
+            );
           }
         }
       }
     );
+    this.chatService.userListLatestMessage.subscribe((data) => {
+      if (data) {
+        console.log(data);
+        console.log(this.privateChatsList);
+        let objIndex = this.privateChatsList.findIndex(
+          (obj) =>
+            obj.receiver._id == data.receiver._id &&
+            obj.sender._id == data.sender._id
+        );
+
+        if (objIndex !== -1) {
+          this.privateChatsList[objIndex].text = data.text;
+          this.privateChatsList[objIndex].createdDate = data.createdDate;
+
+          this.privateChatsList.sort((a, b) =>
+            a.createdDate < b.createdDate ? 1 : -1
+          );
+        }
+      }
+    });
     // -----------------------------------------------------
 
     this.chatService.userListObservable.subscribe((data) => {

@@ -51,7 +51,7 @@ export interface PrivateChats {
   text: string;
   receiver: Receiver;
   sender: Sender;
-  // createdDate: string;
+  createdDate: string;
   unReadCount: number;
 }
 
@@ -63,4 +63,6 @@ export interface OnlineStatus {
 export interface MESSAGE_COUNT {
   id: string;
   newMessagesCount: number;
+  createdDate: string;
+  text: string;
 }

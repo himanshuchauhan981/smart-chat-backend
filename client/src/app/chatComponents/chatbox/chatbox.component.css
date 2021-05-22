@@ -24,7 +24,7 @@
 .chat-body {
   min-height: 540px;
   max-height: 540px;
-  overflow-y: auto;
+  overflow-y: scroll;
   outline: none;
   border-bottom: 1px solid #eaeaea;
 }

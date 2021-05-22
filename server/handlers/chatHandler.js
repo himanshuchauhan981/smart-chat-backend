@@ -78,6 +78,7 @@ let chatHandler = {
 					receiver: { $last: '$receiver' },
 					sender: { $last: '$sender' },
 					unReadCount: { $sum: '$unreadMessages' },
+					createdDate: { $last: '$createdDate' },
 				},
 			},
 			{ $sort: { createdDate: -1 } },

@@ -7,7 +7,7 @@
             <span class="writing-status text-success">writing...</span>
         </div>
     </div>
-    <div class="chat-body pb-3">
+    <div class="chat-body pb-3" #scrollEnd [scrollTop]="scrollEnd.scrollHeight">
         <div *ngFor="let message of roomMessages">
             <div class="d-flex flex-row px-4 pt-3">
                 <div class="message-avatar">{{message.sender.firstName[0] | titlecase}}</div>

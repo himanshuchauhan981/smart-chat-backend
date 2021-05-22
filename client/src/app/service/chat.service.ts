@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import * as io from "socket.io-client";
 import { Subject, BehaviorSubject } from "rxjs";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 import { UserService } from "./user.service";
-import { Title } from "@angular/platform-browser";
 import {
   DecodedToken,
   OnlineStatus,
@@ -11,8 +11,6 @@ import {
   RECEIVE_MESSAGES,
   RoomMessages,
 } from "../chat-interface";
-import { Router } from "@angular/router";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { environment } from "src/environments/environment";
 
 @Injectable({
@@ -24,6 +22,7 @@ export class ChatService {
   receiverDetails: BehaviorSubject<ReceiverDetails> = new BehaviorSubject(null);
   roomMessages: BehaviorSubject<Array<RoomMessages>> = new BehaviorSubject([]);
   onlineStatus: BehaviorSubject<OnlineStatus> = new BehaviorSubject(null);
+  userListLatestMessage: BehaviorSubject<any> = new BehaviorSubject(null);
 
   userListObservable = new Subject<any>();
 
@@ -39,13 +38,8 @@ export class ChatService {
 
   activeUserList = [];
 
-  constructor(
-    private userService: UserService,
-    private titleService: Title,
-    private http: HttpClient
-  ) {
+  constructor(private userService: UserService, private http: HttpClient) {
     this.socket = io(this.userService.baseUrl);
-    // this.activeChatWindow.next(false);
   }
 
   getFriendsList() {
@@ -91,13 +85,13 @@ export class ChatService {
     this.socket.on("RECEIVE_NEW_MESSAGE", (socketData) => {
       let { newMessage } = socketData;
       let roomId = this.receiverDetails.value.roomId;
-      console.log(socketData);
 
       if (roomId === newMessage.room) {
         let oldMessages = this.roomMessages.value;
         let updatedMessages = [...oldMessages, newMessage];
         this.roomMessages.next(updatedMessages);
       }
+      this.userListLatestMessage.next(newMessage);
     });
     // ---------------------------------------------------------
 
@@ -143,7 +137,6 @@ export class ChatService {
   }
 
   joinGroup(groupName: string, sender: string) {
-    // this.activeChatWindow.next(true);
     this.socket.emit("JOIN_GROUP", groupName, sender);
   }
 

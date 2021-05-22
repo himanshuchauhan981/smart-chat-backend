@@ -113,7 +113,14 @@ module.exports.SocketManager = (socket) => {
 				socketArgs
 			);
 
-			socketArgs = { newMessagesCount: 0, id: receiver };
+			let lastMessage = roomMessages[roomMessages.length - 1];
+
+			socketArgs = {
+				newMessagesCount: 0,
+				id: receiver,
+				text: lastMessage.text,
+				createdDate: lastMessage.createdDate,
+			};
 
 			io.to(roomID).emit(
 				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
@@ -122,7 +129,7 @@ module.exports.SocketManager = (socket) => {
 		}
 	);
 
-	socket.on('SEND_MESSAGE', async (socketData) => {
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.SEND_MESSAGE, async (socketData) => {
 		let newMessage = socketData;
 
 		let message = await queries.create(Schema.chats, newMessage);
@@ -171,6 +178,8 @@ module.exports.SocketManager = (socket) => {
 			let receiverSocketData = {
 				newMessagesCount: count,
 				id: newMessage[0].sender._id,
+				createdDate: message.createdDate,
+				text: message.text,
 			};
 			io.to(receiverSocket.id).emit(
 				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
