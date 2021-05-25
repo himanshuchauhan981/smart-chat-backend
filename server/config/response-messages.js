@@ -20,6 +20,14 @@ const RESPONSE_MESSAGES = {
 		STATUS_CODE: 401,
 		MSG: 'Invalid token',
 	},
+	CREATE_GROUP: {
+		STATUS_CODE: 200,
+		MSG: 'Group created successfully',
+	},
+	ADD_NEW_MEMBERS: {
+		STATUS_CODE: 200,
+		MSG: 'New members added successfully',
+	},
 };
 
 module.exports = RESPONSE_MESSAGES;

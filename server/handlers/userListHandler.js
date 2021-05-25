@@ -60,7 +60,7 @@ let userListHandler = {
 		return activeUsers;
 	},
 
-	showAllUserNames: async (req, res) => {
+	getUsersList: async (req, res) => {
 		let username = req.query.currentUser;
 		let userDetails = await users
 			.find({

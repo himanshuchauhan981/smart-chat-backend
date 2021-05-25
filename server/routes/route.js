@@ -1,4 +1,5 @@
 const express = require('express');
+const { route } = require('.');
 
 const {
 	userController,
@@ -27,13 +28,25 @@ module.exports = () => {
 		chatController.getPrivateChats
 	);
 
-	// ---------------------------------------------------
+	router.get(
+		'/groups',
+		validateAuth.validateToken,
+		groupController.getUserGroups
+	);
 
-	router.get('/logout', userController.logoutExistingUser);
+	router.post(
+		'/group',
+		validateAuth.validateToken,
+		groupController.createGroup
+	);
 
-	router.get('/users', userController.getAllUsersName);
+	router.post(
+		'/group/:groupId/addMembers',
+		validateAuth.validateToken,
+		groupController.addNewMembers
+	);
 
-	router.post('/group', groupController.createGroup);
+	router.get('/users', validateAuth.validateToken, userController.getUsersList);
 
 	return router;
 };

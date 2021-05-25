@@ -1,16 +1,39 @@
 const { groupHandler } = require('../handlers');
 
 let groupController = {
-	createGroup: async (req, res) => {
-		let response = await groupHandler.createGroup(req, res);
-		if (response['status']) res.status(200).send(response);
-		else res.status(409).send(response);
+	getUserGroups: async (req, res) => {
+		let userDetails = req.user;
+		let response = await groupHandler.getUserGroups(userDetails);
+		res.status(response.status).send(response.data);
 	},
 
-	getUserGroups: async (username) => {
-		let response = await groupHandler.getUserGroups(username);
-		return response;
+	createGroup: async (req, res) => {
+		try {
+			let groupDetails = req.body;
+			let userDetails = req.user;
+			let response = await groupHandler.createGroup(groupDetails, userDetails);
+			res.status(response.status).send(response.data);
+		} catch (err) {
+			throw err;
+		}
 	},
+
+	addNewMembers: async (req, res) => {
+		try {
+			let groupMembers = req.body;
+			let groupDetails = req.params;
+
+			let response = await groupHandler.addNewMembers(
+				groupMembers,
+				groupDetails
+			);
+			res.status(response.status).send(response.data);
+		} catch (err) {
+			throw err;
+		}
+	},
+
+	// ---------------------------------------------------------
 
 	getGroupMessages: async (groupName) => {
 		let response = await groupHandler.getGroupMessages(groupName);

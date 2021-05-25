@@ -1,9 +1,8 @@
 const bcryptjs = require('bcryptjs');
 const moment = require('moment');
+const mongoose = require('mongoose');
 
-const { users } = require('../schemas');
 const { tokenUtil } = require('../utils');
-const { makeUserOffline } = require('./userListHandler');
 const { queries } = require('../db');
 const Schema = require('../schemas');
 const APP_DEFAULTS = require('../config/app-defaults');
@@ -98,16 +97,53 @@ let userHandler = {
 		}
 	},
 
-	logoutExistingUser: async (req, res) => {
-		let token = req.headers.authorization;
+	getUsersList: async (userDetails) => {
+		try {
+			let aggregateArray = [
+				{ $match: { _id: { $ne: mongoose.Types.ObjectId(userDetails.id) } } },
+				{
+					$project: {
+						name: {
+							$concat: [
+								{
+									$concat: [
+										{ $toUpper: { $substrCP: ['$firstName', 0, 1] } },
+										{
+											$substrCP: [
+												'$firstName',
+												1,
+												{ $subtract: [{ $strLenCP: '$firstName' }, 1] },
+											],
+										},
+									],
+								},
+								' ',
+								{
+									$concat: [
+										{ $toUpper: { $substrCP: ['$lastName', 0, 1] } },
+										{
+											$substrCP: [
+												'$lastName',
+												1,
+												{ $subtract: [{ $strLenCP: '$lastName' }, 1] },
+											],
+										},
+									],
+								},
+							],
+						},
+						isActive: 1,
+					},
+				},
+				{ $sort: { name: 1 } },
+			];
 
-		let decodedToken = tokenUtil.decodeJWTToken(token);
-		let usernameObject = await users
-			.findById(decodedToken.id)
-			.select({ username: 1 });
+			let userList = await queries.aggregateData(Schema.users, aggregateArray);
 
-		await makeUserOffline(usernameObject.username);
-		return { status: 200, msg: 'User Logout sucessfully' };
+			return { status: 200, data: { userList } };
+		} catch (err) {
+			throw err;
+		}
 	},
 };
 

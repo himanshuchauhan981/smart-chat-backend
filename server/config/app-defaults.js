@@ -17,6 +17,10 @@ const appDefaults = {
 		ONLINE: 'online',
 		OFFLINE: 'offline',
 	},
+	GROUP_MEMBERS_STATUS: {
+		ACTIVE: 'ACTIVE',
+		DELETED: 'DELETED',
+	},
 };
 
 module.exports = appDefaults;

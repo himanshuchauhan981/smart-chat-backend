@@ -21,13 +21,9 @@ let userController = {
 		}
 	},
 
-	logoutExistingUser: async (req, res) => {
-		let response = await userHandler.logoutExistingUser(req, res);
-		res.status(200).send(response);
-	},
-
-	getAllUsersName: async (req, res) => {
-		let response = await userListHandler.showAllUserNames(req, res);
+	getUsersList: async (req, res) => {
+		let userDetails = req.user;
+		let response = await userHandler.getUsersList(userDetails);
 		res.status(200).send(response);
 	},
 };

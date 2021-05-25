@@ -1,35 +1,74 @@
 const { groupDetailModel, userModel, groupChatModel } = require('../models');
+const { queries } = require('../db');
+const Schema = require('../schemas');
+const RESPONSE_MESSAGES = require('../config/response-messages');
 
 let groupHandler = {
-	createGroup: async (req, res) => {
-		let groupData = req.body;
-		let existingGroup = await groupDetailModel.findByGroupRoom(groupData.name);
-		if (existingGroup.length === 0) {
-			let adminDetails = await userModel
-				.findByUsername(groupData.admin)
-				.select({ _id: 1 });
-			let groupObject = {
-				room: groupData.name,
-				members: groupData.members.map(({ _id: memberId }) => ({
-					memberId,
-				})),
-				admin: adminDetails._id,
-				groupStatus: 'New Group',
-				groupImage: 'No image',
+	createGroup: async (groupDetails, userDetails) => {
+		try {
+			// groupDetails.admin = userDetails.id;
+			let newGroup = await queries.create(Schema.groupDetails, groupDetails);
+
+			let groupMemberDetails = {
+				userId: userDetails.id,
+				isAdmin: true,
+				groupId: newGroup._id,
 			};
-			await groupDetailModel.create(groupObject);
-			return { status: true, msg: 'New group created' };
-		} else {
-			return { status: false, msg: 'Group name already existed' };
+
+			let newGroupDetails = await queries.create(
+				Schema.groupMembers,
+				groupMemberDetails
+			);
+			return {
+				status: RESPONSE_MESSAGES.CREATE_GROUP.STATUS_CODE,
+				data: {
+					msg: RESPONSE_MESSAGES.CREATE_GROUP.MSG,
+					groupId: newGroupDetails._id,
+				},
+			};
+		} catch (err) {
+			throw err;
 		}
 	},
 
-	getUserGroups: async (username) => {
-		let userDetails = await userModel.findByUsername(username);
-		let groupList = await groupDetailModel
-			.findParticularUserGroups(userDetails._id)
-			.select({ room: 1 });
-		return groupList;
+	addNewMembers: async (groupMembers, groupDetails) => {
+		try {
+			for (let i = 0; i < groupMembers.length; i++) {
+				console.log('hello');
+				let newGroupMember = {
+					userId: groupMembers[i],
+					isAdmin: false,
+					groupId: groupDetails.groupId,
+				};
+
+				await queries.create(Schema.groupMembers, newGroupMember);
+			}
+			return {
+				status: RESPONSE_MESSAGES.ADD_NEW_MEMBERS.STATUS_CODE,
+				data: { msg: RESPONSE_MESSAGES.ADD_NEW_MEMBERS.MSG },
+			};
+		} catch (err) {
+			throw err;
+		}
+	},
+
+	getUserGroups: async (userDetails) => {
+		let query = {};
+		let projections = {};
+		let options = {};
+		let userGroups = await queries.getData(
+			Schema.groupDetails,
+			query,
+			projections,
+			options
+		);
+
+		return { status: 200, data: { groupList: userGroups } };
+		// let userDetails = await userModel.findByUsername(username);
+		// let groupList = await groupDetailModel
+		// 	.findParticularUserGroups(userDetails._id)
+		// 	.select({ room: 1 });
+		// return groupList;
 	},
 
 	getGroupMessages: async (groupName) => {
