@@ -8,8 +8,8 @@
                         class="fa fa-user-o fa-lg cursor-pointer" aria-hidden="true"></i>
                 </li>
                 <li class="private-chat-icon cursor-pointer" [ngClass]="{'activeList':activeUserListType === 'group'}"
-                    matTooltip="Group" matTooltipPosition="below"><i class="fa fa-users fa-lg cursor-pointer"
-                        aria-hidden="true"></i></li>
+                    matTooltip="Group" matTooltipPosition="below" (click)="getGroupList()"><i
+                        class="fa fa-users fa-lg cursor-pointer" aria-hidden="true"></i></li>
                 <li class="private-chat-icon cursor-pointer" [ngClass]="{'activeList':activeUserListType === 'friends'}"
                     matTooltip="Friends" matTooltipPosition="below" (click)="getFriendsList()"><i
                         class="fa fa-user-plus fa-lg cursor-pointer" aria-hidden="true"></i>
@@ -70,6 +70,16 @@
                 <div class="d-flex flex-column ml-2 align-self-center">
                     <span class="friend-name">{{user.firstName}} {{user.lastName}}</span>
                     <span class="friend-status text-truncate">{{user.userStatus}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="userlist-container" *ngIf="activeUserListType === 'group'">
+        <div class="userlist-sidebar">
+            <div class="d-flex flex-row justify-content-between">
+                <h4 class="align-self-center mb-0">Groups</h4>
+                <div class="add-icon" matTooltip="New group" matTooltipPosition="below" (click)="openGroupModal()">
+                    <i class="fa fa-plus-circle align-self-center" aria-hidden="true"></i>
                 </div>
             </div>
         </div>

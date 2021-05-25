@@ -1,7 +1,9 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material";
 import { Router } from "@angular/router";
 
 import { MESSAGE_COUNT, PrivateChats } from "src/app/chat-interface";
+import { CreateGroupComponent } from "src/app/dialog/create-group/create-group.component";
 import { ChatService } from "src/app/service/chat.service";
 import { UserService } from "src/app/service/user.service";
 
@@ -21,7 +23,8 @@ export class UserlistComponent implements OnInit {
   constructor(
     public chatService: ChatService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -76,8 +79,6 @@ export class UserlistComponent implements OnInit {
     );
     this.chatService.userListLatestMessage.subscribe((data) => {
       if (data) {
-        console.log(data);
-        console.log(this.privateChatsList);
         let objIndex = this.privateChatsList.findIndex(
           (obj) =>
             obj.receiver._id == data.receiver._id &&
@@ -129,7 +130,19 @@ export class UserlistComponent implements OnInit {
   getPrivateChatsList() {
     this.chatService.getPrivateChats().subscribe((res) => {
       this.privateChatsList = res["privateChats"];
-      this.activeUserListType = "private";
+      this.activeUserListType = "group";
+    });
+  }
+
+  getGroupList() {
+    this.chatService.getGroupsList().subscribe((res) => {
+      this.activeUserListType = "group";
+    });
+  }
+
+  openGroupModal(): void {
+    this.dialog.open(CreateGroupComponent, {
+      width: "550px",
     });
   }
 

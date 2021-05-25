@@ -66,3 +66,13 @@ export interface MESSAGE_COUNT {
   createdDate: string;
   text: string;
 }
+
+export interface ADD_GROUP_MEMBERS {
+  group: string;
+  children: Array<{
+    _id: string;
+    isActive: string;
+    name: string;
+    checked: boolean;
+  }>;
+}

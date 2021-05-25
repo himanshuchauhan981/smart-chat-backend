@@ -1,0 +1,24 @@
+<div class="bg-dark text-white p-3 group-heading">Create a New Group</div>
+<form [formGroup]="createGroupForm" (ngSubmit)="createNewGroup(createGroupForm)">
+    <div class="p-4">
+
+        <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Name</mat-label>
+            <input matInput placeholder="Placeholder" class="w-100" formControlName="name" name="name">
+            <mat-error *ngIf="createGroupForm.get('name').hasError('required')">Group name is required</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Status</mat-label>
+            <input matInput maxlength="120" #status placeholder="Placeholder" class="w-100" formControlName="status"
+                name="status">
+            <mat-hint align="end">{{status.value.length}} / 120</mat-hint>
+        </mat-form-field>
+        <input id="singleFile" type="file" class="d-none" #profileImage />
+        <div class="upload-file cursor-pointer" (click)="profileImage.click()">Image</div>
+
+    </div>
+    <div class="bg-dark d-flex justify-content-end p-3">
+        <button mat-raised-button color="warn" (click)="closeGroup()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" class="ml-3">Add participant</button>
+    </div>
+</form>

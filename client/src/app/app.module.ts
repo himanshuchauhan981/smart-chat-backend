@@ -15,6 +15,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatBadgeModule } from "@angular/material/badge";
+import { MatFileUploadModule } from "angular-material-fileupload";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -26,6 +27,8 @@ import { ChatboxComponent } from "./chatComponents/chatbox/chatbox.component";
 import { NavbarComponent } from "./navbar/navbar.component";
 import { GroupChatComponent } from "./chatComponents/group-chat/group-chat.component";
 import { MomentModule } from "angular2-moment";
+import { CreateGroupComponent } from "./dialog/create-group/create-group.component";
+import { AddParticipantsComponent } from "./dialog/add-participants/add-participants.component";
 
 @NgModule({
   declarations: [
@@ -37,6 +40,8 @@ import { MomentModule } from "angular2-moment";
     NavbarComponent,
     SignupComponent,
     UserlistComponent,
+    CreateGroupComponent,
+    AddParticipantsComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -58,9 +63,15 @@ import { MomentModule } from "angular2-moment";
     MatIconModule,
     MatTooltipModule,
     MatBadgeModule,
+    MatFileUploadModule,
+    MatCheckboxModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [GroupChatComponent],
+  entryComponents: [
+    GroupChatComponent,
+    CreateGroupComponent,
+    AddParticipantsComponent,
+  ],
 })
 export class AppModule {}

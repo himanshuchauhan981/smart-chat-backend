@@ -66,6 +66,63 @@ export class ChatService {
     return this.http.get(`${this.baseUrl}/api/privateChats`, httpOptions);
   }
 
+  getGroupsList() {
+    let token = this.userService.getToken();
+
+    let httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        Authorization: token,
+      }),
+    };
+    return this.http.get(`${this.baseUrl}/api/groups`, httpOptions);
+  }
+
+  createNewGroup(groupDetails) {
+    let token = this.userService.getToken();
+
+    let httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        Authorization: token,
+      }),
+    };
+    return this.http.post(
+      `${this.baseUrl}/api/group`,
+      groupDetails,
+      httpOptions
+    );
+  }
+
+  listAllUsers = () => {
+    let token = this.userService.getToken();
+
+    let httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        Authorization: token,
+      }),
+    };
+    return this.http.get(`${this.baseUrl}/api/users`, httpOptions);
+  };
+
+  addNewMembers = (members, groupId) => {
+    let token = this.userService.getToken();
+
+    let httpOptions = {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+        Authorization: token,
+      }),
+    };
+
+    return this.http.post(
+      `${this.baseUrl}/api/group/${groupId}/addMembers`,
+      members,
+      httpOptions
+    );
+  };
+
   initiateSocket(decodeToken: DecodedToken) {
     this.socket.emit("CREATE_USER_SOCKET", decodeToken.id);
 
@@ -138,11 +195,5 @@ export class ChatService {
 
   joinGroup(groupName: string, sender: string) {
     this.socket.emit("JOIN_GROUP", groupName, sender);
-  }
-
-  updateMessageCount(message) {
-    this.userListObservable.subscribe((data) => {
-      console.log(data);
-    });
   }
 }
