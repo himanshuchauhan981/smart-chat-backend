@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const { groupDetailModel, userModel, groupChatModel } = require('../models');
 const { queries } = require('../db');
 const Schema = require('../schemas');
@@ -15,15 +17,13 @@ let groupHandler = {
 				groupId: newGroup._id,
 			};
 
-			let newGroupDetails = await queries.create(
-				Schema.groupMembers,
-				groupMemberDetails
-			);
+			await queries.create(Schema.groupMembers, groupMemberDetails);
+
 			return {
 				status: RESPONSE_MESSAGES.CREATE_GROUP.STATUS_CODE,
 				data: {
 					msg: RESPONSE_MESSAGES.CREATE_GROUP.MSG,
-					groupId: newGroupDetails._id,
+					groupId: newGroup._id,
 				},
 			};
 		} catch (err) {
@@ -53,22 +53,21 @@ let groupHandler = {
 	},
 
 	getUserGroups: async (userDetails) => {
-		let query = {};
-		let projections = {};
-		let options = {};
-		let userGroups = await queries.getData(
-			Schema.groupDetails,
-			query,
-			projections,
-			options
+		console.log(userDetails.id);
+		let aggregateArray = [
+			{ $match: { userId: mongoose.Types.ObjectId(userDetails.id) } },
+			{ $project: { groupId: 1 } },
+		];
+
+		let populateOptions = { path: 'groupId', select: 'name image' };
+
+		let userGroups = await queries.aggregateDataWithPopulate(
+			Schema.groupMembers,
+			aggregateArray,
+			populateOptions
 		);
 
 		return { status: 200, data: { groupList: userGroups } };
-		// let userDetails = await userModel.findByUsername(username);
-		// let groupList = await groupDetailModel
-		// 	.findParticularUserGroups(userDetails._id)
-		// 	.select({ room: 1 });
-		// return groupList;
 	},
 
 	getGroupMessages: async (groupName) => {

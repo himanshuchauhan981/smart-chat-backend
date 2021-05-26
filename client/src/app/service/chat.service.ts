@@ -172,8 +172,12 @@ export class ChatService {
     this.socket.emit("LOGOUT_USER");
   }
 
-  joinRoom(roomId: string, sender: string, receiver: string) {
-    this.socket.emit("JOIN_ROOM", roomId, sender, receiver);
+  joinPrivateRoom(roomId: string, sender: string, receiver: string) {
+    this.socket.emit("JOIN_PRIVATE_ROOM", roomId, sender, receiver);
+  }
+
+  joinGroupRoom(groupId: string) {
+    this.socket.emit("JOIN_GROUP_ROOM", { groupId });
   }
 
   sendMessage(receiver: string, text: string, room: string) {
@@ -191,9 +195,5 @@ export class ChatService {
       }
       return true;
     });
-  }
-
-  joinGroup(groupName: string, sender: string) {
-    this.socket.emit("JOIN_GROUP", groupName, sender);
   }
 }

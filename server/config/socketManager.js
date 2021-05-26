@@ -2,20 +2,62 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 
 const io = require('./server').io;
-const { userListController, groupController } = require('../controllers');
+const { userListController } = require('../controllers');
 const { userListHandler } = require('../handlers');
 const APP_DEFAULTS = require('./app-defaults');
 const Schema = require('../schemas');
-
 const { queries } = require('../db');
 
 let connectedUsers = {};
 
-getAllUsers = async (username) => {
-	let privateUsers = await userListController.showAllActiveUsers(username);
-	let userGroups = await groupController.getUserGroups(username);
-	let data = { privateUsers: privateUsers, userGroups: userGroups };
-	io.emit('CONNECTED_USERS', data);
+const getPrivateRoomMessage = async (messageId) => {
+	let query = { _id: mongoose.Types.ObjectId(messageId) };
+	let projections = {
+		text: 1,
+		createdDate: 1,
+		sender: 1,
+		receiver: 1,
+		isRead: 1,
+		room: 1,
+	};
+	let options = { lean: true };
+	let collectionOptions = [
+		{ path: 'sender', select: 'firstName lastName' },
+		{ path: 'receiver', select: 'firstName lastName' },
+	];
+
+	let newMessage = await queries.populateData(
+		Schema.chats,
+		query,
+		projections,
+		options,
+		collectionOptions
+	);
+
+	return newMessage;
+};
+
+const getGroupRoomMessage = async (messageId) => {
+	let query = { _id: mongoose.Types.ObjectId(messageId) };
+	let projections = {
+		text: 1,
+		createdDate: 1,
+		sender: 1,
+		room: 1,
+	};
+
+	let options = { lean: true };
+	let collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
+
+	let newMessage = await queries.populateData(
+		Schema.groupChat,
+		query,
+		projections,
+		options,
+		collectionOptions
+	);
+
+	return newMessage;
 };
 
 const deleteConnectedUser = async (socket) => {
@@ -60,18 +102,52 @@ module.exports.SocketManager = (socket) => {
 	});
 
 	socket.on(
-		APP_DEFAULTS.SOCKET_EVENT.JOIN_ROOM,
+		APP_DEFAULTS.SOCKET_EVENT.JOIN_PRIVATE_ROOM,
 		async (roomID, sender, receiver) => {
 			socket.join(roomID);
 
-			let query = { _id: mongoose.Types.ObjectId(receiver) };
-			let projections = { firstName: 1, lastName: 1 };
+			let aggregateData = [
+				{ $match: { _id: mongoose.Types.ObjectId(receiver) } },
+				{
+					$project: {
+						name: {
+							$concat: [
+								{
+									$concat: [
+										{ $toUpper: { $substrCP: ['$firstName', 0, 1] } },
+										{
+											$substrCP: [
+												'$firstName',
+												1,
+												{ $subtract: [{ $strLenCP: '$firstName' }, 1] },
+											],
+										},
+									],
+								},
+								' ',
+								{
+									$concat: [
+										{ $toUpper: { $substrCP: ['$lastName', 0, 1] } },
+										{
+											$substrCP: [
+												'$lastName',
+												1,
+												{ $subtract: [{ $strLenCP: '$lastName' }, 1] },
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+			];
+
 			let options = { lean: true };
 
-			let receiverDetails = await queries.findOne(
+			let receiverDetails = await queries.aggregateData(
 				Schema.users,
-				query,
-				projections,
+				aggregateData,
 				options
 			);
 
@@ -107,7 +183,11 @@ module.exports.SocketManager = (socket) => {
 			};
 			await queries.updateMany(Schema.chats, conditions, toUpdate, options);
 
-			let socketArgs = { receiverDetails, roomID, roomMessages };
+			let socketArgs = {
+				receiverDetails: receiverDetails[0],
+				roomID,
+				roomMessages,
+			};
 			io.to(roomID).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
 				socketArgs
@@ -130,95 +210,115 @@ module.exports.SocketManager = (socket) => {
 	);
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.SEND_MESSAGE, async (socketData) => {
-		let newMessage = socketData;
+		if (socketData.receiver !== null) {
+			let message = await queries.create(Schema.chats, socketData);
 
-		let message = await queries.create(Schema.chats, newMessage);
+			let newMessage = await getPrivateRoomMessage(message._id);
 
-		let query = { _id: mongoose.Types.ObjectId(message._id) };
-		let projections = {
-			text: 1,
-			createdDate: 1,
-			sender: 1,
-			receiver: 1,
-			isRead: 1,
-			room: 1,
-		};
-		let options = { lean: true };
-		let collectionOptions = [
-			{ path: 'sender', select: 'firstName lastName' },
-			{ path: 'receiver', select: 'firstName lastName' },
-		];
+			let conditions = {
+				room: newMessage[0].room,
+				sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
+				isRead: false,
+			};
+			let count = await queries.countDocuments(Schema.chats, conditions);
 
-		newMessage = await queries.populateData(
-			Schema.chats,
-			query,
-			projections,
-			options,
-			collectionOptions
-		);
+			let newSocketData = { newMessage: newMessage[0] };
 
-		let conditions = {
-			room: newMessage[0].room,
-			sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
-			isRead: false,
-		};
+			io.to(message.room).emit(
+				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
+				newSocketData
+			);
 
-		let count = await queries.countDocuments(Schema.chats, conditions);
+			let receiverSocket = connectedUsers[newMessage[0].receiver._id];
 
-		let newSocketData = { newMessage: newMessage[0] };
+			if (receiverSocket) {
+				let receiverSocketData = {
+					newMessagesCount: count,
+					id: newMessage[0].sender._id,
+					createdDate: message.createdDate,
+					text: message.text,
+				};
+				io.to(receiverSocket.id).emit(
+					APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
+					receiverSocketData
+				);
+			}
+		} else {
+			let message = await queries.create(Schema.groupChat, socketData);
 
-		io.to(message.room).emit(
-			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
-			newSocketData
-		);
+			let newMessage = await getGroupRoomMessage(message._id);
 
-		let receiverSocket = connectedUsers[newMessage[0].receiver._id];
+			let conditions = {
+				room: newMessage[0].room,
+				sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
+				isRead: false,
+			};
+			let count = await queries.countDocuments(Schema.groupChat, conditions);
 
-		if (receiverSocket) {
+			let newSocketData = { newMessage: newMessage[0] };
+
+			io.to(message.room).emit(
+				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
+				newSocketData
+			);
+
 			let receiverSocketData = {
 				newMessagesCount: count,
 				id: newMessage[0].sender._id,
 				createdDate: message.createdDate,
 				text: message.text,
 			};
-			io.to(receiverSocket.id).emit(
-				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
+
+			io.to(message.room).emit(
+				APP_DEFAULTS.SOCKET_EVENT.GROUP_MESSAGES_COUNT,
 				receiverSocketData
 			);
 		}
+	});
 
-		// let messageData;
-		// let messageObject;
-		// if (messageType == 'PRIVATE') {
-		// 	messageData = await chatController.saveNewMessage(
-		// 		roomID,
-		// 		sender,
-		// 		receiver,
-		// 		message
-		// 	);
-		// 	messageObject = factories.newPrivateMessage(messageData);
-		// 	connectedUsers[receiver].emit('MESSAGE_COUNT', data['savedMsg']);
-		// } else {
-		// 	messageData = await groupController.saveNewMessage(
-		// 		sender,
-		// 		roomID,
-		// 		message
-		// 	);
-		// 	messageObject = factories.newGroupMessage(messageData);
-		// }
-		// io.in(roomID).emit('RECEIVE_MESSAGE', messageObject);
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.JOIN_GROUP_ROOM, async (socketData) => {
+		socket.join(socketData.groupId);
+
+		let query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
+		let projections = { name: 1 };
+		let options = { lean: true };
+
+		let groupDetails = await queries.findOne(
+			Schema.groupDetails,
+			query,
+			projections,
+			options
+		);
+
+		query = { room: socketData.groupId };
+		projections = {
+			text: 1,
+			createdDate: 1,
+			sender: 1,
+		};
+		let collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
+
+		let roomMessages = await queries.populateData(
+			Schema.groupChat,
+			query,
+			projections,
+			options,
+			collectionOptions
+		);
+
+		let socketArgs = {
+			receiverDetails: { name: groupDetails.name, _id: null },
+			roomID: socketData.groupId,
+			roomMessages,
+		};
+
+		io.to(socketData.groupId).emit(
+			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
+			socketArgs
+		);
 	});
 
 	socket.on('USER_TYPING_STATUS', (room, typingStatus, receiver) => {
 		io.to(room).emit('TYPING_STATUS', typingStatus, receiver);
-	});
-
-	socket.on('JOIN_GROUP', async (groupName) => {
-		socket.join(groupName);
-		let groupMessages = await groupController.getGroupMessages(groupName);
-		io.to(groupName).emit('SHOW_GROUP_MESSAGES', {
-			groupName: groupName,
-			groupMessages: groupMessages,
-		});
 	});
 };

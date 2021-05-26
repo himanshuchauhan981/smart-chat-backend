@@ -34,7 +34,7 @@ export class ChatboxComponent implements OnInit {
   ngOnInit() {
     this.chatService.receiverDetails.subscribe((data) => {
       if (data) {
-        this.receiverName = `${data.firstName} ${data.lastName}`;
+        this.receiverName = data.name;
         this.roomId = data.roomId;
         this.receiverId = data._id;
       }

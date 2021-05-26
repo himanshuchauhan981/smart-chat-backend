@@ -34,7 +34,7 @@
             </div>
         </div>
         <div *ngFor="let chat of privateChatsList">
-            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateRoomID(chat.receiver._id)">
+            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generatePrivateRoomID(chat.receiver._id)">
 
                 <span [matBadgeColor]="chat.receiver.isActive === 'offline' ? 'warn':'primary'" matBadge="&#8288;"
                     matBadgeOverlap="true" matBadgeSize="small">
@@ -62,7 +62,7 @@
             </div>
         </div>
         <div *ngFor="let user of userList">
-            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateRoomID(user._id)">
+            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generatePrivateRoomID(user._id)">
                 <span [matBadgeColor]="user.isActive === 'offline' ? 'warn':'primary'" matBadge="&#8288;"
                     matBadgeOverlap="true" matBadgeSize="small">
                     <img class="friend-image cursor-pointer align-self-center"
@@ -80,6 +80,21 @@
                 <h4 class="align-self-center mb-0">Groups</h4>
                 <div class="add-icon" matTooltip="New group" matTooltipPosition="below" (click)="openGroupModal()">
                     <i class="fa fa-plus-circle align-self-center" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+        <div *ngFor="let group of groupChatsList">
+            <div class="d-flex py-2 px-3 friend-box cursor-pointer" (click)="generateGroupRoomID(group.groupId._id)">
+
+                <img class="friend-image cursor-pointer align-self-center"
+                    src="https://neilpatel.com/wp-content/uploads/2017/09/image-editing-tools.jpg" />
+
+                <div class="ml-2 friend-data">
+                    <div class="d-flex flex-row justify-content-between">
+                        <span class="friend-name">{{group.groupId.name}}</span>
+                        <!-- <span class="unReadCount bg-primary" *ngIf="chat.unReadCount !== 0">{{chat.unReadCount}}</span> -->
+                    </div>
+                    <!-- <span class="friend-status">{{chat.text}}</span> -->
                 </div>
             </div>
         </div>

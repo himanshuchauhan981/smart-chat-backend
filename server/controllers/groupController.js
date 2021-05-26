@@ -2,9 +2,13 @@ const { groupHandler } = require('../handlers');
 
 let groupController = {
 	getUserGroups: async (req, res) => {
-		let userDetails = req.user;
-		let response = await groupHandler.getUserGroups(userDetails);
-		res.status(response.status).send(response.data);
+		try {
+			let userDetails = req.user;
+			let response = await groupHandler.getUserGroups(userDetails);
+			res.status(response.status).send(response.data);
+		} catch (err) {
+			throw err;
+		}
 	},
 
 	createGroup: async (req, res) => {

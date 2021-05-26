@@ -19,6 +19,7 @@ export class UserlistComponent implements OnInit {
   activeUserListType: string = "private";
   userList = [];
   privateChatsList: PrivateChats[] = [];
+  groupChatsList = [];
 
   constructor(
     public chatService: ChatService,
@@ -130,12 +131,13 @@ export class UserlistComponent implements OnInit {
   getPrivateChatsList() {
     this.chatService.getPrivateChats().subscribe((res) => {
       this.privateChatsList = res["privateChats"];
-      this.activeUserListType = "group";
+      this.activeUserListType = "private";
     });
   }
 
   getGroupList() {
     this.chatService.getGroupsList().subscribe((res) => {
+      this.groupChatsList = res["groupList"];
       this.activeUserListType = "group";
     });
   }
@@ -153,14 +155,14 @@ export class UserlistComponent implements OnInit {
     return roomID;
   }
 
-  generateRoomID(receiver: string) {
+  generatePrivateRoomID(receiver: string) {
     let decodedToken = this.userService.decodeToken();
     let sender = decodedToken["id"];
     let roomID = this.createRoom(sender, receiver);
-    this.chatService.joinRoom(roomID, sender, receiver);
+    this.chatService.joinPrivateRoom(roomID, sender, receiver);
   }
 
-  generateGroupId(groupName: string) {
-    this.chatService.joinGroup(groupName, this.username);
+  generateGroupRoomID(groupId: string) {
+    this.chatService.joinGroupRoom(groupId);
   }
 }

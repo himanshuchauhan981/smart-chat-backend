@@ -19,8 +19,7 @@ export interface RECEIVE_MESSAGES {
 
 export interface ReceiverDetails {
   _id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   roomId: string;
 }
 
