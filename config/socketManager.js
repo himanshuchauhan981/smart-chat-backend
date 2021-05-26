@@ -1,0 +1,324 @@
+const mongoose = require('mongoose');
+const moment = require('moment');
+
+const io = require('./server').io;
+const { userListController } = require('../controllers');
+const { userListHandler } = require('../handlers');
+const APP_DEFAULTS = require('./app-defaults');
+const Schema = require('../schemas');
+const { queries } = require('../db');
+
+let connectedUsers = {};
+
+const getPrivateRoomMessage = async (messageId) => {
+	let query = { _id: mongoose.Types.ObjectId(messageId) };
+	let projections = {
+		text: 1,
+		createdDate: 1,
+		sender: 1,
+		receiver: 1,
+		isRead: 1,
+		room: 1,
+	};
+	let options = { lean: true };
+	let collectionOptions = [
+		{ path: 'sender', select: 'firstName lastName' },
+		{ path: 'receiver', select: 'firstName lastName' },
+	];
+
+	let newMessage = await queries.populateData(
+		Schema.chats,
+		query,
+		projections,
+		options,
+		collectionOptions
+	);
+
+	return newMessage;
+};
+
+const getGroupRoomMessage = async (messageId) => {
+	let query = { _id: mongoose.Types.ObjectId(messageId) };
+	let projections = {
+		text: 1,
+		createdDate: 1,
+		sender: 1,
+		room: 1,
+	};
+
+	let options = { lean: true };
+	let collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
+
+	let newMessage = await queries.populateData(
+		Schema.groupChat,
+		query,
+		projections,
+		options,
+		collectionOptions
+	);
+
+	return newMessage;
+};
+
+const deleteConnectedUser = async (socket) => {
+	const { userId } = socket;
+	delete connectedUsers[userId];
+
+	if (userId) {
+		await userListController.makeUserOffline(userId);
+		return userId;
+	}
+	return null;
+};
+
+module.exports.SocketManager = (socket) => {
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.CREATE_USER_SOCKET, async (userId) => {
+		socket.userId = userId;
+		connectedUsers[userId] = socket;
+		await userListHandler.makeUserOnline(userId);
+
+		let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.ONLINE };
+
+		io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+	});
+
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.LOGOUT_USER, async () => {
+		let userId = await deleteConnectedUser(socket);
+		if (userId) {
+			let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
+
+			io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+		}
+	});
+
+	socket.on('disconnect', async () => {
+		let userId = await deleteConnectedUser(socket);
+
+		if (userId) {
+			let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
+
+			io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+		}
+	});
+
+	socket.on(
+		APP_DEFAULTS.SOCKET_EVENT.JOIN_PRIVATE_ROOM,
+		async (roomID, sender, receiver) => {
+			socket.join(roomID);
+
+			let aggregateData = [
+				{ $match: { _id: mongoose.Types.ObjectId(receiver) } },
+				{
+					$project: {
+						name: {
+							$concat: [
+								{
+									$concat: [
+										{ $toUpper: { $substrCP: ['$firstName', 0, 1] } },
+										{
+											$substrCP: [
+												'$firstName',
+												1,
+												{ $subtract: [{ $strLenCP: '$firstName' }, 1] },
+											],
+										},
+									],
+								},
+								' ',
+								{
+									$concat: [
+										{ $toUpper: { $substrCP: ['$lastName', 0, 1] } },
+										{
+											$substrCP: [
+												'$lastName',
+												1,
+												{ $subtract: [{ $strLenCP: '$lastName' }, 1] },
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+			];
+
+			let options = { lean: true };
+
+			let receiverDetails = await queries.aggregateData(
+				Schema.users,
+				aggregateData,
+				options
+			);
+
+			query = { room: roomID };
+			projections = {
+				text: 1,
+				createdDate: 1,
+				sender: 1,
+				receiver: 1,
+				isRead: 1,
+			};
+			let collectionOptions = [
+				{ path: 'sender', select: 'firstName lastName' },
+				{ path: 'receiver', select: 'firstName lastName' },
+			];
+
+			let roomMessages = await queries.populateData(
+				Schema.chats,
+				query,
+				projections,
+				options,
+				collectionOptions
+			);
+			let conditions = {
+				room: roomID,
+				isRead: false,
+				sender: mongoose.Types.ObjectId(receiver),
+			};
+			let toUpdate = {
+				isRead: true,
+				isReadDate: moment().valueOf(),
+				modifiedDate: moment().valueOf(),
+			};
+			await queries.updateMany(Schema.chats, conditions, toUpdate, options);
+
+			let socketArgs = {
+				receiverDetails: receiverDetails[0],
+				roomID,
+				roomMessages,
+			};
+			io.to(roomID).emit(
+				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
+				socketArgs
+			);
+
+			let lastMessage = roomMessages[roomMessages.length - 1];
+
+			socketArgs = {
+				newMessagesCount: 0,
+				id: receiver,
+				text: lastMessage.text,
+				createdDate: lastMessage.createdDate,
+			};
+
+			io.to(roomID).emit(
+				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
+				socketArgs
+			);
+		}
+	);
+
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.SEND_MESSAGE, async (socketData) => {
+		if (socketData.receiver !== null) {
+			let message = await queries.create(Schema.chats, socketData);
+
+			let newMessage = await getPrivateRoomMessage(message._id);
+
+			let conditions = {
+				room: newMessage[0].room,
+				sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
+				isRead: false,
+			};
+			let count = await queries.countDocuments(Schema.chats, conditions);
+
+			let newSocketData = { newMessage: newMessage[0] };
+
+			io.to(message.room).emit(
+				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
+				newSocketData
+			);
+
+			let receiverSocket = connectedUsers[newMessage[0].receiver._id];
+
+			if (receiverSocket) {
+				let receiverSocketData = {
+					newMessagesCount: count,
+					id: newMessage[0].sender._id,
+					createdDate: message.createdDate,
+					text: message.text,
+				};
+				io.to(receiverSocket.id).emit(
+					APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
+					receiverSocketData
+				);
+			}
+		} else {
+			let message = await queries.create(Schema.groupChat, socketData);
+
+			let newMessage = await getGroupRoomMessage(message._id);
+
+			let conditions = {
+				room: newMessage[0].room,
+				sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
+				isRead: false,
+			};
+			let count = await queries.countDocuments(Schema.groupChat, conditions);
+
+			let newSocketData = { newMessage: newMessage[0] };
+
+			io.to(message.room).emit(
+				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
+				newSocketData
+			);
+
+			let receiverSocketData = {
+				newMessagesCount: count,
+				id: newMessage[0].sender._id,
+				createdDate: message.createdDate,
+				text: message.text,
+			};
+
+			io.to(message.room).emit(
+				APP_DEFAULTS.SOCKET_EVENT.GROUP_MESSAGES_COUNT,
+				receiverSocketData
+			);
+		}
+	});
+
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.JOIN_GROUP_ROOM, async (socketData) => {
+		socket.join(socketData.groupId);
+
+		let query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
+		let projections = { name: 1 };
+		let options = { lean: true };
+
+		let groupDetails = await queries.findOne(
+			Schema.groupDetails,
+			query,
+			projections,
+			options
+		);
+
+		query = { room: socketData.groupId };
+		projections = {
+			text: 1,
+			createdDate: 1,
+			sender: 1,
+		};
+		let collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
+
+		let roomMessages = await queries.populateData(
+			Schema.groupChat,
+			query,
+			projections,
+			options,
+			collectionOptions
+		);
+
+		let socketArgs = {
+			receiverDetails: { name: groupDetails.name, _id: null },
+			roomID: socketData.groupId,
+			roomMessages,
+		};
+
+		io.to(socketData.groupId).emit(
+			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
+			socketArgs
+		);
+	});
+
+	socket.on('USER_TYPING_STATUS', (room, typingStatus, receiver) => {
+		io.to(room).emit('TYPING_STATUS', typingStatus, receiver);
+	});
+};
