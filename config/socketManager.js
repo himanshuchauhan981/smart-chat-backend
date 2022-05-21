@@ -295,8 +295,8 @@ module.exports.SocketManager = (socket) => {
 
 		socket.join(socketData.groupId);
 
-		const query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
-		const projections = { name: 1 };
+		let query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
+		let projections = { name: 1 };
 		const options = { lean: true };
 
 		const groupDetails = await queries.findOne(

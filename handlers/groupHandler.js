@@ -60,20 +60,53 @@ let groupHandler = {
 	},
 
 	getUserGroups: async (userDetails) => {
-		let aggregateArray = [
+		const aggregateArray = [
 			{ $match: { userId: mongoose.Types.ObjectId(userDetails.id) } },
-			{ $project: { groupId: 1 } },
+			{
+        $lookup: {
+					from: 'groupdetails',
+					let: { 'groupId': '$_id' },
+					pipeline: [
+							{ $match: { $expr: ['$$groupId', '$groupId'] } }
+					],
+					as: 'group'
+        }
+			},
+			{ $unwind: '$group' },
+			{
+        $lookup: {
+					from: 'groupchats',
+					localField: 'groupId',
+					foreignField: 'room',
+					as: 'groupChat'
+				}
+			},
+			{ $addFields: { groupChat: { $slice: ['$groupChat', -1] } } },
+			{ $unwind: '$groupChat' },
+			{
+				$project: {
+					'group._id': 1,
+					'group.image':1,
+					'group.name': 1,
+					'_id': 1,
+					'groupChat.text': 1,
+					'groupChat.createdDate': 1,
+				}
+			}
 		];
 
-		let populateOptions = { path: 'groupId', select: 'name image' };
+		const options = {};
 
-		let userGroups = await queries.aggregateDataWithPopulate(
+		const userGroups = await queries.aggregateData(
 			Schema.groupMembers,
 			aggregateArray,
-			populateOptions
+			options
 		);
 
-		return { status: 200, data: { groupList: userGroups } };
+		return {
+			status: RESPONSE_MESSAGES.ADD_NEW_MEMBERS.STATUS_CODE,
+			data: { groupList: userGroups }
+		};
 	},
 
 	getGroupMessages: async (groupName) => {
