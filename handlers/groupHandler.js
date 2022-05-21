@@ -8,22 +8,26 @@ const RESPONSE_MESSAGES = require('../config/response-messages');
 let groupHandler = {
 	createGroup: async (groupDetails, userDetails) => {
 		try {
-			// groupDetails.admin = userDetails.id;
-			let newGroup = await queries.create(Schema.groupDetails, groupDetails);
-
-			let groupMemberDetails = {
-				userId: userDetails.id,
-				isAdmin: true,
-				groupId: newGroup._id,
+			const newGroupPayload = {
+				name: groupDetails.name,
+				admin: userDetails.id,
 			};
+			const newGroup = await queries.create(Schema.groupDetails, newGroupPayload);
 
-			await queries.create(Schema.groupMembers, groupMemberDetails);
+			groupDetails.participants.forEach(async (item) =>{
+				const groupMembersPayload = {
+					userId: item,
+					groupId: newGroup._id,
+				};
+
+				await queries.create(Schema.groupMembers, groupMembersPayload);
+
+			});
 
 			return {
 				status: RESPONSE_MESSAGES.CREATE_GROUP.STATUS_CODE,
 				data: {
 					msg: RESPONSE_MESSAGES.CREATE_GROUP.MSG,
-					groupId: newGroup._id,
 				},
 			};
 		} catch (err) {

@@ -15,7 +15,6 @@ const groupMembers = new Schema({
 		required: true,
 		ref: 'groupDetails',
 	},
-	isAdmin: { type: Boolean, required: true },
 	createdDate: { type: Number, default: Date.now },
 	modifiedDate: { type: Number, default: Date.now },
 	status: { type: String, enum: statusEnum, default: statusEnum[0] },

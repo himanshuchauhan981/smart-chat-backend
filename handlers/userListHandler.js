@@ -18,7 +18,7 @@ let userListHandler = {
 		};
 		let options = { lean: true };
 
-		await queries.findAndUpdate(Schema.users, conditions, toUpdate, options);
+		return await queries.findAndUpdate(Schema.users, conditions, toUpdate, options);
 	},
 
 	makeUserOffline: async (userId) => {

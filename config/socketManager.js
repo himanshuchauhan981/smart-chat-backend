@@ -75,11 +75,23 @@ module.exports.SocketManager = (socket) => {
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.CREATE_USER_SOCKET, async (userId) => {
 		socket.userId = userId;
 		connectedUsers[userId] = socket;
-		await userListHandler.makeUserOnline(userId);
 
-		let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.ONLINE };
+
+		const userDetails = await userListHandler.makeUserOnline(userId);
+
+		const socketData = {
+			userId,
+			status: APP_DEFAULTS.ACTIVE_STATUS.ONLINE,
+		};
+
+		const userData = {
+			firstName: userDetails.firstName,
+			lastName: userDetails.lastName
+		}
 
 		io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+
+		connectedUsers[userDetails._id].emit(APP_DEFAULTS.SOCKET_EVENT.SOCKET_USER_DATA, userData);
 	});
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.LOGOUT_USER, async () => {
@@ -188,6 +200,7 @@ module.exports.SocketManager = (socket) => {
 				roomID,
 				roomMessages,
 			};
+
 			io.to(roomID).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
 				socketArgs
@@ -318,7 +331,7 @@ module.exports.SocketManager = (socket) => {
 		);
 	});
 
-	socket.on('USER_TYPING_STATUS', (room, typingStatus, receiver) => {
+	socket.on(APP_DEFAULTS.SOCKET_EVENT.USER_TYPING_STATUS, (room, typingStatus, receiver) => {
 		io.to(room).emit('TYPING_STATUS', typingStatus, receiver);
 	});
 };
