@@ -89,7 +89,7 @@ module.exports.SocketManager = (socket) => {
 			lastName: userDetails.lastName
 		}
 
-		io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
+		socket.broadcast.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
 
 		connectedUsers[userDetails._id].emit(APP_DEFAULTS.SOCKET_EVENT.SOCKET_USER_DATA, userData);
 	});
@@ -206,7 +206,7 @@ module.exports.SocketManager = (socket) => {
 				socketArgs
 			);
 
-			let lastMessage = roomMessages[roomMessages.length - 1];
+			let lastMessage = roomMessages.length ?  roomMessages[roomMessages.length - 1]: {};
 
 			socketArgs = {
 				newMessagesCount: 0,
@@ -224,25 +224,25 @@ module.exports.SocketManager = (socket) => {
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.SEND_MESSAGE, async (socketData) => {
 		if (socketData.receiver !== null) {
-			let message = await queries.create(Schema.chats, socketData);
+			const message = await queries.create(Schema.chats, socketData);
 
-			let newMessage = await getPrivateRoomMessage(message._id);
+			const newMessage = await getPrivateRoomMessage(message._id);
 
-			let conditions = {
+			const conditions = {
 				room: newMessage[0].room,
 				sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
 				isRead: false,
 			};
-			let count = await queries.countDocuments(Schema.chats, conditions);
+			const count = await queries.countDocuments(Schema.chats, conditions);
 
-			let newSocketData = { newMessage: newMessage[0] };
+			const newSocketData = { newMessage: newMessage[0] };
 
 			io.to(message.room).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
 				newSocketData
 			);
 
-			let receiverSocket = connectedUsers[newMessage[0].receiver._id];
+			const receiverSocket = connectedUsers[newMessage[0].receiver._id];
 
 			if (receiverSocket) {
 				let receiverSocketData = {
@@ -257,25 +257,27 @@ module.exports.SocketManager = (socket) => {
 				);
 			}
 		} else {
-			let message = await queries.create(Schema.groupChat, socketData);
 
-			let newMessage = await getGroupRoomMessage(message._id);
+			const message = await queries.create(Schema.groupChat, socketData);
 
-			let conditions = {
+			const newMessage = await getGroupRoomMessage(message._id);
+
+			const conditions = {
 				room: newMessage[0].room,
 				sender: mongoose.Types.ObjectId(newMessage[0].sender._id),
 				isRead: false,
 			};
-			let count = await queries.countDocuments(Schema.groupChat, conditions);
 
-			let newSocketData = { newMessage: newMessage[0] };
+			const count = await queries.countDocuments(Schema.groupChat, conditions);
+
+			const newSocketData = { newMessage: newMessage[0] };
 
 			io.to(message.room).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
 				newSocketData
 			);
 
-			let receiverSocketData = {
+			const receiverSocketData = {
 				newMessagesCount: count,
 				id: newMessage[0].sender._id,
 				createdDate: message.createdDate,
@@ -290,13 +292,14 @@ module.exports.SocketManager = (socket) => {
 	});
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.JOIN_GROUP_ROOM, async (socketData) => {
+
 		socket.join(socketData.groupId);
 
-		let query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
-		let projections = { name: 1 };
-		let options = { lean: true };
+		const query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
+		const projections = { name: 1 };
+		const options = { lean: true };
 
-		let groupDetails = await queries.findOne(
+		const groupDetails = await queries.findOne(
 			Schema.groupDetails,
 			query,
 			projections,
@@ -309,9 +312,9 @@ module.exports.SocketManager = (socket) => {
 			createdDate: 1,
 			sender: 1,
 		};
-		let collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
+		const collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
 
-		let roomMessages = await queries.populateData(
+		const roomMessages = await queries.populateData(
 			Schema.groupChat,
 			query,
 			projections,
@@ -319,7 +322,7 @@ module.exports.SocketManager = (socket) => {
 			collectionOptions
 		);
 
-		let socketArgs = {
+		const socketArgs = {
 			receiverDetails: { name: groupDetails.name, _id: null },
 			roomID: socketData.groupId,
 			roomMessages,

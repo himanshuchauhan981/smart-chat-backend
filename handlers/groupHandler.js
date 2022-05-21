@@ -21,7 +21,11 @@ let groupHandler = {
 				};
 
 				await queries.create(Schema.groupMembers, groupMembersPayload);
+			});
 
+			await queries.create(Schema.groupMembers, {
+				userId: userDetails.id,
+				groupId: newGroup._id,
 			});
 
 			return {
@@ -38,7 +42,6 @@ let groupHandler = {
 	addNewMembers: async (groupMembers, groupDetails) => {
 		try {
 			for (let i = 0; i < groupMembers.length; i++) {
-				console.log('hello');
 				let newGroupMember = {
 					userId: groupMembers[i],
 					isAdmin: false,
@@ -57,7 +60,6 @@ let groupHandler = {
 	},
 
 	getUserGroups: async (userDetails) => {
-		console.log(userDetails.id);
 		let aggregateArray = [
 			{ $match: { userId: mongoose.Types.ObjectId(userDetails.id) } },
 			{ $project: { groupId: 1 } },
