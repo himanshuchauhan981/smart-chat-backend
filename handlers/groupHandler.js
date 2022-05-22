@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 
-const { groupDetailModel, userModel, groupChatModel } = require('../models');
 const { queries } = require('../db');
 const Schema = require('../schemas');
-const RESPONSE_MESSAGES = require('../config/response-messages');
+const RESPONSE_MESSAGES = require('../constants/response-messages');
 
 let groupHandler = {
+
 	createGroup: async (groupDetails, userDetails) => {
+
 		try {
 			const newGroupPayload = {
 				name: groupDetails.name,
@@ -41,8 +42,9 @@ let groupHandler = {
 
 	addNewMembers: async (groupMembers, groupDetails) => {
 		try {
-			for (let i = 0; i < groupMembers.length; i++) {
-				let newGroupMember = {
+			for (const i = 0; i < groupMembers.length; i++) {
+
+				const newGroupMember = {
 					userId: groupMembers[i],
 					isAdmin: false,
 					groupId: groupDetails.groupId,
@@ -82,7 +84,7 @@ let groupHandler = {
 				}
 			},
 			{ $addFields: { groupChat: { $slice: ['$groupChat', -1] } } },
-			{ $unwind: '$groupChat' },
+			{ $unwind: { path: '$groupChat', preserveNullAndEmptyArrays: true } },
 			{
 				$project: {
 					'group._id': 1,
@@ -107,32 +109,6 @@ let groupHandler = {
 			status: RESPONSE_MESSAGES.ADD_NEW_MEMBERS.STATUS_CODE,
 			data: { groupList: userGroups }
 		};
-	},
-
-	getGroupMessages: async (groupName) => {
-		let groupDetails = await groupDetailModel
-			.findByGroupRoom(groupName)
-			.select({ _id: 1 });
-		let groupMessages = await groupChatModel.findByRoom(groupDetails._id);
-		return groupMessages;
-	},
-
-	saveNewMessage: async (sender, roomID, message) => {
-		let groupNameDetails = await groupDetailModel
-			.findByGroupRoom(roomID)
-			.select({ _id: 1, room: 1 });
-
-		let senderDetails = await userModel
-			.findByUsername(sender)
-			.select({ firstName: 1 });
-		let messageObject = {
-			room: groupNameDetails._id,
-			sender: senderDetails._id,
-			text: message,
-		};
-
-		let savedMessage = await groupChatModel.create(messageObject);
-		return { savedMessage, senderDetails, groupNameDetails };
 	},
 };
 

@@ -1,6 +1,15 @@
-exports.users = require('./users');
-exports.chats = require('./chats');
-exports.groupMembers = require('./groupMembers');
-exports.userOnlineStatus = require('./userOnlineStatus');
-exports.groupChat = require('./groupChat');
-exports.groupDetails = require('./groupDetails');
+const users = require('./users');
+const chats = require('./chats');
+const groupMembers = require('./groupMembers');
+const userOnlineStatus = require('./userOnlineStatus');
+const groupChat = require('./groupChat');
+const groupDetails = require('./groupDetails');
+
+module.exports = {
+  users,
+  chats,
+  groupMembers,
+  userOnlineStatus,
+  groupChat,
+  groupDetails,
+};

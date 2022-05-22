@@ -5,28 +5,27 @@ const mongoose = require('mongoose');
 const { tokenUtil } = require('../utils');
 const { queries } = require('../db');
 const Schema = require('../schemas');
-const APP_DEFAULTS = require('../config/app-defaults');
-const RESPONSE_MESSAGES = require('../config/response-messages');
+const { APP_DEFAULTS, RESPONSE_MESSAGES } = require('../constants');
 
 const generateHashedPassword = async (password) => {
-	let salt = bcryptjs.genSaltSync(10);
-	let hashedPassword = bcryptjs.hashSync(password, salt);
+	const salt = bcryptjs.genSaltSync(10);
+	const hashedPassword = bcryptjs.hashSync(password, salt);
 	return hashedPassword;
 };
 
 const checkHashedPassword = async (password, hashedPassword) => {
-	let status = bcryptjs.compareSync(password, hashedPassword);
+	const status = bcryptjs.compareSync(password, hashedPassword);
 	return status;
 };
 
-let userHandler = {
+const userHandler = {
 	signUp: async (userData) => {
 		try {
-			let query = { username: userData.username };
-			let projections = {};
-			let options = { lean: true };
+			const query = { username: userData.username };
+			const projections = {};
+			const options = { lean: true };
 
-			let existingUser = await queries.findOne(
+			const existingUser = await queries.findOne(
 				Schema.users,
 				query,
 				projections,
@@ -50,11 +49,11 @@ let userHandler = {
 
 	login: async (userData) => {
 		try {
-			let query = { username: userData.username };
-			let projections = { password: 1, username: 1 };
-			let options = { lean: true };
+			const query = { username: userData.username };
+			const projections = { password: 1, username: 1 };
+			const options = { lean: true };
 
-			let existingUser = await queries.findOne(
+			const existingUser = await queries.findOne(
 				Schema.users,
 				query,
 				projections,
@@ -62,15 +61,15 @@ let userHandler = {
 			);
 
 			if (existingUser) {
-				let passwordStatus = await checkHashedPassword(
+				const passwordStatus = await checkHashedPassword(
 					userData.password,
 					existingUser.password
 				);
 				if (passwordStatus) {
-					let token = tokenUtil.createJWTToken(existingUser._id);
+					const token = tokenUtil.createJWTToken(existingUser._id);
 
-					let conditions = { username: existingUser._id };
-					let toUpdate = {
+					const conditions = { username: existingUser._id };
+					const toUpdate = {
 						$set: {
 							isActive: APP_DEFAULTS.ACTIVE_STATUS.ONLINE,
 							lastLogin: moment().valueOf(),
@@ -99,7 +98,7 @@ let userHandler = {
 
 	getUsersList: async (userDetails) => {
 		try {
-			let aggregateArray = [
+			const aggregateArray = [
 				{ $match: { _id: { $ne: mongoose.Types.ObjectId(userDetails.id) } } },
 				{
 					$project: {
@@ -138,7 +137,7 @@ let userHandler = {
 				{ $sort: { name: 1 } },
 			];
 
-			let userList = await queries.aggregateData(Schema.users, aggregateArray);
+			const userList = await queries.aggregateData(Schema.users, aggregateArray);
 
 			return { status: 200, data: { userList } };
 		} catch (err) {

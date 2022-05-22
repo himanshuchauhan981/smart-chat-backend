@@ -1,1 +1,0 @@
-exports.factories = require('./factories')

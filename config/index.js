@@ -1,4 +1,7 @@
-exports.server = require('./server');
-exports.socketManager = require('./socketManager');
-exports.APP_DEFAULTS = require('./app-defaults');
-exports.RESPONSE_MESSAGES = require('./response-messages');
+const server = require('./server');
+const socketManager = require('./socketManager');
+
+module.exports = {
+  server,
+  socketManager,
+};

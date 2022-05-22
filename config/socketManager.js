@@ -2,9 +2,8 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 
 const io = require('./server').io;
-const { userListController } = require('../controllers');
 const { userListHandler } = require('../handlers');
-const APP_DEFAULTS = require('./app-defaults');
+const { APP_DEFAULTS } = require('../constants');
 const Schema = require('../schemas');
 const { queries } = require('../db');
 
@@ -65,7 +64,7 @@ const deleteConnectedUser = async (socket) => {
 	delete connectedUsers[userId];
 
 	if (userId) {
-		await userListController.makeUserOffline(userId);
+		await userListHandler.makeUserOffline(userId);
 		return userId;
 	}
 	return null;
