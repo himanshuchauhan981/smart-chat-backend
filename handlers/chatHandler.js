@@ -68,7 +68,7 @@ const chatHandler = {
 			populateOptions
 		);
 
-		for (const i = 0; i < privateChats.length; i++) {
+		for (let i = 0; i < privateChats.length; i++) {
 			if (privateChats[i].receiver._id == userDetails.id) {
 				const newReceiver = privateChats[i].receiver;
 				privateChats[i].receiver = privateChats[i].sender;

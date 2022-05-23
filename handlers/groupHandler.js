@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { queries } = require('../db');
 const Schema = require('../schemas');
 const RESPONSE_MESSAGES = require('../constants/response-messages');
+const socketManager = require('../config/socketManager');
 
 let groupHandler = {
 
@@ -28,6 +29,10 @@ let groupHandler = {
 				userId: userDetails.id,
 				groupId: newGroup._id,
 			});
+
+			const participantsIds = [...groupDetails.participants, userDetails.id ];
+
+			socketManager.addGroupToGroupList(participantsIds, newGroup);
 
 			return {
 				status: RESPONSE_MESSAGES.CREATE_GROUP.STATUS_CODE,

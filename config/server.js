@@ -6,7 +6,6 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const bodyParser = require('body-parser')
-const socket = require('socket.io')
 
 const { route } = require('../routes')
 dotenv.config()
@@ -33,9 +32,6 @@ const server = app.listen(process.env.PORT,process.env.HOST,(err)=>{
 
 app.use('/api',route())
 
-const io = socket(server)
+const { createConnection } = require('./socketManager');
 
-module.exports.io = io
-
-const { SocketManager }= require('./socketManager')
-io.on('connection',SocketManager)
+createConnection(server);

@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const socket = require('socket.io');
 
-const io = require('./server').io;
 const { userListHandler } = require('../handlers');
 const { APP_DEFAULTS } = require('../constants');
 const Schema = require('../schemas');
 const { queries } = require('../db');
 
 let connectedUsers = {};
+let io;
 
 const getPrivateRoomMessage = async (messageId) => {
 	let query = { _id: mongoose.Types.ObjectId(messageId) };
@@ -70,7 +71,7 @@ const deleteConnectedUser = async (socket) => {
 	return null;
 };
 
-module.exports.SocketManager = (socket) => {
+const SocketManager = (socket) => {
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.CREATE_USER_SOCKET, async (userId) => {
 		socket.userId = userId;
 		connectedUsers[userId] = socket;
@@ -337,3 +338,25 @@ module.exports.SocketManager = (socket) => {
 		io.to(room).emit('TYPING_STATUS', typingStatus, receiver);
 	});
 };
+
+const createConnection = (server) => {
+
+	io = socket(server);
+	io.on('connection', SocketManager);
+};
+
+const addGroupToGroupList = (groupMembers, groupData) => {
+
+	for(const userId of groupMembers) {
+
+		if(userId in connectedUsers) {
+
+			io.to(connectedUsers[userId].id).emit(APP_DEFAULTS.SOCKET_EVENT.ADD_GROUP_TO_GROUPLIST, groupData);
+		}
+	}
+};
+
+module.exports = {
+	createConnection,
+	addGroupToGroupList,
+}

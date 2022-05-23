@@ -51,7 +51,7 @@ const userHandler = {
 		try {
 			const query = { username: userData.username };
 			const projections = { password: 1, username: 1 };
-			const options = { lean: true };
+			let options = { lean: true };
 
 			const existingUser = await queries.findOne(
 				Schema.users,
