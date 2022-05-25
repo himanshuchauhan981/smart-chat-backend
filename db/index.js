@@ -1,2 +1,2 @@
-exports.connection = require('./connection');
+exports.initiateMongoDB = require('./connection');
 exports.queries = require('./queries');

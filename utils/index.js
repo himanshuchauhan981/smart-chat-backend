@@ -1,1 +1,1 @@
-exports.tokenUtil = require('./token.utils')
+exports.tokenUtil = require('./token.utils');

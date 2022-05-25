@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
-const socket = require('socket.io');
+const socketIO = require('socket.io');
 
 const { userListHandler } = require('../handlers');
 const { APP_DEFAULTS } = require('../constants');
 const Schema = require('../schemas');
 const { queries } = require('../db');
 
-let connectedUsers = {};
+const connectedUsers = {};
 let io;
 
 const getPrivateRoomMessage = async (messageId) => {
-	let query = { _id: mongoose.Types.ObjectId(messageId) };
-	let projections = {
+	const query = { _id: mongoose.Types.ObjectId(messageId) };
+	const projections = {
 		text: 1,
 		createdDate: 1,
 		sender: 1,
@@ -20,41 +20,41 @@ const getPrivateRoomMessage = async (messageId) => {
 		isRead: 1,
 		room: 1,
 	};
-	let options = { lean: true };
-	let collectionOptions = [
+	const options = { lean: true };
+	const collectionOptions = [
 		{ path: 'sender', select: 'firstName lastName' },
 		{ path: 'receiver', select: 'firstName lastName' },
 	];
 
-	let newMessage = await queries.populateData(
+	const newMessage = await queries.populateData(
 		Schema.chats,
 		query,
 		projections,
 		options,
-		collectionOptions
+		collectionOptions,
 	);
 
 	return newMessage;
 };
 
 const getGroupRoomMessage = async (messageId) => {
-	let query = { _id: mongoose.Types.ObjectId(messageId) };
-	let projections = {
+	const query = { _id: mongoose.Types.ObjectId(messageId) };
+	const projections = {
 		text: 1,
 		createdDate: 1,
 		sender: 1,
 		room: 1,
 	};
 
-	let options = { lean: true };
-	let collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
+	const options = { lean: true };
+	const collectionOptions = [{ path: 'sender', select: 'firstName lastName' }];
 
-	let newMessage = await queries.populateData(
+	const newMessage = await queries.populateData(
 		Schema.groupChat,
 		query,
 		projections,
 		options,
-		collectionOptions
+		collectionOptions,
 	);
 
 	return newMessage;
@@ -73,9 +73,10 @@ const deleteConnectedUser = async (socket) => {
 
 const SocketManager = (socket) => {
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.CREATE_USER_SOCKET, async (userId) => {
-		socket.userId = userId;
-		connectedUsers[userId] = socket;
+		const tempSocket = socket;
+		tempSocket.userId = userId;
 
+		connectedUsers[userId] = tempSocket;
 
 		const userDetails = await userListHandler.makeUserOnline(userId);
 
@@ -86,8 +87,8 @@ const SocketManager = (socket) => {
 
 		const userData = {
 			firstName: userDetails.firstName,
-			lastName: userDetails.lastName
-		}
+			lastName: userDetails.lastName,
+		};
 
 		socket.broadcast.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
 
@@ -95,19 +96,19 @@ const SocketManager = (socket) => {
 	});
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.LOGOUT_USER, async () => {
-		let userId = await deleteConnectedUser(socket);
+		const userId = await deleteConnectedUser(socket);
 		if (userId) {
-			let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
+			const socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
 
 			io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
 		}
 	});
 
 	socket.on('disconnect', async () => {
-		let userId = await deleteConnectedUser(socket);
+		const userId = await deleteConnectedUser(socket);
 
 		if (userId) {
-			let socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
+			const socketData = { userId, status: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE };
 
 			io.emit(APP_DEFAULTS.SOCKET_EVENT.ONLINE_STATUS, socketData);
 		}
@@ -116,7 +117,6 @@ const SocketManager = (socket) => {
 	socket.on(
 		APP_DEFAULTS.SOCKET_EVENT.JOIN_PRIVATE_ROOM,
 		async (roomID, sender, receiver) => {
-
 			socket.join(roomID);
 
 			const aggregateData = [
@@ -156,34 +156,34 @@ const SocketManager = (socket) => {
 				},
 			];
 
-			let options = { lean: true };
+			const options = { lean: true };
 
 			const receiverDetails = await queries.aggregateData(
 				Schema.users,
 				aggregateData,
-				options
+				options,
 			);
 
-			query = [
+			const query = [
 				{ $match: { room: roomID } },
 				{
 					$addFields: {
-						isSender : {
+						isSender: {
 							$cond: [
-								{ $eq: [ "$sender", new mongoose.Types.ObjectId(sender) ] },
+								{ $eq: ['$sender', new mongoose.Types.ObjectId(sender)] },
 								1,
-								0
-							]
-						}
-					}
+								0,
+							],
+						},
+					},
 				},
 				{
-					$match : {
-						$or : [
-							{ $and : [{ isSender : 0 }, { toDelete : false }] },
-							{ $and : [{ isSender : 1 }, { fromDelete : false }] },
-						]
-					}
+					$match: {
+						$or: [
+							{ $and: [{ isSender: 0 }, { toDelete: false }] },
+							{ $and: [{ isSender: 1 }, { fromDelete: false }] },
+						],
+					},
 				},
 				{
 					$project: {
@@ -194,29 +194,19 @@ const SocketManager = (socket) => {
 						isRead: 1,
 						fromDelete: 1,
 						toDelete: 1,
-					}
-				}
+					},
+				},
 			];
 
-			projections = {
-				text: 1,
-				createdDate: 1,
-				sender: 1,
-				receiver: 1,
-				isRead: 1,
-				fromDelete: 1,
-				toDelete: 1,
-			};
-
-			const projectionOptions = [
+			const populateOptions = [
 				{ path: 'sender', select: 'firstName lastName' },
 				{ path: 'receiver', select: 'firstName lastName' },
 			];
 
-			let roomMessages = await queries.aggregateDataWithPopulate(
+			const roomMessages = await queries.aggregateDataWithPopulate(
 				Schema.chats,
 				query,
-				projectionOptions
+				populateOptions,
 			);
 
 			const conditions = {
@@ -240,10 +230,10 @@ const SocketManager = (socket) => {
 
 			io.to(roomID).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
-				socketArgs
+				socketArgs,
 			);
 
-			let lastMessage = roomMessages.length ?  roomMessages[roomMessages.length - 1]: {};
+			const lastMessage = roomMessages.length ? roomMessages[roomMessages.length - 1] : {};
 
 			socketArgs = {
 				newMessagesCount: 0,
@@ -254,9 +244,9 @@ const SocketManager = (socket) => {
 
 			io.to(roomID).emit(
 				APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
-				socketArgs
+				socketArgs,
 			);
-		}
+		},
 	);
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.SEND_MESSAGE, async (socketData) => {
@@ -276,13 +266,13 @@ const SocketManager = (socket) => {
 
 			io.to(message.room).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
-				newSocketData
+				newSocketData,
 			);
 
 			const receiverSocket = connectedUsers[newMessage[0].receiver._id];
 
 			if (receiverSocket) {
-				let receiverSocketData = {
+				const receiverSocketData = {
 					newMessagesCount: count,
 					id: newMessage[0].sender._id,
 					createdDate: message.createdDate,
@@ -290,11 +280,10 @@ const SocketManager = (socket) => {
 				};
 				io.to(receiverSocket.id).emit(
 					APP_DEFAULTS.SOCKET_EVENT.PRIVATE_MESSAGES_COUNT,
-					receiverSocketData
+					receiverSocketData,
 				);
 			}
 		} else {
-
 			const message = await queries.create(Schema.groupChat, socketData);
 
 			const newMessage = await getGroupRoomMessage(message._id);
@@ -311,7 +300,7 @@ const SocketManager = (socket) => {
 
 			io.to(message.room).emit(
 				APP_DEFAULTS.SOCKET_EVENT.RECEIVE_NEW_MESSAGE,
-				newSocketData
+				newSocketData,
 			);
 
 			const receiverSocketData = {
@@ -323,13 +312,12 @@ const SocketManager = (socket) => {
 
 			io.to(message.room).emit(
 				APP_DEFAULTS.SOCKET_EVENT.GROUP_MESSAGES_COUNT,
-				receiverSocketData
+				receiverSocketData,
 			);
 		}
 	});
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.JOIN_GROUP_ROOM, async (socketData) => {
-
 		socket.join(socketData.groupId);
 
 		let query = { _id: mongoose.Types.ObjectId(socketData.groupId) };
@@ -340,7 +328,7 @@ const SocketManager = (socket) => {
 			Schema.groupDetails,
 			query,
 			projections,
-			options
+			options,
 		);
 
 		query = { room: socketData.groupId };
@@ -356,7 +344,7 @@ const SocketManager = (socket) => {
 			query,
 			projections,
 			options,
-			collectionOptions
+			collectionOptions,
 		);
 
 		const socketArgs = {
@@ -367,7 +355,7 @@ const SocketManager = (socket) => {
 
 		io.to(socketData.groupId).emit(
 			APP_DEFAULTS.SOCKET_EVENT.RECEIVE_MESSAGES,
-			socketArgs
+			socketArgs,
 		);
 	});
 
@@ -378,44 +366,44 @@ const SocketManager = (socket) => {
 	socket.on(
 		APP_DEFAULTS.SOCKET_EVENT.DELETE_PRIVATE_MESSAGE,
 		async (messageId, sender) => {
-
-			const projections = {sender: 1, receiver:1 };
+			const projections = { sender: 1, receiver: 1 };
 			const options = { lean: true, new: true };
 			const conditions = { _id: mongoose.Types.ObjectId(messageId) };
 			let toUpdate = {};
 
 			const messageDetails = await queries.findOne(Schema.chats, conditions, projections, options);
 
-			if(messageDetails.sender == sender) {
+			if (messageDetails.sender === sender) {
 				toUpdate = { fromDelete: true };
-			}
-			else {
+			} else {
 				toUpdate = { toDelete: true };
 			}
 
 			const specificSocket = connectedUsers[sender];
 
-			if(specificSocket) {
-				io.to(specificSocket.id).emit(APP_DEFAULTS.SOCKET_EVENT.UPDATE_DELETED_PRIVATE_MESSAGE, messageId);
+			if (specificSocket) {
+				io
+					.to(specificSocket.id)
+					.emit(APP_DEFAULTS.SOCKET_EVENT.UPDATE_DELETED_PRIVATE_MESSAGE, messageId);
 			}
 
 			await queries.findAndUpdate(Schema.chats, conditions, { $set: toUpdate }, options);
-		});
+		},
+	);
 };
 
 const createConnection = (server) => {
-
-	io = socket(server);
+	io = socketIO(server);
 	io.on('connection', SocketManager);
 };
 
 const addGroupToGroupList = (groupMembers, groupData) => {
-
-	for(const userId of groupMembers) {
-
-		if(userId in connectedUsers) {
-
-			io.to(connectedUsers[userId].id).emit(APP_DEFAULTS.SOCKET_EVENT.ADD_GROUP_TO_GROUPLIST, groupData);
+	// eslint-disable-next-line no-restricted-syntax
+	for (const userId of groupMembers) {
+		if (userId in connectedUsers) {
+			io
+				.to(connectedUsers[userId].id)
+				.emit(APP_DEFAULTS.SOCKET_EVENT.ADD_GROUP_TO_GROUPLIST, groupData);
 		}
 	}
 };
@@ -423,4 +411,4 @@ const addGroupToGroupList = (groupMembers, groupData) => {
 module.exports = {
 	createConnection,
 	addGroupToGroupList,
-}
+};

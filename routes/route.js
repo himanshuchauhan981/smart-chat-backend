@@ -18,31 +18,31 @@ module.exports = () => {
 	router.get(
 		'/friends',
 		validateAuth.validateToken,
-		userListController.getAllFriendsList
+		userListController.getAllFriendsList,
 	);
 
 	router.get(
 		'/chat/private',
 		validateAuth.validateToken,
-		chatController.getPrivateChats
+		chatController.getPrivateChats,
 	);
 
 	router.get(
 		'/chat/group',
 		validateAuth.validateToken,
-		groupController.getUserGroups
+		groupController.getUserGroups,
 	);
 
 	router.post(
 		'/group',
 		validateAuth.validateToken,
-		groupController.createGroup
+		groupController.createGroup,
 	);
 
 	router.post(
 		'/group/:groupId/addMembers',
 		validateAuth.validateToken,
-		groupController.addNewMembers
+		groupController.addNewMembers,
 	);
 
 	router.get('/users', validateAuth.validateToken, userController.getUsersList);

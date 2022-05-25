@@ -1,47 +1,35 @@
 const queries = {
-	getData: async (model, query, projection, options) => {
-		return model.find(query, projection, options);
-	},
+	getData: async (model, query, projection, options) => model.find(query, projection, options),
 
-	findOne: async (model, query, projection, options) => {
-		return model.findOne(query, projection, options);
-	},
+	findOne: async (model, query, projection, options) => model.findOne(query, projection, options),
 
-	create: async (model, data) => {
-		return new model(data).save();
-	},
+	create: async (Model, data) => new Model(data).save(),
 
-	populateData: (model, query, projection, options, collectionOptions) => {
-		return model
-			.find(query, projection, options)
-			.populate(collectionOptions)
-			.exec();
-	},
+	populateData: (model, query, projection, options, collectionOptions) => model
+		.find(query, projection, options)
+		.populate(collectionOptions)
+		.exec(),
 
-	aggregateDataWithPopulate: (model, aggregateArray, populateOptions) => {
-		return new Promise((resolve, reject) => {
-			model.aggregate(aggregateArray, (err, data) => {
-				if (err) {
-					reject(err);
-				}
-				model.populate(data, populateOptions, function (err, populatedDocs) {
-					if (err) reject(err);
-					resolve(populatedDocs);
-				});
+	aggregateDataWithPopulate:
+	(model, aggregateArray, populateOptions) => new Promise((resolve, reject) => {
+		model.aggregate(aggregateArray, (err, data) => {
+			if (err) {
+				reject(err);
+			}
+			model.populate(data, populateOptions, (populateError, populatedDocs) => {
+				if (populateError) reject(populateError);
+				resolve(populatedDocs);
 			});
 		});
-	},
+	}),
 
-	countDocuments: (model, condition) => {
-		return model.countDocuments(condition);
-	},
+	countDocuments: (model, condition) => model.countDocuments(condition),
 
-	findAndUpdate: (model, conditions, update, options) => {
-		return model.findOneAndUpdate(conditions, update, options);
-	},
+	findAndUpdate:
+	(model, conditions, update, options) => model.findOneAndUpdate(conditions, update, options),
 
 	aggregateData: (model, aggregateArray, options) => {
-		let aggregation = model.aggregate(aggregateArray);
+		const aggregation = model.aggregate(aggregateArray);
 
 		if (options) {
 			aggregation.options = options;
@@ -50,9 +38,7 @@ const queries = {
 		return aggregation.exec();
 	},
 
-	updateMany: (model, conditions, update, options) => {
-		return model.updateMany(conditions, update, options);
-	},
+	updateMany: (model, conditions, update, options) => model.updateMany(conditions, update, options),
 };
 
 module.exports = queries;

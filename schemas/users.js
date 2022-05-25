@@ -6,51 +6,51 @@ const users = new Schema({
 
 	username: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	password: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	firstName: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	lastName: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	image: {
-		type: String
+		type: String,
 	},
 
 	createdDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 
 	modifiedDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 
 	userStatus: {
 		type: String,
-		default: 'Hey there. I am using smart chat'
+		default: 'Hey there. I am using smart chat',
 	},
 
 	isActive: {
 		type: String,
-		default: 'offline'
+		default: 'offline',
 	},
 
 	lastLogin: {
 		type: Number,
-		default: null
+		default: null,
 	},
 
 	lastPasswordReset: {

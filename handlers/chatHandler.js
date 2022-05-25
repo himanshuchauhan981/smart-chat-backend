@@ -62,14 +62,14 @@ const chatHandler = {
 			},
 		];
 
-		let privateChats = await queries.aggregateDataWithPopulate(
+		const privateChats = await queries.aggregateDataWithPopulate(
 			Schema.chats,
 			aggregateArray,
-			populateOptions
+			populateOptions,
 		);
 
 		for (let i = 0; i < privateChats.length; i++) {
-			if (privateChats[i].receiver._id == userDetails.id) {
+			if (privateChats[i].receiver._id === userDetails.id) {
 				const newReceiver = privateChats[i].receiver;
 				privateChats[i].receiver = privateChats[i].sender;
 				privateChats[i].sender = newReceiver;

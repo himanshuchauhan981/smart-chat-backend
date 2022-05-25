@@ -4,8 +4,8 @@ const chatController = require('./chatController');
 const groupController = require('./groupController');
 
 module.exports = {
-  userController,
-  userListController,
-  chatController,
-  groupController
+	userController,
+	userListController,
+	chatController,
+	groupController,
 };

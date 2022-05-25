@@ -8,7 +8,6 @@ const { APP_DEFAULTS } = require('../constants');
 const userListHandler = {
 
 	makeUserOnline: async (userId) => {
-
 		const conditions = { _id: mongoose.Types.ObjectId(userId) };
 		const toUpdate = {
 			$set: {
@@ -18,11 +17,10 @@ const userListHandler = {
 		};
 		const options = { lean: true };
 
-		return await queries.findAndUpdate(Schema.users, conditions, toUpdate, options);
+		return queries.findAndUpdate(Schema.users, conditions, toUpdate, options);
 	},
 
 	makeUserOffline: async (userId) => {
-
 		const conditions = { _id: mongoose.Types.ObjectId(userId) };
 		const toUpdate = { $set: { isActive: APP_DEFAULTS.ACTIVE_STATUS.OFFLINE } };
 		const options = { lean: true };
@@ -31,16 +29,17 @@ const userListHandler = {
 	},
 
 	getAllFriendsList: async (userDetails) => {
-
 		const query = { _id: { $ne: mongoose.Types.ObjectId(userDetails.id) } };
-		const projections = { firstName: 1, lastName: 1, isActive: 1, userStatus: 1 };
+		const projections = {
+			firstName: 1, lastName: 1, isActive: 1, userStatus: 1,
+		};
 		const options = { lean: true };
 
 		const friendsList = await queries.getData(
 			Schema.users,
 			query,
 			projections,
-			options
+			options,
 		);
 
 		return { status: 200, data: { friendsList } };

@@ -6,31 +6,31 @@ const groupDetails = new Schema({
 
 	name: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	status: {
 		type: String,
-		default: null
+		default: null,
 	},
 
 	image: {
 		type: String,
-		default: null
+		default: null,
 	},
 
 	admin: {
-		type: mongoose.Types.ObjectId
+		type: mongoose.Types.ObjectId,
 	},
 
 	createdDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 
 	modifiedDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 });
 

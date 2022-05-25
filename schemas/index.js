@@ -6,10 +6,10 @@ const groupChat = require('./groupChat');
 const groupDetails = require('./groupDetails');
 
 module.exports = {
-  users,
-  chats,
-  groupMembers,
-  userOnlineStatus,
-  groupChat,
-  groupDetails,
+	users,
+	chats,
+	groupMembers,
+	userOnlineStatus,
+	groupChat,
+	groupDetails,
 };

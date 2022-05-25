@@ -7,42 +7,42 @@ const chats = new Schema({
 	sender: {
 		type: Schema.Types.ObjectId,
 		required: true,
-		ref: 'users'
+		ref: 'users',
 	},
 
 	receiver: {
 		type: Schema.Types.ObjectId,
-		ref: 'users'
+		ref: 'users',
 	},
 
 	text: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	createdDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 
 	modifiedDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 
 	room: {
 		type: String,
-		required: true
+		required: true,
 	},
 
 	isRead: {
 		type: Boolean,
-		default: false
+		default: false,
 	},
 
 	isReadDate: {
 		type: Number,
-		default: null
+		default: null,
 	},
 
 	fromDelete: {
@@ -53,7 +53,7 @@ const chats = new Schema({
 	toDelete: {
 		type: Boolean,
 		default: false,
-	}
+	},
 });
 
 module.exports = mongoose.model('chats', chats);

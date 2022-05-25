@@ -14,7 +14,7 @@ const groupMembers = new Schema({
 	userId: {
 		type: mongoose.Types.ObjectId,
 		required: true,
-		ref: 'users'
+		ref: 'users',
 	},
 
 	groupId: {
@@ -26,17 +26,17 @@ const groupMembers = new Schema({
 	status: {
 		type: String,
 		enum: statusEnum,
-		default: statusEnum[0]
+		default: statusEnum[0],
 	},
 
 	createdDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 
 	modifiedDate: {
 		type: Number,
-		default: Date.now
+		default: Date.now,
 	},
 });
 

@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken');
-
 const RESPONSE_MESSAGES = require('../constants/response-messages');
 const { tokenUtil } = require('../utils');
 
@@ -10,12 +8,10 @@ module.exports = {
 
 		if (token) {
 			try {
-
 				result = tokenUtil.decodeJWTToken(token);
 				req.user = result;
 				next();
 			} catch (err) {
-
 				result = {
 					error: RESPONSE_MESSAGES.INVALID_TOKEN.MSG,
 					status: RESPONSE_MESSAGES.INVALID_TOKEN.STATUS_CODE,
@@ -24,7 +20,6 @@ module.exports = {
 				res.status(401).send(result);
 			}
 		} else {
-
 			result = {
 				error: RESPONSE_MESSAGES.NO_TOKEN.MSG,
 				status: RESPONSE_MESSAGES.NO_TOKEN.STATUS_CODE,
