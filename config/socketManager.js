@@ -116,9 +116,10 @@ const SocketManager = (socket) => {
 	socket.on(
 		APP_DEFAULTS.SOCKET_EVENT.JOIN_PRIVATE_ROOM,
 		async (roomID, sender, receiver) => {
+
 			socket.join(roomID);
 
-			let aggregateData = [
+			const aggregateData = [
 				{ $match: { _id: mongoose.Types.ObjectId(receiver) } },
 				{
 					$project: {
@@ -157,38 +158,74 @@ const SocketManager = (socket) => {
 
 			let options = { lean: true };
 
-			let receiverDetails = await queries.aggregateData(
+			const receiverDetails = await queries.aggregateData(
 				Schema.users,
 				aggregateData,
 				options
 			);
 
-			query = { room: roomID };
+			query = [
+				{ $match: { room: roomID } },
+				{
+					$addFields: {
+						isSender : {
+							$cond: [
+								{ $eq: [ "$sender", new mongoose.Types.ObjectId(sender) ] },
+								1,
+								0
+							]
+						}
+					}
+				},
+				{
+					$match : {
+						$or : [
+							{ $and : [{ isSender : 0 }, { toDelete : false }] },
+							{ $and : [{ isSender : 1 }, { fromDelete : false }] },
+						]
+					}
+				},
+				{
+					$project: {
+						text: 1,
+						createdDate: 1,
+						sender: 1,
+						receiver: 1,
+						isRead: 1,
+						fromDelete: 1,
+						toDelete: 1,
+					}
+				}
+			];
+
 			projections = {
 				text: 1,
 				createdDate: 1,
 				sender: 1,
 				receiver: 1,
 				isRead: 1,
+				fromDelete: 1,
+				toDelete: 1,
 			};
-			let collectionOptions = [
+
+			const projectionOptions = [
 				{ path: 'sender', select: 'firstName lastName' },
 				{ path: 'receiver', select: 'firstName lastName' },
 			];
 
-			let roomMessages = await queries.populateData(
+			let roomMessages = await queries.aggregateDataWithPopulate(
 				Schema.chats,
 				query,
-				projections,
-				options,
-				collectionOptions
+				projectionOptions
 			);
-			let conditions = {
+
+			const conditions = {
 				room: roomID,
 				isRead: false,
 				sender: mongoose.Types.ObjectId(receiver),
 			};
-			let toUpdate = {
+
+			const toUpdate = {
 				isRead: true,
 				isReadDate: moment().valueOf(),
 				modifiedDate: moment().valueOf(),
@@ -335,8 +372,35 @@ const SocketManager = (socket) => {
 	});
 
 	socket.on(APP_DEFAULTS.SOCKET_EVENT.USER_TYPING_STATUS, (room, typingStatus, receiver) => {
-		io.to(room).emit('TYPING_STATUS', typingStatus, receiver);
+		io.to(room).emit(APP_DEFAULTS.SOCKET_EVENT.TYPING_STATUS, typingStatus, receiver);
 	});
+
+	socket.on(
+		APP_DEFAULTS.SOCKET_EVENT.DELETE_PRIVATE_MESSAGE,
+		async (messageId, sender) => {
+
+			const projections = {sender: 1, receiver:1 };
+			const options = { lean: true, new: true };
+			const conditions = { _id: mongoose.Types.ObjectId(messageId) };
+			let toUpdate = {};
+
+			const messageDetails = await queries.findOne(Schema.chats, conditions, projections, options);
+
+			if(messageDetails.sender == sender) {
+				toUpdate = { fromDelete: true };
+			}
+			else {
+				toUpdate = { toDelete: true };
+			}
+
+			const specificSocket = connectedUsers[sender];
+
+			if(specificSocket) {
+				io.to(specificSocket.id).emit(APP_DEFAULTS.SOCKET_EVENT.UPDATE_DELETED_PRIVATE_MESSAGE, messageId);
+			}
+
+			await queries.findAndUpdate(Schema.chats, conditions, { $set: toUpdate }, options);
+		});
 };
 
 const createConnection = (server) => {

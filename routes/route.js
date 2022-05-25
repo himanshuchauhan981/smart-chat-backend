@@ -16,19 +16,19 @@ module.exports = () => {
 	router.post('/login', userController.login);
 
 	router.get(
-		'/friendsList',
+		'/friends',
 		validateAuth.validateToken,
 		userListController.getAllFriendsList
 	);
 
 	router.get(
-		'/privateChats',
+		'/chat/private',
 		validateAuth.validateToken,
 		chatController.getPrivateChats
 	);
 
 	router.get(
-		'/groups',
+		'/chat/group',
 		validateAuth.validateToken,
 		groupController.getUserGroups
 	);

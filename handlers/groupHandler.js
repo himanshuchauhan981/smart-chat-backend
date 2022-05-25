@@ -8,12 +8,13 @@ const socketManager = require('../config/socketManager');
 let groupHandler = {
 
 	createGroup: async (groupDetails, userDetails) => {
-
 		try {
+
 			const newGroupPayload = {
 				name: groupDetails.name,
 				admin: userDetails.id,
 			};
+
 			const newGroup = await queries.create(Schema.groupDetails, newGroupPayload);
 
 			groupDetails.participants.forEach(async (item) =>{
@@ -47,6 +48,7 @@ let groupHandler = {
 
 	addNewMembers: async (groupMembers, groupDetails) => {
 		try {
+
 			for (const i = 0; i < groupMembers.length; i++) {
 
 				const newGroupMember = {
@@ -67,15 +69,14 @@ let groupHandler = {
 	},
 
 	getUserGroups: async (userDetails) => {
+
 		const aggregateArray = [
 			{ $match: { userId: mongoose.Types.ObjectId(userDetails.id) } },
 			{
         $lookup: {
 					from: 'groupdetails',
-					let: { 'groupId': '$_id' },
-					pipeline: [
-							{ $match: { $expr: ['$$groupId', '$groupId'] } }
-					],
+					localField: 'groupId',
+					foreignField: '_id',
 					as: 'group'
         }
 			},

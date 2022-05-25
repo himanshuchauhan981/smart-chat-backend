@@ -44,6 +44,16 @@ const chats = new Schema({
 		type: Number,
 		default: null
 	},
+
+	fromDelete: {
+		type: Boolean,
+		default: false,
+	},
+
+	toDelete: {
+		type: Boolean,
+		default: false,
+	}
 });
 
 module.exports = mongoose.model('chats', chats);
