@@ -2,6 +2,7 @@ import express from "express";
 
 import Locals from "./Locals";
 import Routes from "../routes";
+import SocketManager from "./SocketManager";
 
 class Express {
 
@@ -21,11 +22,13 @@ class Express {
   public init(): void {
     const port = Locals.config().port;
 
-    this.express.listen(port, () => {
+    const server = this.express.listen(port, () => {
       console.log('\x1b[33m%s\x1b[0m', `Server :: Running @ 'http://localhost:${port}'`);
     }).on('error', (error) => {
       console.log('Error', error.message);
     });
+
+    SocketManager.init(server);
   }
 }
 
