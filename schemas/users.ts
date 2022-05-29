@@ -1,4 +1,5 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
+import DefaultField from "./defaultFields";
 
 enum status {
 	online = 'online',
@@ -8,41 +9,41 @@ enum status {
 @modelOptions({
 	schemaOptions: { timestamps: true }
 })
-export class User {
+export class User extends DefaultField {
 
 	@prop({ required: true, type: String })
-	public firstName!: string;
+	public firstName: string;
 
 	@prop({ required: true, type: String })
-	public lastName!: string;
+	public lastName: string;
 
 	@prop({ unique: true, required: true, type: String })
-	public username!: string;
+	public username: string;
 
 	@prop({ required: true, type: String })
-	public password!: string;
+	public password: string;
 
 	@prop({
 		default: 'Hey there. I am using smart chat',
 		type: String
 	})
-	public userStatus!: string;
+	public userStatus: string;
 
 	@prop({ type: String })
-	public image!: string;
+	public image: string;
 
 	@prop({
 		enum: status,
 		default: status.offline,
 		type: String
 	})
-	public isActive!: string;
+	public isActive: string;
 
 	@prop({ type: Number })
-	public lastLogin!: number;
+	public lastLogin: number;
 
 	@prop({ type: Number })
-	public lastPasswordReset!: number;
+	public lastPasswordReset: number;
 }
 
 const UserModel = getModelForClass(User);
