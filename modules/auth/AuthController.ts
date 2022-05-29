@@ -14,7 +14,7 @@ class AuthController {
       const payload = req.body;
       const response = await this.authHandler.login(payload);
 
-      res.status(response.status).json({ message: response.message });
+      res.status(response.status).json(response);
     }
     catch(err) {
       next(err);

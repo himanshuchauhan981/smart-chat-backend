@@ -4,9 +4,9 @@ import CustomError from "../exception/CustomError";
 
 function handleError(
   err: CustomError,
-  request: Request,
+  _request: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
   let customError = err;
 

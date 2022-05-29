@@ -7,8 +7,15 @@ import CustomError from "../../exception/CustomError";
 import response from "../../constants/response";
 import { LoginResponse, SignUpResponse } from "./interface/response";
 import statusCode from "../../constants/statusCode";
+import JWTService from "../../utils/jwt.service";
 
 class AuthHandler {
+
+  private readonly jwtService: JWTService;
+
+  constructor() {
+    this.jwtService = new JWTService;
+  }
   
   #generateHashPassword(password: string): Promise<string> {
     const salt = bcyrpt.genSaltSync(10);
@@ -23,13 +30,13 @@ class AuthHandler {
     const userDetails = await UserModel.findOne({ username: payload.username }) as User;
 
     if(!userDetails) {
-      throw new CustomError(response.noUserFound, statusCode.unauthorized);
+      throw new CustomError(response.invalidCredentials, statusCode.unauthorized);
     }
 
     const verifyPassword = this.#verifyPassword(userDetails.password, payload.password);
 
     if(!verifyPassword) {
-      throw new CustomError(response.noUserFound, statusCode.unauthorized);
+      throw new CustomError(response.invalidCredentials, statusCode.unauthorized);
     }
 
     await UserModel.findByIdAndUpdate(
@@ -37,7 +44,17 @@ class AuthHandler {
       { $set: { lastLogin: moment().valueOf() } }
     );
 
-    return { status: statusCode.success, message: response.loginSuccessfull }
+    const jwtPayload = {
+      id: userDetails._id.toString(),
+    }
+
+    const token = this.jwtService.signJWT(jwtPayload);
+
+    return {
+      status: statusCode.success,
+      message: response.loginSuccessfull,
+      data: { token }
+    }
   }
 
   async signUp(payload: SignUpInput): Promise<SignUpResponse>{
