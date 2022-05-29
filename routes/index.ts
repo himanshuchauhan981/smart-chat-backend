@@ -9,7 +9,7 @@ class Routes {
 
     const router = apiRouter.prepareRoutes();
 
-    return express.use('/', router);
+    return express.use('/api', router);
   }
 }
 

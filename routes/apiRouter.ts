@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { API_ROUTES } from "../constants";
+import AuthController from "../modules/auth/AuthController";
 
 class ApiRoutes {
 
@@ -12,9 +13,9 @@ class ApiRoutes {
 
   public prepareRoutes(): Router {
     
-    this.router.post(API_ROUTES.SIGNUP);
+    this.router.post(API_ROUTES.SIGNUP, AuthController.signup);
 
-    this.router.post(API_ROUTES.LOGIN);
+    this.router.post(API_ROUTES.LOGIN, AuthController.login);
     
     this.router.get(API_ROUTES.FRIENDS);
 
