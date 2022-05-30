@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import { API_ROUTES } from "../constants";
 import AuthController from "../modules/auth/AuthController";
+import ChatController from "../modules/chats/ChatController";
+import authValidation from "../middleware/jwtHandler.middleware";
 
 class ApiRoutes {
 
@@ -19,7 +21,7 @@ class ApiRoutes {
     
     this.router.get(API_ROUTES.FRIENDS);
 
-    this.router.get(API_ROUTES.PRIVATE_CHAT);
+    this.router.get(API_ROUTES.PRIVATE_CHAT, authValidation, ChatController.privateChatList);
 
     this.router.post(API_ROUTES.NEW_GROUP);
 

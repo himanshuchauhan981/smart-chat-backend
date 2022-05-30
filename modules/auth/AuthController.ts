@@ -1,4 +1,5 @@
 import { NextFunction } from "express";
+
 import { IRequest, IResponse } from "../../interfaces/Api";
 import AuthHandler from "./AuthHandler";
 

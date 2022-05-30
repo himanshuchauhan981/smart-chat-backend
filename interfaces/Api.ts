@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
 
-export interface IRequest extends Request {}
+export interface User {
+  id: string;
+  iat: number;
+  exp: number;
+}
+
+export interface IRequest extends Request {
+  user?: User
+}
 
 export interface IResponse extends Response {}
 

@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { JWTPayload } from '../interfaces/jwt';
 
 import Locals from '../server/Locals';
@@ -7,7 +7,11 @@ class JWTService {
 	signJWT(payload: JWTPayload) {
 		const secret: string = Locals.config().jwt_secret;
 
-		return jwt.sign(payload, secret);
+		const signOption: SignOptions = {
+			expiresIn: '2h'
+		};
+
+		return jwt.sign(payload, secret, signOption);
 	};
 
 	decode(token: string) {
