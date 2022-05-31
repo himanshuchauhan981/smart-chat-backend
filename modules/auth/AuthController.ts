@@ -4,7 +4,7 @@ import { IRequest, IResponse } from "../../interfaces/Api";
 import AuthHandler from "./AuthHandler";
 
 class AuthController {
-  authHandler: AuthHandler;
+  private authHandler: AuthHandler;
 
   constructor() {
     this.authHandler = new AuthHandler();
@@ -28,6 +28,18 @@ class AuthController {
       const response = await this.authHandler.signUp(payload);
 
       res.status(response.status).json({ message: response.message });
+    }
+    catch(err) {
+      next(err);
+    }
+  }
+
+  public friendsList = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    try{
+      const id = req.user?.id as string;
+      const response = await this.authHandler.friendsList(id);
+
+      res.status(response.status).json(response.data);
     }
     catch(err) {
       next(err);

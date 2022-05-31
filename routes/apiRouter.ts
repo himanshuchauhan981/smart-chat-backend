@@ -19,7 +19,7 @@ class ApiRoutes {
 
     this.router.post(API_ROUTES.LOGIN, AuthController.login);
     
-    this.router.get(API_ROUTES.FRIENDS);
+    this.router.get(API_ROUTES.FRIENDS, authValidation, AuthController.friendsList);
 
     this.router.get(API_ROUTES.PRIVATE_CHAT, authValidation, ChatController.privateChatList);
 
