@@ -1,4 +1,6 @@
 import { Response, Request, NextFunction } from "express";
+import { MongoServerError } from "mongodb";
+
 
 import CustomError from "../exception/CustomError";
 
@@ -10,13 +12,17 @@ function handleError(
 ) {
   let customError = err;
 
-  if (!(err instanceof CustomError)) {
-    customError = new CustomError('Internal Server Error',500);
-
-    res.status((customError as CustomError).status).send(customError);
+  if ((err instanceof CustomError)) {
+    return res.status(err.status).send(customError);
   }
-  res.status(err.status).send(customError);
-  
+
+  if(err['name'] === 'MongoServerError') {
+    customError = new CustomError('Internal Server Error',500, err['message']);
+  }
+  else {
+    customError = new CustomError('Internal Server Error',500);
+  }
+  return res.status((customError as CustomError).status).send(customError);
 }
 
 export default handleError;

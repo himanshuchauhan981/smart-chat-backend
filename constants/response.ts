@@ -1,4 +1,5 @@
 const response = {
+	success: 'success',
 	existingUser: 'Username already existed',
 	invalidCredentials: 'Invalid username or password',
 	noUserFound: 'No user found',

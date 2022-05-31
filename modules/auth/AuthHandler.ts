@@ -6,7 +6,7 @@ import { LoginInput, SignUpInput } from "./interface/Input";
 import UserModel, { User } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
 import response from "../../constants/response";
-import { LoginResponse, SignUpResponse } from "./interface/response";
+import { FriendsListResponse, LoginResponse, SignUpResponse } from "./interface/response";
 import statusCode from "../../constants/statusCode";
 import JWTService from "../../utils/jwt.service";
 
@@ -77,49 +77,58 @@ class AuthHandler {
     }
 	}
 
-  async friendsList(userId: string) {
-    const aggregateArray: any[] = [
-			{ $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
-			{
-				$project: {
-					name: {
-						$concat: [
-							{
-								$concat: [
-									{ $toUpper: { $substrCP: ['$firstName', 0, 1] } },
-									{
-										$substrCP: [
-											'$firstName',
-											1,
-											{ $subtract: [{ $strLenCP: '$firstName' }, 1] },
-										],
-									},
-								],
-							},
-							' ',
-							{
-								$concat: [
-									{ $toUpper: { $substrCP: ['$lastName', 0, 1] } },
-									{
-										$substrCP: [
-											'$lastName',
-											1,
-											{ $subtract: [{ $strLenCP: '$lastName' }, 1] },
-										],
-									},
-								],
-							},
-						],
-					},
-					isActive: 1,
-				},
-			},
-			{ $sort: { $name: 1 } },
-		];
+  async friendsList(userId: string): Promise<FriendsListResponse> {
+    try {
+      const aggregateArray: any[] = [
+        { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
+        {
+          $project: {
+            name: {
+              $concat: [
+                {
+                  $concat: [
+                    { $toUpper: { $substrCP: ['$firstName', 0, 1] } },
+                    {
+                      $substrCP: [
+                        '$firstName',
+                        1,
+                        { $subtract: [{ $strLenCP: '$firstName' }, 1] },
+                      ],
+                    },
+                  ],
+                },
+                ' ',
+                {
+                  $concat: [
+                    { $toUpper: { $substrCP: ['$lastName', 0, 1] } },
+                    {
+                      $substrCP: [
+                        '$lastName',
+                        1,
+                        { $subtract: [{ $strLenCP: '$lastName' }, 1] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            isActive: 1,
+          },
+        },
+        { $sort: { name: 1 } },
+      ];
 
-    const userList = await UserModel.aggregate(aggregateArray);
+      const userList = await UserModel.aggregate(aggregateArray);
 
-    return { status: statusCode.success, data: { userList } };
+      return {
+        status: statusCode.success,
+        message: response.success,
+        data: { userList }
+      };
+    }
+    catch(err) {
+      throw err;
+    }
   }
 }
 
