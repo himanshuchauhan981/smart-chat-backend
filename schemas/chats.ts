@@ -2,11 +2,12 @@ import mongoose from "mongoose";
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
 import { User } from "./users";
+import DefaultField from "./defaultFields";
 
 @modelOptions({
 	schemaOptions: { timestamps: true }
 })
-export class Chat {
+export class Chat extends DefaultField {
 
 	@prop({
 		required: true,
@@ -28,7 +29,7 @@ export class Chat {
 	@prop({ required: true, type: String })
 	public room!: string;
 
-	@prop({ required: true, type: Boolean })
+	@prop({ type: Boolean, default: false })
 	public isRead!: boolean;
 
 	@prop({ type: Number, default: null })
