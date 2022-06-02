@@ -14,5 +14,4 @@ export interface IResponse extends Response {}
 
 export interface ApiResponse {
   status: number;
-  message: string;
 }

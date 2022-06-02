@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import moment from "moment";
 
 import ChatModel from "../../schemas/chats";
-import { SendPrivateMessagePayload } from "../socket/interface";
+import { SendMessagePayload } from "../socket/interface";
 import statusCode from "../../constants/statusCode";
 import response from "../../constants/response";
 
@@ -135,7 +135,7 @@ class ChatHandler {
     );
   }
 
-  async create(payload: SendPrivateMessagePayload) {
+  async create(payload: SendMessagePayload) {
     const populateOptions = [
       { path: 'sender', select: 'firstName lastName' },
       { path: 'receiver', select: 'firstName lastName' },

@@ -2,11 +2,12 @@ import mongoose from "mongoose";
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
 import { User } from "./users";
+import DefaultField from "./defaultFields";
 
 @modelOptions({
 	schemaOptions: { timestamps: true }
 })
-export class GroupDetails {
+export class GroupDetails extends DefaultField {
 
 	@prop({
 		required: true,

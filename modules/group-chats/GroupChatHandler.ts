@@ -1,16 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { QueryWithHelpers } from "mongoose";
 
 import response from "../../constants/response";
 import statusCode from "../../constants/statusCode";
 import GroupChatModel from "../../schemas/groupChat";
-import GroupDetailsModel from "../../schemas/groupDetails";
+import GroupDetailsModel, { GroupDetails } from "../../schemas/groupDetails";
 import GroupMemberModel from "../../schemas/groupMembers";
 import SocketManager from "../../server/SocketManager";
+import { SendMessagePayload } from "../socket/interface";
 import { NewGroupPayload } from "./interface/input";
+import { CreateGroupResponse, GroupListResponse } from "./interface/response";
 
 class GroupChatHandler {
 
-  async createGroup(payload: NewGroupPayload, userId: string) {
+  async createGroup(payload: NewGroupPayload, userId: string): Promise<CreateGroupResponse> {
 
 		const newGroupPayload = {
 			name: payload.name,
@@ -36,7 +38,7 @@ class GroupChatHandler {
 		};
   }
 
-  async userGroupList(userId: string) {
+  async userGroupList(userId: string): Promise<GroupListResponse> {
     const aggregateArray = [
 			{ $match: { userId: new mongoose.Types.ObjectId(userId) } },
 			{
@@ -75,11 +77,11 @@ class GroupChatHandler {
     return { status: statusCode.success, data: { groupList, message: response.success } };
   }
 
-	async findGroupById(id: string) {
+	findGroupById(id: string): QueryWithHelpers<GroupDetails | null, GroupDetails> {
 		return GroupDetailsModel.findById(id);
 	}
 
-	async groupChatList(id: string) {
+	groupChatList(id: string) {
 		const populateOptions = [{ path: 'sender', select: 'firstName lastName' }];
 		const projections = {
 			text: 1,
@@ -90,7 +92,7 @@ class GroupChatHandler {
 		return GroupChatModel.find({ room: id }, projections).populate(populateOptions);
 	}
 
-	async createMessage(messagePayload: any) {
+	async createMessage(messagePayload: SendMessagePayload) {
 
 		const populateOptions = [{ path: 'sender', select: 'firstName lastName' }];
 
