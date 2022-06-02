@@ -44,7 +44,9 @@ class Express {
       console.log('Error', error.message);
     });
 
-    SocketManager.init(server);
+    const socketManager = new SocketManager(server);
+
+    socketManager.init();
   }
 }
 
