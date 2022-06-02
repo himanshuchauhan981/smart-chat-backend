@@ -85,7 +85,7 @@ class GroupChatHandler {
 		const populateOptions = [{ path: 'sender', select: 'firstName lastName' }];
 		const projections = {
 			text: 1,
-			createdDate: 1,
+			createdAt: 1,
 			sender: 1,
 		};
 

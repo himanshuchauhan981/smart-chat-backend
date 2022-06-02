@@ -18,7 +18,6 @@ class GroupChatController {
       res.status(response.status).send(response.data);
     }
     catch(err) {
-      console.log(err);
       next(err);
     }
   };

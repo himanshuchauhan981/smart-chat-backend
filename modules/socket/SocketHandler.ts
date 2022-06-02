@@ -60,14 +60,14 @@ class SocketHandler {
     }
   };
 
-  joinPrivateRoom = async (socket: any, io: any, room: string, senderId: string, receiverId: string): Promise<void> => {
+  joinPrivateRoom = async (socket: any, io: any, room: string, senderId: string, receiverId: string) => {
     socket.join(room);
 
     const [receiverDetails] = await this.authHandler.findUser(receiverId);
 
-    const roomMessages = await this.chatHandler.privateChatMessages(room, senderId);
+    await this.chatHandler.readMessages(room, receiverId);
 
-    this.chatHandler.readMessages(room, receiverId);
+    const roomMessages = await this.chatHandler.privateChatMessages(room, senderId);
 
     const socketReceiveMessages = {
       receiverDetails: receiverDetails,
@@ -77,16 +77,18 @@ class SocketHandler {
 
     io.to(room).emit(socketEvents.RECEIVE_MESSAGES, socketReceiveMessages);
 
-    const lastMessage = roomMessages.length ? roomMessages[roomMessages.length - 1] : null;
+    const senderSocket = this.socketUser[senderId];
 
-    const privateMessageCountSocket = {
-      newMessagesCount: 0,
-      id: receiverId,
-      text: lastMessage ? lastMessage.text : null,
-      createdDate: lastMessage ? lastMessage.createdAt: null,
-    };
+    if(senderSocket) {
+      const senderSocketData = {
+        newMessageCount: 0,
+        id: receiverId,
+				text: roomMessages.length ? roomMessages[roomMessages.length - 1]?.text: null,
+				createdAt: roomMessages.length ? roomMessages[roomMessages.length -1]?.createdAt: null,
+      };
 
-    io.to(room).emit(socketEvents.PRIVATE_MESSAGES_COUNT, privateMessageCountSocket);
+      io.to(senderSocket.id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, senderSocketData);
+    }
   };
 
   sendMessage = async (io: any, messagePayload: SendMessagePayload) => {
@@ -105,11 +107,13 @@ class SocketHandler {
         const receiverSocketData = {
           newMessagesCount: count,
           id: messagePayload.sender,
-          createdDate: newMessage.createdAt,
+          createdAt: newMessage.createdAt,
           text: messagePayload.text,
+          sender: newMessage.sender,
+          receiver: newMessage.receiver,
         };
 
-        io.to(messagePayload.receiver).emit(socketEvents.PRIVATE_MESSAGES_COUNT, receiverSocketData);
+        io.to(this.socketUser[messagePayload.receiver].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, receiverSocketData);
       }
     }
     else {

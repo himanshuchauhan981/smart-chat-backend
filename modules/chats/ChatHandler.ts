@@ -25,7 +25,7 @@ class ChatHandler {
 					sender: 1,
 					receiver: 1,
 					text: 1,
-					createdDate: 1,
+					createdAt: 1,
 					room: 1,
 					unreadMessages: {
 						$cond: [
@@ -128,8 +128,8 @@ class ChatHandler {
     return ChatModel.populate(roomMessages, populateOptions);
   }
 
-  readMessages(room: string, userId: string): void {
-    ChatModel.updateMany(
+  async readMessages(room: string, userId: string): Promise<void> {
+    await ChatModel.updateMany(
       { room, isRead: false, sender: new mongoose.Types.ObjectId(userId) },
       { isRead: true, isReadDate: moment().valueOf() },
     );
@@ -137,8 +137,8 @@ class ChatHandler {
 
   async create(payload: SendMessagePayload) {
     const populateOptions = [
-      { path: 'sender', select: 'firstName lastName' },
-      { path: 'receiver', select: 'firstName lastName' },
+      { path: 'sender', select: 'firstName lastName isActive' },
+      { path: 'receiver', select: 'firstName lastName isActive' },
     ];
     
     const newMessage = await ChatModel.create(payload);
@@ -156,6 +156,10 @@ class ChatHandler {
 
   async deleteMessage(messageId: string, updatePayload: any): Promise<void> {
     await ChatModel.findByIdAndUpdate(messageId, {$set: updatePayload});
+  }
+
+  checkForNewWindowMessage(room: string) {
+    return ChatModel.findOne({ room });
   }
 }
 
