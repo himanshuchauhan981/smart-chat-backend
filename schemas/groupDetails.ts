@@ -18,7 +18,7 @@ export class GroupDetails {
 	@prop({ required: true, type: String })
 	public name!: string;
 
-	@prop({ required: true, type: String })
+	@prop({ default: null, type: String })
 	public status!: string;
 	
 	@prop({ default: null, type: String })

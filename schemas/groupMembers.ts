@@ -3,6 +3,7 @@ import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
 import { User } from "./users";
 import { GroupDetails } from "./groupDetails";
+import DefaultField from "./defaultFields";
 
 enum status {
 	active = 'active',
@@ -12,7 +13,7 @@ enum status {
 @modelOptions({
 	schemaOptions: { timestamps: true }
 })
-export class GroupMember {
+export class GroupMember extends DefaultField {
 
 	@prop({
 		required: true,
