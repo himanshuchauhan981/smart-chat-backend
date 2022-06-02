@@ -1,7 +1,7 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 import DefaultField from "./defaultFields";
 
-enum status {
+export enum UserChatStatus {
 	online = 'online',
 	offline = 'offline',
 }
@@ -33,8 +33,8 @@ export class User extends DefaultField {
 	public image: string;
 
 	@prop({
-		enum: status,
-		default: status.offline,
+		enum: UserChatStatus,
+		default: UserChatStatus.offline,
 		type: String
 	})
 	public isActive: string;

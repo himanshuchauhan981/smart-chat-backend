@@ -11,7 +11,9 @@ enum IsActive {
 
 interface Friends {
   _id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  userStatus: string;
   isActive: IsActive;
 }
 
@@ -23,11 +25,12 @@ interface SignUpResponse extends ApiResponse {}
 
 interface FriendsListResponse extends ApiResponse {
   data: {
-    userList: Friends[]
+    friendsList: Friends[]
   };
 }
 
 export {
+  Friends,
   LoginResponse,
   SignUpResponse,
   FriendsListResponse

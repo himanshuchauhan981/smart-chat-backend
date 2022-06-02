@@ -1,5 +1,4 @@
 import { Response, Request, NextFunction } from "express";
-import { MongoServerError } from "mongodb";
 
 
 import CustomError from "../exception/CustomError";

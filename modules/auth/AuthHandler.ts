@@ -3,7 +3,7 @@ import moment from "moment";
 import mongoose from "mongoose";
 
 import { LoginInput, SignUpInput } from "./interface/Input";
-import UserModel, { User } from "../../schemas/users";
+import UserModel, { User, UserChatStatus } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
 import response from "../../constants/response";
 import { FriendsListResponse, LoginResponse, SignUpResponse } from "./interface/response";
@@ -18,13 +18,47 @@ class AuthHandler {
     this.jwtService = new JWTService;
   }
   
-  #generateHashPassword(password: string): Promise<string> {
+  private generateHashPassword(password: string): Promise<string> {
     const salt = bcyrpt.genSaltSync(10);
     return bcyrpt.hash(password, salt);
   }
 
-  #verifyPassword(hashPassword: string, password: string): boolean {
+  private verifyPassword(hashPassword: string, password: string): boolean {
     return bcyrpt.compareSync(password, hashPassword);
+  }
+
+  private formatName() {
+    return {
+      name: {
+        $concat: [
+          {
+            $concat: [
+              { $toUpper: { $substrCP: ['$firstName', 0, 1] } },
+              {
+                $substrCP: [
+                  '$firstName',
+                  1,
+                  { $subtract: [{ $strLenCP: '$firstName' }, 1] },
+                ],
+              },
+            ],
+          },
+          ' ',
+          {
+            $concat: [
+              { $toUpper: { $substrCP: ['$lastName', 0, 1] } },
+              {
+                $substrCP: [
+                  '$lastName',
+                  1,
+                  { $subtract: [{ $strLenCP: '$lastName' }, 1] },
+                ],
+              },
+            ],
+          },
+        ],
+      }
+    }; 
   }
   
   async login(payload: LoginInput): Promise<LoginResponse> {
@@ -34,7 +68,7 @@ class AuthHandler {
       throw new CustomError(response.invalidCredentials, statusCode.unauthorized);
     }
 
-    const verifyPassword = this.#verifyPassword(userDetails.password, payload.password);
+    const verifyPassword = this.verifyPassword(userDetails.password, payload.password);
 
     if(!verifyPassword) {
       throw new CustomError(response.invalidCredentials, statusCode.unauthorized);
@@ -66,7 +100,7 @@ class AuthHandler {
       if (userDetails) {
         throw new CustomError(response.existingUser, 403);
       }
-      const password = await this.#generateHashPassword(payload.password);
+      const password = await this.generateHashPassword(payload.password);
 
       await UserModel.create({ ...payload, password });
 
@@ -79,56 +113,74 @@ class AuthHandler {
 
   async friendsList(userId: string): Promise<FriendsListResponse> {
     try {
+      const formatNameOption = this.formatName();
       const aggregateArray: any[] = [
         { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
         {
           $project: {
-            name: {
-              $concat: [
-                {
-                  $concat: [
-                    { $toUpper: { $substrCP: ['$firstName', 0, 1] } },
-                    {
-                      $substrCP: [
-                        '$firstName',
-                        1,
-                        { $subtract: [{ $strLenCP: '$firstName' }, 1] },
-                      ],
-                    },
-                  ],
-                },
-                ' ',
-                {
-                  $concat: [
-                    { $toUpper: { $substrCP: ['$lastName', 0, 1] } },
-                    {
-                      $substrCP: [
-                        '$lastName',
-                        1,
-                        { $subtract: [{ $strLenCP: '$lastName' }, 1] },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
+            name: formatNameOption.name,
             isActive: 1,
+            userStatus: 1,
           },
         },
         { $sort: { name: 1 } },
       ];
 
-      const userList = await UserModel.aggregate(aggregateArray);
+      const friendsList = await UserModel.aggregate(aggregateArray);
 
       return {
         status: statusCode.success,
         message: response.success,
-        data: { userList }
+        data: { friendsList }
       };
     }
     catch(err) {
       throw err;
     }
+  }
+
+  updateChatStatus(userId: string, status: string) {
+    let updatePayload: any = {};
+
+    if(status === UserChatStatus.online) {
+      updatePayload.isActive = UserChatStatus.online;
+      updatePayload.lastLogin = moment().valueOf();
+    }
+    else {
+      updatePayload.isActive = UserChatStatus.offline;
+    }
+
+    return UserModel.findByIdAndUpdate(userId, updatePayload, { new: true });
+  }
+
+  findUser(userId: string) {
+    const name = this.formatName();
+
+    const aggregateArray: any[] = [
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      { $project: name },
+    ];
+
+    return UserModel.aggregate(aggregateArray);
+  }
+
+  async findAllUsers(userId: string) {
+    const formatNameOpton = this.formatName();
+
+    const aggregateArray: any = [
+			{ $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
+			{
+				$project: {
+					name: formatNameOpton.name,
+					isActive: 1,
+				},
+			},
+			{ $sort: { name: 1 } },
+		];
+
+    const userList = await UserModel.aggregate(aggregateArray);
+
+    return {status: statusCode.success, message: response.success, data: { userList } };
   }
 }
 

@@ -45,6 +45,18 @@ class AuthController {
       next(err);
     }
   }
+
+  public findAllUsers = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    try{
+      const id = req.user?.id as string;
+      const response = await this.authHandler.findAllUsers(id);
+
+      res.status(response.status).json(response.data);
+    }
+    catch(err) {
+      next(err);
+    }
+  }
 };
 
 export default new AuthController;
