@@ -8,7 +8,7 @@ class JWTService {
 		const secret: string = Locals.config().jwt_secret;
 
 		const signOption: SignOptions = {
-			expiresIn: '2h'
+			expiresIn: '8h'
 		};
 
 		return jwt.sign(payload, secret, signOption);

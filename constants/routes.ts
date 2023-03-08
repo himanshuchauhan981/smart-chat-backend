@@ -7,4 +7,6 @@ export const API_ROUTES = {
   NEW_GROUP: '/group',
   NEW_GROUP_MEMBERS: '/group/:groupId/members',
   USERS: '/users',
+  SPECIFIC_USER: '/user',
+  NEW_FRIEND_REQUEST: '/friendRequest'
 };

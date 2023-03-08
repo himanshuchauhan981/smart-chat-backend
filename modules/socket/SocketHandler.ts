@@ -33,14 +33,14 @@ class SocketHandler {
 			status: socketEvents.ONLINE_STATUS,
 		};
 
-    const userData = {
-			// firstName: userChatStatus.firstName,
-			// lastName: userChatStatus.lastName,
-		};
+    // const userData = {
+		// 	firstName: userChatStatus.firstName,
+		// 	lastName: userChatStatus.lastName,
+		// };
 
     socket.broadcast.emit(socketEvents.ONLINE_STATUS, socketData);
 
-		this.socketUser[userChatStatus?._id.toString()].emit(socketEvents.SOCKET_USER_DATA, userData);
+		// this.socketUser[userChatStatus?._id.toString()].emit(socketEvents.SOCKET_USER_DATA, userData);
   }
 
   removeUser = async (socket: any, io: any) => {
@@ -51,12 +51,12 @@ class SocketHandler {
     if(userId) {
       const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.offline);
 
-      const socketData = {
-        userId: userChatStatus?._id.toString(),
-        status: userChatStatus?.userStatus
-      };
+      // const socketData = {
+      //   userId: userChatStatus?._id.toString(),
+      //   status: userChatStatus?.userStatus
+      // };
 
-      io.emit(socketEvents.ONLINE_STATUS, socketData);
+      // io.emit(socketEvents.ONLINE_STATUS, socketData);
     }
   };
 

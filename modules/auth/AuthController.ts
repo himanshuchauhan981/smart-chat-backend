@@ -56,10 +56,21 @@ class AuthController {
       res.status(response.status).json(response.data);
     }
     catch(err) {
-      console.log('>>>err', err);
       next(err);
     }
   }
+
+  public specificUser = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    try {
+      const user = req.user;
+
+      const response = await this.authHandler.findUser(user?.id as string);
+      res.status(response.status).json(response.data);
+    }
+    catch(err) {
+      next(err);
+    }
+  };
 };
 
 export default new AuthController;

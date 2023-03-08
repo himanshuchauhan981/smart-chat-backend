@@ -3,7 +3,7 @@ import moment from "moment";
 import mongoose from "mongoose";
 
 import { LoginInput, SignUpInput } from "./interface/Input";
-import UserModel, { User, UserChatStatus } from "../../schemas/users";
+import UserModel, { User } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
 import RESPONSE from "../../constants/response";
 import { FriendsListResponse, LoginResponse, SignUpResponse } from "./interface/response";
@@ -142,26 +142,19 @@ class AuthHandler {
   updateChatStatus(userId: string, status: string) {
     let updatePayload: any = {};
 
-    if(status === UserChatStatus.online) {
-      updatePayload.isActive = UserChatStatus.online;
-      updatePayload.lastLogin = moment().valueOf();
-    }
-    else {
-      updatePayload.isActive = UserChatStatus.offline;
-    }
-
+    updatePayload.isActive = status;
     return UserModel.findByIdAndUpdate(userId, updatePayload, { new: true });
   }
 
-  findUser(userId: string) {
-    const name = this.formatName();
-
-    const aggregateArray: any[] = [
-      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
-      { $project: name },
-    ];
-
-    return UserModel.aggregate(aggregateArray);
+  async findUser(userId: string) {
+    const projections = { fullName: 1 };
+    
+    const user = await UserModel.findById(userId, projections);
+    return {
+      status: STATUS_CODE.SUCCESS,
+      message: RESPONSE.SUCCESS,
+      data: { user }
+    };    
   }
 
   async findAllUsers(search: string, userId: string) {

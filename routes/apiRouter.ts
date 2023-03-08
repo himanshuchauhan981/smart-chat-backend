@@ -5,6 +5,7 @@ import AuthController from "../modules/auth/AuthController";
 import ChatController from "../modules/chats/ChatController";
 import authValidation from "../middleware/jwtHandler.middleware";
 import GroupChatController from "../modules/group-chats/GroupChatController";
+import FriendsController from "../modules/friends/FriendsController";
 
 class ApiRoutes {
 
@@ -31,6 +32,10 @@ class ApiRoutes {
     this.router.post(API_ROUTES.NEW_GROUP_MEMBERS);
 
     this.router.get(API_ROUTES.USERS, authValidation, AuthController.findAllUsers);
+
+    this.router.get(API_ROUTES.SPECIFIC_USER, authValidation, AuthController.specificUser);
+
+    this.router.post(API_ROUTES.NEW_FRIEND_REQUEST, authValidation, FriendsController.newRequest);
 
     return this.router;
   }
