@@ -13,8 +13,8 @@ export class Database {
     const url = `mongodb://${host}:${port}/${db}`;
 
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true
     };
 
     mongoose.connect(url, options, (error) => {

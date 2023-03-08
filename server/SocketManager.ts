@@ -10,8 +10,8 @@ class SocketManager {
   static socketHandler: SocketHandler;
 
   constructor(server: any) {
-    SocketManager.io = SocketIO(server);
-    SocketManager.socketHandler = new SocketHandler();
+    SocketManager.io = SocketIO(server, { cors: { origin: '*'} });
+    SocketManager.socketHandler = new SocketHandler();``
   }
 
   public init(): void {

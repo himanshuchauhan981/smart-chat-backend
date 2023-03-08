@@ -4,9 +4,8 @@ interface LoginInput {
 }
 
 interface SignUpInput {
-  firstName: string;
-  lastName: string;
-  username: string;
+  fullName: string;
+  userName: string;
   password: string;
 }
 

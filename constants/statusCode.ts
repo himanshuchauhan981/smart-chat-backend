@@ -1,7 +1,8 @@
 const statusCode = {
-  unauthorized: 401,
-  success: 200,
-  serverError: 500,
+  UNAUTHORIZED: 401,
+  SUCCESS: 200,
+  SERVER_ERROR: 500,
+  CONFLICT: 409
 };
 
 export default statusCode;

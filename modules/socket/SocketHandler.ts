@@ -34,8 +34,8 @@ class SocketHandler {
 		};
 
     const userData = {
-			firstName: userChatStatus.firstName,
-			lastName: userChatStatus.lastName,
+			// firstName: userChatStatus.firstName,
+			// lastName: userChatStatus.lastName,
 		};
 
     socket.broadcast.emit(socketEvents.ONLINE_STATUS, socketData);

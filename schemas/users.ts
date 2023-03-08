@@ -12,13 +12,10 @@ export enum UserChatStatus {
 export class User extends DefaultField {
 
 	@prop({ required: true, type: String })
-	public firstName: string;
+	public fullName: string;
 
 	@prop({ required: true, type: String })
-	public lastName: string;
-
-	@prop({ unique: true, required: true, type: String })
-	public username: string;
+	public userName: string;
 
 	@prop({ required: true, type: String })
 	public password: string;

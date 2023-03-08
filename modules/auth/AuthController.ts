@@ -27,7 +27,7 @@ class AuthController {
       const payload = req.body;
       const response = await this.authHandler.signUp(payload);
 
-      res.status(response.status).json({ message: response.message });
+      res.status(response.status).json({ message: response.message, status: response.status });
     }
     catch(err) {
       next(err);
@@ -48,12 +48,15 @@ class AuthController {
 
   public findAllUsers = async (req: IRequest, res: IResponse, next: NextFunction) => {
     try{
-      const id = req.user?.id as string;
-      const response = await this.authHandler.findAllUsers(id);
+      const search = req.query.search as string;
+      const userId =req.user?.id as string;
+
+      const response = await this.authHandler.findAllUsers(search, userId);
 
       res.status(response.status).json(response.data);
     }
     catch(err) {
+      console.log('>>>err', err);
       next(err);
     }
   }

@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
 import response from "../constants/response";
 
-import statusCode from "../constants/statusCode";
+import STATUS_CODE from "../constants/statusCode";
 import { IRequest, IResponse, User } from "../interfaces/Api";
 import JWTService from "../utils/jwt.service";
 
@@ -12,7 +12,7 @@ function authValidation(req: IRequest, res: IResponse, next: NextFunction): void
     let jwt = req.headers.authorization as string;
 
     if(!jwt) {
-      res.status(statusCode.unauthorized).json({ message: response.requiredToken });
+      res.status(STATUS_CODE.UNAUTHORIZED).json({ message: response.REQUIRED_TOKEN });
     }
 
     if(jwt?.toLocaleLowerCase().startsWith('bearer')) {
@@ -27,10 +27,10 @@ function authValidation(req: IRequest, res: IResponse, next: NextFunction): void
   }
   catch(err: any) {
     if(err.name === 'TokenExpiredError') {
-      res.status(statusCode.unauthorized).json({ message: response.expiredToken });
+      res.status(STATUS_CODE.UNAUTHORIZED).json({ message: response.EXPIRED_TOKEN });
     }
 
-    res.status(statusCode.serverError).json({ message: response.failedTokenValidation });
+    res.status(STATUS_CODE.SERVER_ERROR).json({ message: response.FAILED_TOKEN_VALIDATION });
   }
 }
 

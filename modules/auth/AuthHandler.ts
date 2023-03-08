@@ -5,9 +5,9 @@ import mongoose from "mongoose";
 import { LoginInput, SignUpInput } from "./interface/Input";
 import UserModel, { User, UserChatStatus } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
-import response from "../../constants/response";
+import RESPONSE from "../../constants/response";
 import { FriendsListResponse, LoginResponse, SignUpResponse } from "./interface/response";
-import statusCode from "../../constants/statusCode";
+import STATUS_CODE from "../../constants/statusCode";
 import JWTService from "../../utils/jwt.service";
 
 class AuthHandler {
@@ -65,13 +65,13 @@ class AuthHandler {
     const userDetails = await UserModel.findOne({ username: payload.username }) as User;
 
     if(!userDetails) {
-      throw new CustomError(response.invalidCredentials, statusCode.unauthorized);
+      throw new CustomError(RESPONSE.INVALID_CREDENTIALS, STATUS_CODE.UNAUTHORIZED);
     }
 
     const verifyPassword = this.verifyPassword(userDetails.password, payload.password);
 
     if(!verifyPassword) {
-      throw new CustomError(response.invalidCredentials, statusCode.unauthorized);
+      throw new CustomError(RESPONSE.INVALID_CREDENTIALS, STATUS_CODE.UNAUTHORIZED);
     }
 
     await UserModel.findByIdAndUpdate(
@@ -86,8 +86,8 @@ class AuthHandler {
     const token = this.jwtService.signJWT(jwtPayload);
 
     return {
-      status: statusCode.success,
-      message: response.loginSuccessfull,
+      status: STATUS_CODE.SUCCESS,
+      message: RESPONSE.LOGIN_SUCCESS,
       data: { token }
     }
   }
@@ -95,16 +95,16 @@ class AuthHandler {
   async signUp(payload: SignUpInput): Promise<SignUpResponse>{
 
     try {
-      const userDetails = await UserModel.findOne({ username: payload.username }) as User;
+      const userDetails = await UserModel.findOne({ userName: payload.userName }) as User;
 
       if (userDetails) {
-        throw new CustomError(response.existingUser, 403);
+        throw new CustomError(RESPONSE.EXISTING_USER, STATUS_CODE.CONFLICT);
       }
       const password = await this.generateHashPassword(payload.password);
 
       await UserModel.create({ ...payload, password });
 
-      return { status: statusCode.success, message: response.signupSuccessfull };
+      return { status: STATUS_CODE.SUCCESS, message: RESPONSE.SIGNUP_SUCCESS };
     }
     catch(err) {
       throw err;
@@ -129,8 +129,8 @@ class AuthHandler {
       const friendsList = await UserModel.aggregate(aggregateArray);
 
       return {
-        status: statusCode.success,
-        message: response.success,
+        status: STATUS_CODE.SUCCESS,
+        message: RESPONSE.SUCCESS,
         data: { friendsList }
       };
     }
@@ -164,23 +164,26 @@ class AuthHandler {
     return UserModel.aggregate(aggregateArray);
   }
 
-  async findAllUsers(userId: string) {
-    const formatNameOpton = this.formatName();
+  async findAllUsers(search: string, userId: string) {
+    const conditions = {
+      $or: [
+        { userName: new RegExp(search, 'i') },
+        { fullName: new RegExp(search, 'i') }
+      ],
+      _id: { $ne: new mongoose.Types.ObjectId(userId) }
+    };
+    const projections = { fullName: 1, isActive: 1, userStatus: 1 };
+    const options = { sort: { fullName: 1 }};
 
-    const aggregateArray: any = [
-			{ $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
-			{
-				$project: {
-					name: formatNameOpton.name,
-					isActive: 1,
-				},
-			},
-			{ $sort: { name: 1 } },
-		];
+    const userList = await UserModel.find(conditions, projections, options);
 
-    const userList = await UserModel.aggregate(aggregateArray);
+    const count = await UserModel.count(conditions);
 
-    return {status: statusCode.success, message: response.success, data: { userList } };
+    return {
+      status: STATUS_CODE.SUCCESS,
+      message: RESPONSE.SUCCESS,
+      data: { users: userList, count }
+    };
   }
 }
 
