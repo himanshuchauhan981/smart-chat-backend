@@ -1,6 +1,6 @@
 import bcyrpt from "bcryptjs";
 import moment from "moment";
-import mongoose from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 
 import { LoginInput, SignUpInput } from "./interface/Input";
 import UserModel, { User } from "../../schemas/users";
@@ -158,25 +158,53 @@ class AuthHandler {
   }
 
   async findAllUsers(search: string, userId: string) {
-    const conditions = {
-      $or: [
-        { userName: new RegExp(search, 'i') },
-        { fullName: new RegExp(search, 'i') }
-      ],
-      _id: { $ne: new mongoose.Types.ObjectId(userId) }
-    };
-    const projections = { fullName: 1, isActive: 1, userStatus: 1 };
-    const options = { sort: { fullName: 1 }};
-
-    const userList = await UserModel.find(conditions, projections, options);
-
-    const count = await UserModel.count(conditions);
-
-    return {
-      status: STATUS_CODE.SUCCESS,
-      message: RESPONSE.SUCCESS,
-      data: { users: userList, count }
-    };
+    try {
+      const query = {
+        $or: [
+          { userName: new RegExp(search, 'i') },
+          { fullName: new RegExp(search, 'i') }
+        ],
+        _id: { $ne: new mongoose.Types.ObjectId(userId) }
+      }
+      const aggregationPipeline: PipelineStage[] = [
+        { $match: query },
+        { $addFields: { userId: '$_id' } },
+        { $project: { fullName: 1, isActive: 1, userStatus: 1 } },
+        { $sort: { fullName: 1 } },
+        { $lookup: {
+            from: 'friends',
+            let: { status: '$status', requestedBy: '$requestedBy', 'friendId': '$friendId' },
+            pipeline: [
+                {
+                  $match: {
+                    $and: [
+                      { $expr: { $eq: ['$status', 'REQUESTED'] } },
+                      { $expr: { $eq: ['$requestedBy', new mongoose.Types.ObjectId(userId)] } },
+                      { $expr: { $eq: ['$$friendId', '$userId'] } },
+                      { $expr: { $eq: ['$isDeleted', false] } }
+                    ]
+                  }
+                }
+            ],
+            as: 'friendRequest'
+        }},
+        { $unwind: { path: '$friendRequest', preserveNullAndEmptyArrays: true } },
+        { $project: { fullName: 1, userName: 1, isActive: 1, userStatus: 1, 'friendRequest.status': 1, 'friendRequest._id':1 } }
+      ];
+  
+      const userList = await UserModel.aggregate(aggregationPipeline);
+  
+      const count = await UserModel.count(query);
+  
+      return {
+        status: STATUS_CODE.SUCCESS,
+        message: RESPONSE.SUCCESS,
+        data: { users: userList, count }
+      };
+    }
+    catch(err) {
+      throw err;
+    }
   }
 }
 
