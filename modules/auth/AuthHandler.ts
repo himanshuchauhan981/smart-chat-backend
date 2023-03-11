@@ -62,7 +62,7 @@ class AuthHandler {
   }
   
   async login(payload: LoginInput): Promise<LoginResponse> {
-    const userDetails = await UserModel.findOne({ username: payload.username }) as User;
+    const userDetails = await UserModel.findOne({ userName: payload.userName }) as User;
 
     if(!userDetails) {
       throw new CustomError(RESPONSE.INVALID_CREDENTIALS, STATUS_CODE.UNAUTHORIZED);
@@ -75,7 +75,7 @@ class AuthHandler {
     }
 
     await UserModel.findByIdAndUpdate(
-      userDetails._id, 
+      userDetails._id,
       { $set: { lastLogin: moment().valueOf() } }
     );
 
@@ -168,8 +168,8 @@ class AuthHandler {
       }
       const aggregationPipeline: PipelineStage[] = [
         { $match: query },
-        { $addFields: { userId: '$_id' } },
         { $project: { fullName: 1, isActive: 1, userStatus: 1 } },
+        { $addFields: { userId: '$_id' } },
         { $sort: { fullName: 1 } },
         { $lookup: {
             from: 'friends',
@@ -191,7 +191,7 @@ class AuthHandler {
         { $unwind: { path: '$friendRequest', preserveNullAndEmptyArrays: true } },
         { $project: { fullName: 1, userName: 1, isActive: 1, userStatus: 1, 'friendRequest.status': 1, 'friendRequest._id':1 } }
       ];
-  
+
       const userList = await UserModel.aggregate(aggregationPipeline);
   
       const count = await UserModel.count(query);

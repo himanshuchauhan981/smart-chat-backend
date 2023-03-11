@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
     "lint": "eslint . --fix",
-    "dev": "ts-node-dev --respawn --pretty --transpile-only index.ts"
+    "start": "ts-node-dev --respawn --pretty --transpile-only index.ts"
   },
   "author": "",
   "license": "ISC",

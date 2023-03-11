@@ -1,5 +1,5 @@
 interface LoginInput {
-  username: string;
+  userName: string;
   password: string;
 }
 

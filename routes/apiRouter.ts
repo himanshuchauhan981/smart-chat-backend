@@ -35,7 +35,9 @@ class ApiRoutes {
 
     this.router.get(API_ROUTES.SPECIFIC_USER, authValidation, AuthController.specificUser);
 
-    this.router.post(API_ROUTES.NEW_FRIEND_REQUEST, authValidation, FriendsController.newRequest);
+    this.router.post(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.newRequest);
+
+    this.router.get(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.requestList);
 
     return this.router;
   }

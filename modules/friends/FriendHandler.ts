@@ -31,6 +31,32 @@ class FriendHandler {
 			data: { message: response.NEW_FRIEND_REQUEST },
 		};
   }
+
+  async requestList(userId: string) {
+    try {
+      const conditions = {
+        isDeleted: false,
+        friendId: new mongoose.Types.ObjectId(userId),
+        status: 'REQUESTED',
+      };
+      const projections = { isDeleted: 0, updatedAt: 0, status: 0, friendId: 0 };
+      const options = { sort: { createdAt: -1 } };
+
+      const populate = 
+        { path: 'requestedBy', select: '_id fullName' }
+      ;
+  
+      const existingRequestList = await FriendsModel.find(conditions, projections, options).populate(populate);
+  
+      return {
+        status: statusCode.SUCCESS,
+        data: { requestList: existingRequestList },
+      };
+    }
+    catch(err) {
+      throw err;
+    }
+  };
 };
 
 export default FriendHandler;
