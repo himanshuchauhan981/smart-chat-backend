@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 
-import response from "../../constants/response";
-import statusCode from "../../constants/statusCode";
+import RESPONSE_MESSAGES from "../../constants/response";
+import STATUS_CODE from "../../constants/statusCode";
 import FriendsModel from "../../schemas/friends";
-import { NewFriendRequestPayload } from "./interface/input";
+import { AcceptRejectRequestPayload, NewFriendRequestPayload } from "./interface/input";
+import { AcceptRejectRequestResponse } from './interface/response';
 
 class FriendHandler {
 
@@ -27,8 +28,8 @@ class FriendHandler {
     }
 
     return {
-			status: statusCode.SUCCESS,
-			data: { message: response.NEW_FRIEND_REQUEST },
+			status: STATUS_CODE.SUCCESS,
+			data: { message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST },
 		};
   }
 
@@ -49,7 +50,7 @@ class FriendHandler {
       const existingRequestList = await FriendsModel.find(conditions, projections, options).populate(populate);
   
       return {
-        status: statusCode.SUCCESS,
+        status: STATUS_CODE.SUCCESS,
         data: { requestList: existingRequestList },
       };
     }
@@ -57,6 +58,48 @@ class FriendHandler {
       throw err;
     }
   };
+
+  async acceptRejectRequest(payload: AcceptRejectRequestPayload, userId: string): Promise<AcceptRejectRequestResponse> {
+    try {
+      const conditions = {
+        requestedBy: payload.friendId,
+        friendId: userId,
+      };
+
+      const toUpdate = {
+        status: payload.status,
+      };
+
+      await FriendsModel.updateOne(conditions, toUpdate);
+
+      return {
+        status: STATUS_CODE.SUCCESS,
+        message: RESPONSE_MESSAGES.SUCCESS,
+        data: {}
+      };
+    }
+    catch(err) {
+      throw err;
+    }
+  };
+
+  async removeFriendRequest(friendId: string, requestedBy: string) {
+    try {
+      const conditions = { friendId, requestedBy };
+      const toUpdate = { isDeleted: true };
+
+      await FriendsModel.updateOne(conditions, toUpdate);
+
+      return {
+        status: STATUS_CODE.SUCCESS,
+        message: RESPONSE_MESSAGES.SUCCESS,
+        data: {}
+      };
+    }
+    catch(err) {
+      throw err;
+    }
+  }
 };
 
 export default FriendHandler;

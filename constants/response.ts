@@ -11,7 +11,7 @@ const response = {
 	REQUIRED_TOKEN: 'Token required',
 	EXPIRED_TOKEN: 'Expired Token',
 	FAILED_TOKEN_VALIDATION: 'Failed to authenticate user',
-	NEW_FRIEND_REQUEST: 'Friend request sent'
+	NEW_FRIEND_REQUEST: 'Friend request sent',
 };
 
 export default response;

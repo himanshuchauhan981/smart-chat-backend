@@ -1,5 +1,10 @@
 interface NewFriendRequestPayload {
   friendId: string;
-}
+};
 
-export { NewFriendRequestPayload };
+interface AcceptRejectRequestPayload {
+  friendId: string;
+  status: string;
+};
+
+export { NewFriendRequestPayload, AcceptRejectRequestPayload };

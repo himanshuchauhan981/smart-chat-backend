@@ -16,11 +16,17 @@ class ApiRoutes {
   }
 
   public prepareRoutes(): Router {
-    
-    this.router.post(API_ROUTES.SIGNUP, AuthController.signup);
 
+    // User Auth API
+    this.router.post(API_ROUTES.SIGNUP, AuthController.signup);
     this.router.post(API_ROUTES.LOGIN, AuthController.login);
-    
+    this.router.get(API_ROUTES.SPECIFIC_USER, authValidation, AuthController.specificUser);
+
+    // Friends Request API
+    this.router.post(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.newRequest);
+    this.router.get(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.requestList);
+    this.router.post(API_ROUTES.ACCEPT_REJECT_FRIEND_REQUEST, authValidation, FriendsController.acceptRejectRequest);
+    this.router.delete(API_ROUTES.REMOVE_FRIEND_REQUEST, authValidation, FriendsController.removeFriendRequest);
     this.router.get(API_ROUTES.FRIENDS, authValidation, AuthController.friendsList);
 
     this.router.get(API_ROUTES.PRIVATE_CHAT, authValidation, ChatController.privateChatList);
@@ -33,66 +39,8 @@ class ApiRoutes {
 
     this.router.get(API_ROUTES.USERS, authValidation, AuthController.findAllUsers);
 
-    this.router.get(API_ROUTES.SPECIFIC_USER, authValidation, AuthController.specificUser);
-
-    this.router.post(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.newRequest);
-
-    this.router.get(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.requestList);
-
     return this.router;
   }
 }
 
 export default ApiRoutes;
-
-// const express = require('express');
-
-// const {
-// 	userController,
-// 	groupController,
-// 	userListController,
-// 	chatController,
-// } = require('../controllers');
-// const { validateAuth } = require('../middleware');
-
-// module.exports = () => {
-// 	const router = express.Router();
-
-// 	router.post('/signup', userController.signUp);
-
-// 	router.post('/login', userController.login);
-
-// 	router.get(
-// 		'/friends',
-// 		validateAuth.validateToken,
-// 		userListController.getAllFriendsList,
-// 	);
-
-// 	router.get(
-// 		'/chat/private',
-// 		validateAuth.validateToken,
-// 		chatController.getPrivateChats,
-// 	);
-
-// 	router.get(
-// 		'/chat/group',
-// 		validateAuth.validateToken,
-// 		groupController.getUserGroups,
-// 	);
-
-// 	router.post(
-// 		'/group',
-// 		validateAuth.validateToken,
-// 		groupController.createGroup,
-// 	);
-
-// 	router.post(
-// 		'/group/:groupId/addMembers',
-// 		validateAuth.validateToken,
-// 		groupController.addNewMembers,
-// 	);
-
-// 	router.get('/users', validateAuth.validateToken, userController.getUsersList);
-
-// 	return router;
-// };
