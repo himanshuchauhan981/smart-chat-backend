@@ -5,8 +5,9 @@ import { User } from "./users";
 import DefaultField from "./defaultFields";
 
 export enum RequestStatus {
-	requested = 'REQUESTED',
-	accepted = 'ACCEPTED',
+	REQUESTED = 'REQUESTED',
+	ACCEPTED = 'ACCEPTED',
+	REJECTED = "REJECTED"
 }
 
 @modelOptions({
@@ -30,7 +31,7 @@ export class Friend extends DefaultField {
 
   @prop({
 		enum: RequestStatus,
-		default: RequestStatus.requested,
+		default: RequestStatus.REQUESTED,
 		type: String
 	})
 	public status: string;

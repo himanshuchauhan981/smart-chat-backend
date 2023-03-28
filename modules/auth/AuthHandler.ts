@@ -169,18 +169,17 @@ class AuthHandler {
       const aggregationPipeline: PipelineStage[] = [
         { $match: query },
         { $project: { fullName: 1, isActive: 1, userStatus: 1 } },
-        { $addFields: { userId: '$_id' } },
         { $sort: { fullName: 1 } },
         { $lookup: {
             from: 'friends',
-            let: { status: '$status', requestedBy: '$requestedBy', 'friendId': '$friendId' },
+            let: { userId: '$_id' },
             pipeline: [
                 {
                   $match: {
                     $and: [
-                      { $expr: { $eq: ['$status', 'REQUESTED'] } },
+                      { $expr: { $ne: ['$status', 'REJECTED'] } },
                       { $expr: { $eq: ['$requestedBy', new mongoose.Types.ObjectId(userId)] } },
-                      { $expr: { $eq: ['$$friendId', '$userId'] } },
+                      { $expr: { $eq: ['$friendId', '$$userId'] } },
                       { $expr: { $eq: ['$isDeleted', false] } }
                     ]
                   }

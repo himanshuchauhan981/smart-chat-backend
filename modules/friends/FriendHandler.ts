@@ -43,9 +43,7 @@ class FriendHandler {
       const projections = { isDeleted: 0, updatedAt: 0, status: 0, friendId: 0 };
       const options = { sort: { createdAt: -1 } };
 
-      const populate = 
-        { path: 'requestedBy', select: '_id fullName' }
-      ;
+      const populate = { path: 'requestedBy', select: '_id fullName' };
   
       const existingRequestList = await FriendsModel.find(conditions, projections, options).populate(populate);
   
@@ -71,6 +69,10 @@ class FriendHandler {
       };
 
       await FriendsModel.updateOne(conditions, toUpdate);
+
+      if(payload.status === 'ACCEPTED') {
+        await FriendsModel.updateOne({ requestedBy: userId, friendId: payload.friendId }, { status: 'ACCEPTED' });
+      }
 
       return {
         status: STATUS_CODE.SUCCESS,
