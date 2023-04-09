@@ -14,6 +14,9 @@ class Locals {
     // MONGO DB config
     const mongo_host = process.env.MONGO_HOSTNAME;
     const mongo_port = process.env.MONGO_PORT;
+    const mongo_user = process.env.MONGO_USER;
+    const mongo_password = process.env.MONGO_PASSWORD;
+    const mongo_url = process.env.MONGO_URL;
     const mongo_db = process.env.MONGO_DB;
 
     return {
@@ -23,6 +26,9 @@ class Locals {
       mongo_host,
       mongo_port,
       mongo_db,
+      mongo_user,
+      mongo_password,
+      mongo_url
     };
   }
 }

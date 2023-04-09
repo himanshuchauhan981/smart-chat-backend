@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import RESPONSE_MESSAGES from "../../constants/response";
 import STATUS_CODE from "../../constants/statusCode";
-import FriendsModel from "../../schemas/friends";
+import FriendsModel, { RequestStatus } from "../../schemas/friends";
 import { AcceptRejectRequestPayload, NewFriendRequestPayload } from "./interface/input";
 import { AcceptRejectRequestResponse } from './interface/response';
 
@@ -70,8 +70,11 @@ class FriendHandler {
 
       await FriendsModel.updateOne(conditions, toUpdate);
 
-      if(payload.status === 'ACCEPTED') {
-        await FriendsModel.updateOne({ requestedBy: userId, friendId: payload.friendId }, { status: 'ACCEPTED' });
+      if(payload.status === RequestStatus.ACCEPTED) {
+        await FriendsModel.updateOne(
+          { requestedBy: new mongoose.Types.ObjectId(userId), friendId: new mongoose.Types.ObjectId(payload.friendId) },
+          { status: payload.status }
+        );
       }
 
       return {

@@ -5,19 +5,19 @@ import Locals from './Locals';
 export class Database {
 
   public static init(): void {
-    const host = Locals.config().mongo_host;
-    const port = Locals.config().mongo_port;
+    const url = Locals.config().mongo_url;
     const db = Locals.config().mongo_db;
+    const user = Locals.config().mongo_user;
+    const password = Locals.config().mongo_password;
 
 
-    const url = `mongodb://${host}:${port}/${db}`;
+    const mongoURL = `mongodb+srv://${user}:${password}@${url}`;
 
     const options = {
-      // useNewUrlParser: true,
-      // useUnifiedTopology: true
+      dbName: db,
     };
 
-    mongoose.connect(url, options, (error) => {
+    mongoose.connect(mongoURL, options, (error) => {
       if(error) {
         throw error;
       }
