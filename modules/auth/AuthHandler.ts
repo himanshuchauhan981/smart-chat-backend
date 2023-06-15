@@ -93,12 +93,23 @@ class AuthHandler {
   }
 
   async signUp(payload: SignUpInput): Promise<SignUpResponse>{
-
     try {
-      const userDetails = await UserModel.findOne({ userName: payload.userName }) as User;
+      const searchConditions = {
+        $or: [
+          { userName: payload.userName },
+          { email: payload.email }
+        ]
+      };
+      
+      const projections = { _id: 1, email: 1 };
+      const userDetails = await UserModel.findOne(searchConditions, projections) as User;
 
       if (userDetails) {
-        throw new CustomError(RESPONSE.EXISTING_USER, STATUS_CODE.CONFLICT);
+
+        if(userDetails.email === payload.email) {
+          throw new CustomError(RESPONSE.EXISTING_EMAIL, STATUS_CODE.CONFLICT);
+        }
+        throw new CustomError(RESPONSE.EXISTING_USERNAME, STATUS_CODE.CONFLICT);
       }
       const password = await this.generateHashPassword(payload.password);
 

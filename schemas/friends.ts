@@ -11,7 +11,7 @@ export enum RequestStatus {
 }
 
 @modelOptions({
-	schemaOptions: { timestamps: true }
+	schemaOptions: { timestamps: true, versionKey: false }
 })
 export class Friend extends DefaultField {
 
@@ -28,6 +28,12 @@ export class Friend extends DefaultField {
 		ref: () => User
 	})
 	public requestedBy: User;
+
+	@prop({
+		required: false,
+		type: String,
+	})
+	public invitationMessage: string;
 
   @prop({
 		enum: RequestStatus,

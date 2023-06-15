@@ -1,5 +1,6 @@
 interface NewFriendRequestPayload {
-  friendId: string;
+  email: string;
+  invitationMessage?: string;
 };
 
 interface AcceptRejectRequestPayload {

@@ -1,6 +1,8 @@
 const response = {
 	SUCCESS: 'success',
-	EXISTING_USER: 'Username already existed',
+	EXISTING_USERNAME: 'Username already existed',
+	INVALID_EMAIL: 'Invalid email address',
+	EXISTING_EMAIL: 'Email already exists',
 	INVALID_CREDENTIALS: 'Invalid username or password',
 	NO_USER_FOUND: 'No user found',
 	INVALID_TOKEN: 'Invalid token',
@@ -12,6 +14,7 @@ const response = {
 	EXPIRED_TOKEN: 'Expired Token',
 	FAILED_TOKEN_VALIDATION: 'Failed to authenticate user',
 	NEW_FRIEND_REQUEST: 'Friend request sent',
+	EXISTED_FRIEND_REQUEST: 'Friend request is already sent to this user'
 };
 
 export default response;

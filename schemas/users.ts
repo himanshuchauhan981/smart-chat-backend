@@ -7,7 +7,7 @@ export enum UserChatStatus {
 }
 
 @modelOptions({
-	schemaOptions: { timestamps: true }
+	schemaOptions: { timestamps: true, versionKey: false }
 })
 export class User extends DefaultField {
 
@@ -16,6 +16,9 @@ export class User extends DefaultField {
 
 	@prop({ required: true, type: String })
 	public userName: string;
+
+	@prop({ required: true, type: String })
+	public email: string;
 
 	@prop({ required: true, type: String })
 	public password: string;

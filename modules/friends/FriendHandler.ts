@@ -5,31 +5,48 @@ import STATUS_CODE from "../../constants/statusCode";
 import FriendsModel, { RequestStatus } from "../../schemas/friends";
 import { AcceptRejectRequestPayload, NewFriendRequestPayload } from "./interface/input";
 import { AcceptRejectRequestResponse } from './interface/response';
+import UserModel from '../../schemas/users';
+import CustomError from '../../exception/CustomError';
+
 
 class FriendHandler {
 
   async newRequest(payload: NewFriendRequestPayload, userId: string) {
+    const existingUser = await UserModel.findOne(
+      { email: payload.email, _id: { $ne: new mongoose.Types.ObjectId(userId) } },
+      { _id: 1 }
+    );
+
+    if(!existingUser) {
+      throw new CustomError(RESPONSE_MESSAGES.INVALID_EMAIL, STATUS_CODE.NOT_FOUND);
+    }
+
     const requestCondition = {
       isDeleted: false,
       requestedBy: new mongoose.Types.ObjectId(userId),
-      friendId: new mongoose.Types.ObjectId(payload.friendId),
-      status: 'REQUESTED',
+      friendId: new mongoose.Types.ObjectId(existingUser?._id),
     };
 
     const existingFriendRequest = await FriendsModel.findOne(requestCondition, { _id: 1 });
 
     if(!existingFriendRequest) {
       const newFriendPayload = {
-        friendId: payload.friendId,
+        friendId: existingUser._id,
         requestedBy: userId,
+        invitationMessage: payload.invitationMessage,
       };
   
       await FriendsModel.create(newFriendPayload);
+
+      return {
+        status: STATUS_CODE.SUCCESS,
+        data: { message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST, status: STATUS_CODE.SUCCESS },
+      };
     }
 
     return {
-			status: STATUS_CODE.SUCCESS,
-			data: { message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST },
+			status: STATUS_CODE.BAD_REQUEST,
+			data: { message: RESPONSE_MESSAGES.EXISTED_FRIEND_REQUEST, status: STATUS_CODE.BAD_REQUEST },
 		};
   }
 

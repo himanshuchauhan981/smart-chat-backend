@@ -10,8 +10,7 @@ export class Database {
     const user = Locals.config().mongo_user;
     const password = Locals.config().mongo_password;
 
-
-    const mongoURL = `mongodb+srv://${user}:${password}@${url}`;
+    const mongoURL = `mongodb+srv://${user}:${password}@${url}?retryWrites=true&w=majority`
 
     const options = {
       dbName: db,
