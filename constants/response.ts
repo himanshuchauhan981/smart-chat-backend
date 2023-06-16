@@ -14,7 +14,9 @@ const response = {
 	EXPIRED_TOKEN: 'Expired Token',
 	FAILED_TOKEN_VALIDATION: 'Failed to authenticate user',
 	NEW_FRIEND_REQUEST: 'Friend request sent',
-	EXISTED_FRIEND_REQUEST: 'Friend request is already sent to this user'
+	EXISTED_FRIEND_REQUEST: 'Friend request is already sent to this user',
+	ACCEPTED_FRIEND_REQUEST: 'This user is already your friend',
+	EXISTED_PENDING_REQUEST: 'You have already pending request to accept',
 };
 
 export default response;

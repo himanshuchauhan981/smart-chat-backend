@@ -4,8 +4,9 @@ import response from "../constants/response";
 import STATUS_CODE from "../constants/statusCode";
 import { IRequest, IResponse, User } from "../interfaces/Api";
 import JWTService from "../utils/jwt.service";
+import UserModel from "../schemas/users";
 
-function authValidation(req: IRequest, res: IResponse, next: NextFunction): void {
+async function authValidation(req: IRequest, res: IResponse, next: NextFunction): Promise<void> {
   try {
     const jwtService = new JWTService();
 
@@ -21,7 +22,12 @@ function authValidation(req: IRequest, res: IResponse, next: NextFunction): void
 
     const decodedToken = jwtService.decode(jwt) as User;
 
-    req.user = decodedToken;
+    const userDetails = await UserModel.findById(decodedToken.id);
+
+    req.user = {
+      ...decodedToken,
+      fullName: userDetails?.fullName as string,
+    };
 
     next();
   }

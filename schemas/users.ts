@@ -2,8 +2,8 @@ import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 import DefaultField from "./defaultFields";
 
 export enum UserChatStatus {
-	online = 'online',
-	offline = 'offline',
+	online = 'ONLINE',
+	offline = 'OFFLINE',
 }
 
 @modelOptions({

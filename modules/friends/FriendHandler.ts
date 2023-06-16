@@ -7,47 +7,85 @@ import { AcceptRejectRequestPayload, NewFriendRequestPayload } from "./interface
 import { AcceptRejectRequestResponse } from './interface/response';
 import UserModel from '../../schemas/users';
 import CustomError from '../../exception/CustomError';
+import NotificationHandler from '../notifications/NotificationHandler';
+import { NotificationType } from '../../schemas/notifications';
+import { User } from '../../interfaces/Api';
 
 
 class FriendHandler {
+  notificationHandler: NotificationHandler;
 
-  async newRequest(payload: NewFriendRequestPayload, userId: string) {
-    const existingUser = await UserModel.findOne(
-      { email: payload.email, _id: { $ne: new mongoose.Types.ObjectId(userId) } },
-      { _id: 1 }
-    );
+  constructor() {
+    this.notificationHandler = new NotificationHandler();
+  }
 
-    if(!existingUser) {
-      throw new CustomError(RESPONSE_MESSAGES.INVALID_EMAIL, STATUS_CODE.NOT_FOUND);
-    }
-
-    const requestCondition = {
-      isDeleted: false,
-      requestedBy: new mongoose.Types.ObjectId(userId),
-      friendId: new mongoose.Types.ObjectId(existingUser?._id),
-    };
-
-    const existingFriendRequest = await FriendsModel.findOne(requestCondition, { _id: 1 });
-
-    if(!existingFriendRequest) {
-      const newFriendPayload = {
-        friendId: existingUser._id,
-        requestedBy: userId,
-        invitationMessage: payload.invitationMessage,
+  async newRequest(payload: NewFriendRequestPayload, user: User) {
+    try {
+      const existingUser = await UserModel.findOne(
+        { email: payload.email, _id: { $ne: new mongoose.Types.ObjectId(user.id) } },
+        { _id: 1 }
+      );
+  
+      if(!existingUser) {
+        throw new CustomError(RESPONSE_MESSAGES.INVALID_EMAIL, STATUS_CODE.NOT_FOUND);
+      }
+  
+      const requestCondition = {
+        $and: [
+          { isDeleted: false },
+          {
+            $or: [
+              { requestedBy: new mongoose.Types.ObjectId(user.id) },
+              { requestedBy: new mongoose.Types.ObjectId(existingUser._id) }
+            ]
+          },
+          {
+            $or: [
+              { friendId: new mongoose.Types.ObjectId(user.id) },
+              { friendId: new mongoose.Types.ObjectId(existingUser._id) }
+            ]
+          },
+          { status: { $ne: RequestStatus.REJECTED } }
+        ],
       };
   
-      await FriendsModel.create(newFriendPayload);
+      const existingFriendRequest = await FriendsModel.findOne(requestCondition, { _id: 1, requestedBy: 1, status: 1 });
+  
+      if(!existingFriendRequest) {
+        const newFriendPayload = {
+          friendId: existingUser._id,
+          requestedBy: user.id,
+          invitationMessage: payload.invitationMessage,
+        };
+    
+        await FriendsModel.create(newFriendPayload);
 
-      return {
-        status: STATUS_CODE.SUCCESS,
-        data: { message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST, status: STATUS_CODE.SUCCESS },
-      };
+        const notificationPayload = {
+          type: NotificationType.send_friend_request,
+          receiver: [existingUser._id.toString()],
+          senderName: user.fullName,
+        };
+
+        await this.notificationHandler.create(notificationPayload, user.id);
+  
+        return {
+          status: STATUS_CODE.SUCCESS,
+          data: { message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST, status: STATUS_CODE.SUCCESS },
+        };
+      }
+
+      if(existingFriendRequest.status === RequestStatus.ACCEPTED) {
+        throw new CustomError(RESPONSE_MESSAGES.ACCEPTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
+      }
+      else if(user.id !== existingFriendRequest.requestedBy.toString()) {
+        throw new CustomError(RESPONSE_MESSAGES.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
+      }
+  
+      throw new CustomError(RESPONSE_MESSAGES.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
     }
-
-    return {
-			status: STATUS_CODE.BAD_REQUEST,
-			data: { message: RESPONSE_MESSAGES.EXISTED_FRIEND_REQUEST, status: STATUS_CODE.BAD_REQUEST },
-		};
+    catch (error) {
+      throw error;
+    }
   }
 
   async requestList(userId: string) {

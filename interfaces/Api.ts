@@ -4,10 +4,11 @@ export interface User {
   id: string;
   iat: number;
   exp: number;
+  fullName: string;
 }
 
 export interface IRequest extends Request {
-  user?: User
+  user?: User;
 }
 
 export interface IResponse extends Response {}
