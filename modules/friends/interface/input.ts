@@ -6,6 +6,18 @@ interface NewFriendRequestPayload {
 interface AcceptRejectRequestPayload {
   friendId: string;
   status: string;
+  acceptedOn?: string;
+  rejectedOn?: string;
 };
 
-export { NewFriendRequestPayload, AcceptRejectRequestPayload };
+interface AcceptRejectRequestUpdatePayload {
+  status: string;
+  acceptedOn?: Date;
+  rejectedOn?: Date;
+};
+
+export {
+  NewFriendRequestPayload,
+  AcceptRejectRequestPayload,
+  AcceptRejectRequestUpdatePayload,
+};

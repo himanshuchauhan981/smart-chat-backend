@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import RESPONSE_MESSAGES from "../../constants/response";
 import STATUS_CODE from "../../constants/statusCode";
 import FriendsModel, { RequestStatus } from "../../schemas/friends";
-import { AcceptRejectRequestPayload, NewFriendRequestPayload } from "./interface/input";
+import { AcceptRejectRequestPayload, AcceptRejectRequestUpdatePayload, NewFriendRequestPayload } from "./interface/input";
 import { AcceptRejectRequestResponse } from './interface/response';
 import UserModel from '../../schemas/users';
 import CustomError from '../../exception/CustomError';
@@ -62,7 +62,7 @@ class FriendHandler {
 
         const notificationPayload = {
           type: NotificationType.send_friend_request,
-          receiver: [existingUser._id.toString()],
+          receiver: existingUser._id.toString(),
           senderName: user.fullName,
         };
 
@@ -98,9 +98,9 @@ class FriendHandler {
       const projections = { isDeleted: 0, updatedAt: 0, status: 0, friendId: 0 };
       const options = { sort: { createdAt: -1 } };
 
-      const populate = { path: 'requestedBy', select: '_id fullName' };
+      const populateOptions = { path: 'requestedBy', select: '_id fullName' };
   
-      const existingRequestList = await FriendsModel.find(conditions, projections, options).populate(populate);
+      const existingRequestList = await FriendsModel.find(conditions, projections, options).populate(populateOptions);
   
       return {
         status: STATUS_CODE.SUCCESS,
@@ -114,28 +114,44 @@ class FriendHandler {
 
   async acceptRejectRequest(payload: AcceptRejectRequestPayload, userId: string): Promise<AcceptRejectRequestResponse> {
     try {
-      const conditions = {
-        requestedBy: payload.friendId,
-        friendId: userId,
+      const uploadConditions = {
+        friendId: new mongoose.Types.ObjectId(userId),
+        requestedBy: new mongoose.Types.ObjectId(payload.friendId),
+        status: RequestStatus.REQUESTED,
       };
 
-      const toUpdate = {
+      let toUpdate: AcceptRejectRequestUpdatePayload = {
         status: payload.status,
       };
 
-      await FriendsModel.updateOne(conditions, toUpdate);
-
       if(payload.status === RequestStatus.ACCEPTED) {
-        await FriendsModel.updateOne(
-          { requestedBy: new mongoose.Types.ObjectId(userId), friendId: new mongoose.Types.ObjectId(payload.friendId) },
-          { status: payload.status }
-        );
+        toUpdate.acceptedOn = new Date();
       }
+      else toUpdate.rejectedOn = new Date();
+
+      const status = await FriendsModel.updateOne(
+        uploadConditions,
+        toUpdate,
+      );
+
+      if(!status.modifiedCount) {
+        throw new CustomError(RESPONSE_MESSAGES.INVALID_FRIEND_ID, STATUS_CODE.NOT_FOUND);
+      }
+
+      const friendDetails = await UserModel.findById(userId, { fullName: 1 } );
+
+      const notificationPayload = {
+        type: NotificationType.accept_friend_request,
+        receiver: payload.friendId,
+        receiverName: friendDetails?.fullName,
+      };
+
+      await this.notificationHandler.create(notificationPayload, userId);
 
       return {
         status: STATUS_CODE.SUCCESS,
         message: RESPONSE_MESSAGES.SUCCESS,
-        data: {}
+        data: { message: RESPONSE_MESSAGES.SUCCESS }
       };
     }
     catch(err) {

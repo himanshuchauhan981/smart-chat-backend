@@ -17,6 +17,7 @@ const response = {
 	EXISTED_FRIEND_REQUEST: 'Friend request is already sent to this user',
 	ACCEPTED_FRIEND_REQUEST: 'This user is already your friend',
 	EXISTED_PENDING_REQUEST: 'You have already pending request to accept',
+	INVALID_FRIEND_ID: 'Invalid friend ID',
 };
 
 export default response;

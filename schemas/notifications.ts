@@ -26,8 +26,8 @@ export class Notification extends DefaultField {
 	})
 	public sender: User;
 
-	@prop({ required: true, type: [mongoose.Types.ObjectId] })
-	public receiver: string[];
+	@prop({ required: true, type: mongoose.Types.ObjectId })
+	public receiver: string;
 
   @prop({ default: NotificationReadStatus.unread, enum: NotificationReadStatus, type: String })
 	public status: string;

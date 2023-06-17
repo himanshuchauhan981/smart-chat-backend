@@ -2,7 +2,7 @@ interface NewNotificationPayload {
   type: string;
   senderName?: string;
   receiverName?: string;
-  receiver: string[];
+  receiver: string;
 };
 
 export type {

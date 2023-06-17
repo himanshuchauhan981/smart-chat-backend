@@ -47,6 +47,18 @@ export class Friend extends DefaultField {
 		type: Boolean
 	})
 	public isDeleted: boolean;
+
+	@prop({
+		required: false,
+		type: Date,
+	})
+	public acceptedOn: string;
+
+	@prop({
+		required: false,
+		type: Date,
+	})
+	public rejectedOn: string;
 }
 
 const FriendsModel = getModelForClass(Friend);

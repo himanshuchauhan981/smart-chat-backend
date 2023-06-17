@@ -1,8 +1,5 @@
-import mongoose from "mongoose";
-
-import { NotificationType } from "../../schemas/notifications";
+import NotificationModel, { NotificationType } from "../../schemas/notifications";
 import { NewNotificationPayload } from "./interface/input";
-import Notification from '../../schemas/notifications';
 
 class NotificationHandler {
 
@@ -20,13 +17,15 @@ class NotificationHandler {
         body = `${payload.receiverName} has accepted your friend request`;
       }
 
-      await Notification.create({
+      const newNotification = new NotificationModel({
         title,
         body,
         receiver: payload.receiver,
         sender,
         type: payload.type
       });
+
+      await newNotification.save();
      }
     catch (error) {
       throw error;
