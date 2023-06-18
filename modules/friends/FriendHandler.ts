@@ -10,7 +10,7 @@ import CustomError from '../../exception/CustomError';
 import NotificationHandler from '../notifications/NotificationHandler';
 import { NotificationType } from '../../schemas/notifications';
 import { User } from '../../interfaces/Api';
-
+import { FriendsListResponse } from '../auth/interface/response';
 
 class FriendHandler {
   notificationHandler: NotificationHandler;
@@ -69,8 +69,8 @@ class FriendHandler {
         await this.notificationHandler.create(notificationPayload, user.id);
   
         return {
-          status: STATUS_CODE.SUCCESS,
-          data: { message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST, status: STATUS_CODE.SUCCESS },
+          message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST,
+          status: STATUS_CODE.SUCCESS
         };
       }
 
@@ -93,7 +93,7 @@ class FriendHandler {
       const conditions = {
         isDeleted: false,
         friendId: new mongoose.Types.ObjectId(userId),
-        status: 'REQUESTED',
+        status: RequestStatus.REQUESTED,
       };
       const projections = { isDeleted: 0, updatedAt: 0, status: 0, friendId: 0 };
       const options = { sort: { createdAt: -1 } };
@@ -104,7 +104,7 @@ class FriendHandler {
   
       return {
         status: STATUS_CODE.SUCCESS,
-        data: { requestList: existingRequestList },
+        requestList: existingRequestList,
       };
     }
     catch(err) {
@@ -151,7 +151,6 @@ class FriendHandler {
       return {
         status: STATUS_CODE.SUCCESS,
         message: RESPONSE_MESSAGES.SUCCESS,
-        data: { message: RESPONSE_MESSAGES.SUCCESS }
       };
     }
     catch(err) {
@@ -170,6 +169,58 @@ class FriendHandler {
         status: STATUS_CODE.SUCCESS,
         message: RESPONSE_MESSAGES.SUCCESS,
         data: {}
+      };
+    }
+    catch(err) {
+      throw err;
+    }
+  }
+
+  async friendsList(userId: string, query: any): Promise<FriendsListResponse> {
+    try {
+      const pageSize = parseInt(query.pageSize, 10);
+      const pageIndex = pageSize * parseInt(query.pageIndex, 10);
+      
+      const matchConditions = {
+        $or: [
+          { friendId: new mongoose.Types.ObjectId(userId) },
+          { requestedBy: new mongoose.Types.ObjectId(userId) },
+        ],
+        status: RequestStatus.ACCEPTED,
+        isDeleted: false,
+      };
+  
+      const aggregateArray: any[] = [
+        {
+          $match: matchConditions,
+        },
+        { $skip: pageIndex },
+        { $limit: pageSize },
+        {
+          $project: {
+            friendId: {
+              $cond: {
+                if: { $ne: ["$friendId", new mongoose.Types.ObjectId(userId)] },
+                then: "$friendId",
+                else: "$requestedBy",
+              },
+            },
+          },
+        },
+        { $lookup: { from: "users", localField: "friendId", foreignField: "_id", as: "users" } },
+        { $unwind: "$users" },
+        { $project: { friendId: 1, friendName: "$users.fullName", isActive: "$users.isActive" } },
+      ];
+
+      const friends = await FriendsModel.aggregate(aggregateArray);
+
+      const count = await FriendsModel.countDocuments(matchConditions);
+
+      return {
+        status: STATUS_CODE.SUCCESS,
+        message: RESPONSE_MESSAGES.SUCCESS,
+        friends,
+        count,
       };
     }
     catch(err) {

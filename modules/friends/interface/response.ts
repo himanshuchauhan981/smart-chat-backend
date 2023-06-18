@@ -24,9 +24,7 @@ interface GroupListResponse extends ApiResponse {
   }
 }
 
-interface AcceptRejectRequestResponse extends ApiResponse {
-  data: {}
-}
+interface AcceptRejectRequestResponse extends ApiResponse {}
 
 export {
   CreateGroupResponse,

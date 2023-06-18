@@ -6,7 +6,7 @@ import { LoginInput, SignUpInput } from "./interface/Input";
 import UserModel, { User } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
 import RESPONSE from "../../constants/response";
-import { FriendsListResponse, LoginResponse, SignUpResponse } from "./interface/response";
+import { LoginResponse, SignUpResponse } from "./interface/response";
 import STATUS_CODE from "../../constants/statusCode";
 import JWTService from "../../utils/jwt.service";
 
@@ -25,40 +25,6 @@ class AuthHandler {
 
   private verifyPassword(hashPassword: string, password: string): boolean {
     return bcyrpt.compareSync(password, hashPassword);
-  }
-
-  private formatName() {
-    return {
-      name: {
-        $concat: [
-          {
-            $concat: [
-              { $toUpper: { $substrCP: ['$firstName', 0, 1] } },
-              {
-                $substrCP: [
-                  '$firstName',
-                  1,
-                  { $subtract: [{ $strLenCP: '$firstName' }, 1] },
-                ],
-              },
-            ],
-          },
-          ' ',
-          {
-            $concat: [
-              { $toUpper: { $substrCP: ['$lastName', 0, 1] } },
-              {
-                $substrCP: [
-                  '$lastName',
-                  1,
-                  { $subtract: [{ $strLenCP: '$lastName' }, 1] },
-                ],
-              },
-            ],
-          },
-        ],
-      }
-    }; 
   }
   
   async login(payload: LoginInput): Promise<LoginResponse> {
@@ -121,34 +87,6 @@ class AuthHandler {
       throw err;
     }
 	}
-
-  async friendsList(userId: string): Promise<FriendsListResponse> {
-    try {
-      const formatNameOption = this.formatName();
-      const aggregateArray: any[] = [
-        { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) } } },
-        {
-          $project: {
-            name: formatNameOption.name,
-            isActive: 1,
-            userStatus: 1,
-          },
-        },
-        { $sort: { name: 1 } },
-      ];
-
-      const friendsList = await UserModel.aggregate(aggregateArray);
-
-      return {
-        status: STATUS_CODE.SUCCESS,
-        message: RESPONSE.SUCCESS,
-        data: { friendsList }
-      };
-    }
-    catch(err) {
-      throw err;
-    }
-  }
 
   updateChatStatus(userId: string, status: string) {
     let updatePayload: any = {};

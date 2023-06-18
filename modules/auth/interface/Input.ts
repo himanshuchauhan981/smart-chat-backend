@@ -1,3 +1,5 @@
+import { PaginationQuery } from "../../../interfaces/Api";
+
 interface LoginInput {
   userName: string;
   password: string;
@@ -10,4 +12,6 @@ interface SignUpInput {
   email: string;
 }
 
-export { LoginInput, SignUpInput };
+interface FriendListQueries extends PaginationQuery {}
+
+export { LoginInput, SignUpInput, FriendListQueries };

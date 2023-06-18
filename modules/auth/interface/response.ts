@@ -5,8 +5,8 @@ interface LoginData {
 }
 
 enum IsActive {
-  offline = 'offline',
-  online = 'online',
+  offline = 'OFFLINE',
+  online = 'ONLINE',
 }
 
 interface Friends {
@@ -24,9 +24,8 @@ interface LoginResponse extends ApiResponse {
 interface SignUpResponse extends ApiResponse {}
 
 interface FriendsListResponse extends ApiResponse {
-  data: {
-    friendsList: Friends[]
-  };
+  friends: Friends[];
+  count: number;
 }
 
 export {

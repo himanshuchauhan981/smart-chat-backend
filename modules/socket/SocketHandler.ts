@@ -63,14 +63,14 @@ class SocketHandler {
   joinPrivateRoom = async (socket: any, io: any, room: string, senderId: string, receiverId: string) => {
     socket.join(room);
 
-    const [receiverDetails] = await this.authHandler.findUser(receiverId);
+    const { data: { user }} = await this.authHandler.findUser(receiverId);
 
     await this.chatHandler.readMessages(room, receiverId);
 
     const roomMessages = await this.chatHandler.privateChatMessages(room, senderId);
 
     const socketReceiveMessages = {
-      receiverDetails: receiverDetails,
+      receiverDetails: user,
       room,
       roomMessages,
     };

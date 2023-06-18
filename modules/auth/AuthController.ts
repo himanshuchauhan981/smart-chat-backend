@@ -34,18 +34,6 @@ class AuthController {
     }
   }
 
-  public friendsList = async (req: IRequest, res: IResponse, next: NextFunction) => {
-    try{
-      const id = req.user?.id as string;
-      const response = await this.authHandler.friendsList(id);
-
-      res.status(response.status).json(response.data);
-    }
-    catch(err) {
-      next(err);
-    }
-  }
-
   public findAllUsers = async (req: IRequest, res: IResponse, next: NextFunction) => {
     try{
       const search = req.query.search as string;

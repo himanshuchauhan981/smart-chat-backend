@@ -17,3 +17,8 @@ export interface ApiResponse {
   status: number;
   message: string;
 }
+
+export interface PaginationQuery {
+  pageIndex: string;
+  pageSize: string;
+};
