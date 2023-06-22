@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import socketEvents from "../../constants/socketEvents";
 import { Chat } from "../../schemas/chats";
 import { GroupDetails } from "../../schemas/groupDetails";
@@ -5,7 +6,7 @@ import { User, UserChatStatus } from "../../schemas/users";
 import AuthHandler from "../auth/AuthHandler";
 import ChatHandler from "../chats/ChatHandler";
 import GroupChatHandler from "../group-chats/GroupChatHandler";
-import { GroupMembersPayload, SendMessagePayload } from "./interface";
+import { GroupMembersPayload, ISocket, SendMessagePayload } from "./interface";
 
 
 class SocketHandler {
@@ -30,7 +31,7 @@ class SocketHandler {
 
     const socketData = {
 			userId,
-			status: socketEvents.ONLINE_STATUS,
+			status: userChatStatus.isActive,
 		};
 
     // const userData = {
@@ -43,36 +44,40 @@ class SocketHandler {
 		// this.socketUser[userChatStatus?._id.toString()].emit(socketEvents.SOCKET_USER_DATA, userData);
   }
 
-  removeUser = async (socket: any, io: any) => {
+  removeUser = async (socket: ISocket, io: any) => {
     const { userId } = socket;
 
     delete this.socketUser[userId];
 
     if(userId) {
-      const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.offline);
+      const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.offline) as User;
 
-      // const socketData = {
-      //   userId: userChatStatus?._id.toString(),
-      //   status: userChatStatus?.userStatus
-      // };
+      const socketData = {
+        userId,
+        status: userChatStatus.isActive,
+      };
 
-      // io.emit(socketEvents.ONLINE_STATUS, socketData);
+      io.emit(socketEvents.ONLINE_STATUS, socketData);
     }
   };
 
-  joinPrivateRoom = async (socket: any, io: any, room: string, senderId: string, receiverId: string) => {
+  joinPrivateRoom = async (socket: ISocket, io: any, room: string, senderId: string, receiverId: string, pageIndex: number, pageSize: number) => {
     socket.join(room);
 
-    const { data: { user }} = await this.authHandler.findUser(receiverId);
+    const { data: { user } } = await this.authHandler.findUser(receiverId);
 
     await this.chatHandler.readMessages(room, receiverId);
 
-    const roomMessages = await this.chatHandler.privateChatMessages(room, senderId);
+    const roomMessages = await this.chatHandler.privateChatMessages(room, senderId, pageIndex, pageSize);
+
+    const countConditions = { room };
+    const count = await this.chatHandler.countDocuments(countConditions);
 
     const socketReceiveMessages = {
       receiverDetails: user,
       room,
       roomMessages,
+      count,
     };
 
     io.to(room).emit(socketEvents.RECEIVE_MESSAGES, socketReceiveMessages);
@@ -96,7 +101,13 @@ class SocketHandler {
 
       const newMessage = await this.chatHandler.create(messagePayload);
 
-      const count = await this.chatHandler.countDocuments(messagePayload.room, false, messagePayload.sender);
+      const countConditions = {
+        room: messagePayload.room,
+        isRead: false,
+        sender: new mongoose.Types.ObjectId(messagePayload.sender),
+      };
+
+      const count = await this.chatHandler.countDocuments(countConditions);
 
       io.to(messagePayload.room).emit(socketEvents.RECEIVE_NEW_MESSAGE, { newMessage });
 

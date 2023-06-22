@@ -27,8 +27,8 @@ class SocketManager {
 
       socket.on(
         socketEvents.JOIN_PRIVATE_ROOM,
-        (roomId: string, sender: string, receiver: string) =>
-          SocketManager.socketHandler.joinPrivateRoom(socket, SocketManager.io, roomId, sender, receiver)
+        (roomId: string, sender: string, receiver: string, pageIndex: number, pageSize: number) =>
+          socketHandler.joinPrivateRoom(socket, SocketManager.io, roomId, sender, receiver, pageIndex, pageSize)
       );
 
       socket.on(

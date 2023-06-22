@@ -3,8 +3,7 @@ import moment from "moment";
 
 import ChatModel from "../../schemas/chats";
 import { SendMessagePayload } from "../socket/interface";
-import statusCode from "../../constants/statusCode";
-import response from "../../constants/response";
+import { STATUS_CODE, RESPONSE } from "../../constants";
 
 class ChatHandler {
   async privateChatList(userId: string) {
@@ -79,12 +78,13 @@ class ChatHandler {
       }
     });
 
-    return { status: statusCode.success, message: response.success, data: { privateChats } };
+    return { status: STATUS_CODE.SUCCESS, message: RESPONSE.SUCCESS, data: { privateChats } };
 
   }
 
-  async privateChatMessages(room: string, senderId: string) {
-    const aggregateArray = [
+  async privateChatMessages(room: string, senderId: string, pageIndex: number, pageSize: number) {
+    pageIndex = pageIndex * pageSize;
+    const aggregateArray: any = [
       { $match: { room: room } },
       {
         $addFields: {
@@ -97,18 +97,18 @@ class ChatHandler {
           },
         },
       },
-      {
-        $match: {
-          $or: [
-            { $and: [{ isSender: 0 }, { toDelete: false }] },
-            { $and: [{ isSender: 1 }, { fromDelete: false }] },
-          ],
-        },
-      },
+      // {
+      //   $match: {
+      //     $or: [
+      //       { $and: [{ isSender: 0 }, { toDelete: false }] },
+      //       { $and: [{ isSender: 1 }, { fromDelete: false }] },
+      //     ],
+      //   },
+      // },
       {
         $project: {
           text: 1,
-          createdDate: 1,
+          createdAt: 1,
           sender: 1,
           receiver: 1,
           isRead: 1,
@@ -116,11 +116,14 @@ class ChatHandler {
           toDelete: 1,
         },
       },
+      { $sort: { createdAt: 1 } },
+      { $skip: pageIndex },
+      { $limit: pageSize },
     ];
 
     const populateOptions = [
-      { path: 'sender', select: 'firstName lastName' },
-      { path: 'receiver', select: 'firstName lastName' },
+      { path: 'sender', select: 'fullName' },
+      { path: 'receiver', select: 'fullName' },
     ];
 
     const roomMessages = await ChatModel.aggregate(aggregateArray);
@@ -146,8 +149,8 @@ class ChatHandler {
     return newMessage.populate(populateOptions);
   }
 
-  countDocuments(room: string, isRead: boolean, senderId: string) {
-    return ChatModel.countDocuments({ room, isRead, sender: new mongoose.Types.ObjectId(senderId) });
+  countDocuments(conditions: any) {
+    return ChatModel.countDocuments(conditions);
   }
 
   findById(id: string) {

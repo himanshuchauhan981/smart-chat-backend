@@ -5,7 +5,7 @@ import { User } from "./users";
 import DefaultField from "./defaultFields";
 
 @modelOptions({
-	schemaOptions: { timestamps: true }
+	schemaOptions: { timestamps: true, versionKey: false }
 })
 export class Chat extends DefaultField {
 
@@ -14,32 +14,29 @@ export class Chat extends DefaultField {
 		type: mongoose.Types.ObjectId,
 		ref: () => User
 	})
-	public sender!: User;
+	public sender: User;
 
 	@prop({
 		required: true,
 		type: mongoose.Types.ObjectId,
 		ref: () => User
 	})
-	public receiver!: User;
+	public receiver: User;
 
 	@prop({ required: true, type: String })
-	public text!: string;
+	public text: string;
 
 	@prop({ required: true, type: String })
-	public room!: string;
+	public room: string;
 
-	@prop({ type: Boolean, default: false })
-	public isRead!: boolean;
+	// @prop({ type: Boolean, default: false })
+	// public isRead: boolean;
 
-	@prop({ type: Number, default: null })
-	public isReadAt!: number;
+	// @prop({ type: Number, required: false })
+	// public readAt: number;
 
-	@prop({ type: Boolean, default: false })
-	public fromDelete!: boolean;
-
-	@prop({ type: Boolean, default: false })
-	public toDelete!: boolean;
+	@prop({ type: [mongoose.Types.ObjectId], required: false })
+	public deletedBy: string[];
 }
 
 const ChatModel = getModelForClass(Chat);

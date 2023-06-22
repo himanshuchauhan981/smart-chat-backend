@@ -1,3 +1,4 @@
+import { Socket } from "socket.io";
 interface SendMessagePayload {
   sender: string;
   receiver: string;
@@ -20,8 +21,13 @@ interface NewGroup {
   updatedAt: Date;
 }
 
+interface ISocket extends Socket {
+  userId: string;
+};
+
 export {
   SendMessagePayload,
   GroupMembersPayload,
-  NewGroup
+  NewGroup,
+  ISocket,
 };

@@ -1,4 +1,4 @@
-const statusCode = {
+export const STATUS_CODE = {
   UNAUTHORIZED: 401,
   SUCCESS: 200,
   SERVER_ERROR: 500,
@@ -6,5 +6,3 @@ const statusCode = {
   NOT_FOUND: 404,
   BAD_REQUEST: 400,
 };
-
-export default statusCode;

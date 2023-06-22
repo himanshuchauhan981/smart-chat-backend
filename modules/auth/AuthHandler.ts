@@ -7,7 +7,7 @@ import UserModel, { User } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
 import RESPONSE from "../../constants/response";
 import { LoginResponse, SignUpResponse } from "./interface/response";
-import STATUS_CODE from "../../constants/statusCode";
+import { STATUS_CODE } from "../../constants";
 import JWTService from "../../utils/jwt.service";
 
 class AuthHandler {

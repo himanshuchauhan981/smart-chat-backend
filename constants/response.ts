@@ -1,4 +1,4 @@
-const response = {
+export const RESPONSE = {
 	SUCCESS: 'success',
 	EXISTING_USERNAME: 'Username already existed',
 	INVALID_EMAIL: 'Invalid email address',
@@ -19,5 +19,3 @@ const response = {
 	EXISTED_PENDING_REQUEST: 'You have already pending request to accept',
 	INVALID_FRIEND_ID: 'Invalid friend ID',
 };
-
-export default response;

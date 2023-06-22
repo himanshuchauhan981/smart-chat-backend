@@ -3,6 +3,7 @@ export const API_ROUTES = {
   LOGIN: '/login',
   FRIENDS: '/friends',
   PRIVATE_CHAT: '/chat/private',
+  SPECIFIC_CHAT: '/chat/:id',
   GROUP_CHAT: '/chat/group',
   NEW_GROUP: '/group',
   NEW_GROUP_MEMBERS: '/group/:groupId/members',
