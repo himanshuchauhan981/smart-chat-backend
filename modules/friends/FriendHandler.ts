@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
-import RESPONSE_MESSAGES from "../../constants/response";
-import STATUS_CODE from "../../constants/statusCode";
+import {STATUS_CODE, RESPONSE } from "../../constants";
 import FriendsModel, { RequestStatus } from "../../schemas/friends";
 import { AcceptRejectRequestPayload, AcceptRejectRequestUpdatePayload, NewFriendRequestPayload } from "./interface/input";
 import { AcceptRejectRequestResponse } from './interface/response';
@@ -27,7 +26,7 @@ class FriendHandler {
       );
   
       if(!existingUser) {
-        throw new CustomError(RESPONSE_MESSAGES.INVALID_EMAIL, STATUS_CODE.NOT_FOUND);
+        throw new CustomError(RESPONSE.INVALID_EMAIL, STATUS_CODE.NOT_FOUND);
       }
   
       const requestCondition = {
@@ -69,19 +68,19 @@ class FriendHandler {
         await this.notificationHandler.create(notificationPayload, user.id);
   
         return {
-          message: RESPONSE_MESSAGES.NEW_FRIEND_REQUEST,
+          message: RESPONSE.NEW_FRIEND_REQUEST,
           status: STATUS_CODE.SUCCESS
         };
       }
 
       if(existingFriendRequest.status === RequestStatus.ACCEPTED) {
-        throw new CustomError(RESPONSE_MESSAGES.ACCEPTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
+        throw new CustomError(RESPONSE.ACCEPTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
       }
       else if(user.id !== existingFriendRequest.requestedBy.toString()) {
-        throw new CustomError(RESPONSE_MESSAGES.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
+        throw new CustomError(RESPONSE.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
       }
   
-      throw new CustomError(RESPONSE_MESSAGES.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
+      throw new CustomError(RESPONSE.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
     }
     catch (error) {
       throw error;
@@ -135,7 +134,7 @@ class FriendHandler {
       );
 
       if(!status.modifiedCount) {
-        throw new CustomError(RESPONSE_MESSAGES.INVALID_FRIEND_ID, STATUS_CODE.NOT_FOUND);
+        throw new CustomError(RESPONSE.INVALID_FRIEND_ID, STATUS_CODE.NOT_FOUND);
       }
 
       const friendDetails = await UserModel.findById(userId, { fullName: 1 } );
@@ -150,7 +149,7 @@ class FriendHandler {
 
       return {
         status: STATUS_CODE.SUCCESS,
-        message: RESPONSE_MESSAGES.SUCCESS,
+        message: RESPONSE.SUCCESS,
       };
     }
     catch(err) {
@@ -167,7 +166,7 @@ class FriendHandler {
 
       return {
         status: STATUS_CODE.SUCCESS,
-        message: RESPONSE_MESSAGES.SUCCESS,
+        message: RESPONSE.SUCCESS,
         data: {}
       };
     }
@@ -218,7 +217,7 @@ class FriendHandler {
 
       return {
         status: STATUS_CODE.SUCCESS,
-        message: RESPONSE_MESSAGES.SUCCESS,
+        message: RESPONSE.SUCCESS,
         friends,
         count,
       };

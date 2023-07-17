@@ -27,7 +27,7 @@ class ChatController {
     try {
       const { params, query } = req;
       const pageSize = parseInt(query.pageSize as string, 10);
-      const pageIndex = pageSize * parseInt(query.pageIndex as string, 10)
+      const pageIndex = parseInt(query.pageIndex as string, 10);
 
       const chatMessages = await this.chatHandler.privateChatMessages(params.id as string, req.user?.id as string, pageIndex, pageSize);
 

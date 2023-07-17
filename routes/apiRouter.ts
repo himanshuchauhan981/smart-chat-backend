@@ -28,6 +28,8 @@ class ApiRoutes {
     this.router.post(API_ROUTES.ACCEPT_REJECT_FRIEND_REQUEST, authValidation, FriendsController.acceptRejectRequest);
     this.router.delete(API_ROUTES.REMOVE_FRIEND_REQUEST, authValidation, FriendsController.removeFriendRequest);
     this.router.get(API_ROUTES.FRIENDS, authValidation, FriendsController.friendsList);
+
+    // Chat API
     this.router.get(API_ROUTES.SPECIFIC_CHAT, authValidation, ChatController.specificChatMessages);
 
     this.router.get(API_ROUTES.PRIVATE_CHAT, authValidation, ChatController.privateChatList);

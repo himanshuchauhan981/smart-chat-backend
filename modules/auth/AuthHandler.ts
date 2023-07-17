@@ -5,7 +5,7 @@ import mongoose, { PipelineStage } from "mongoose";
 import { LoginInput, SignUpInput } from "./interface/Input";
 import UserModel, { User } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
-import RESPONSE from "../../constants/response";
+import { RESPONSE } from "../../constants";
 import { LoginResponse, SignUpResponse } from "./interface/response";
 import { STATUS_CODE } from "../../constants";
 import JWTService from "../../utils/jwt.service";

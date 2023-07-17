@@ -116,7 +116,7 @@ class ChatHandler {
           toDelete: 1,
         },
       },
-      { $sort: { createdAt: 1 } },
+      { $sort: { createdAt: -1 } },
       { $skip: pageIndex },
       { $limit: pageSize },
     ];
