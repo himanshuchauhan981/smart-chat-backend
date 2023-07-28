@@ -5,6 +5,7 @@ interface SendMessagePayload {
   receiver: string;
   text: string;
   room: string;
+  roomId: string;
 }
 
 interface GroupMembersPayload {

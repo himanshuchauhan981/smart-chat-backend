@@ -82,10 +82,10 @@ class ChatHandler {
 
   }
 
-  async privateChatMessages(room: string, senderId: string, pageIndex: number, pageSize: number) {
+  async privateChatMessages(roomId: string, senderId: string, pageIndex: number, pageSize: number) {
     pageIndex = pageIndex * pageSize;
     const aggregateArray: any = [
-      { $match: { room: room } },
+      { $match: { roomId: new mongoose.Types.ObjectId(roomId) } },
       {
         $addFields: {
           isSender: {

@@ -26,8 +26,11 @@ export class Chat extends DefaultField {
 	@prop({ required: true, type: String })
 	public text: string;
 
-	@prop({ required: true, type: String })
-	public room: string;
+	@prop({
+		required: true,
+		type: mongoose.Types.ObjectId,
+	})
+	public roomId: string;
 
 	// @prop({ type: Boolean, default: false })
 	// public isRead: boolean;

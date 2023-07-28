@@ -67,7 +67,7 @@ class SocketHandler {
   };
 
   joinPrivateRoom = async (socket: ISocket, io: any, room: string, senderId: string, receiverId: string, pageIndex: number, pageSize: number) => {
-    const existingRoom = await this.roomHandler.findByRoomId(room);
+    let existingRoom = await this.roomHandler.findByRoomId(room);
 
     if(!existingRoom) {
       const payload = {
@@ -78,7 +78,8 @@ class SocketHandler {
         ],
         type: RoomType.PRIVATE,
       };
-      await this.roomHandler.create(payload);
+
+      existingRoom = await this.roomHandler.create(payload);
     }
 
     socket.join(room);
@@ -87,7 +88,7 @@ class SocketHandler {
 
     await this.chatHandler.readMessages(room, receiverId);
 
-    const roomMessages = await this.chatHandler.privateChatMessages(room, senderId, pageIndex, pageSize);
+    const roomMessages = await this.chatHandler.privateChatMessages(existingRoom._id.toString(), senderId, pageIndex, pageSize);
 
     const countConditions = { room };
     const count = await this.chatHandler.countDocuments(countConditions);
@@ -117,11 +118,12 @@ class SocketHandler {
 
   sendMessage = async (io: any, messagePayload: SendMessagePayload) => {
     if(messagePayload.receiver) {
+      const roomDetails = await this.roomHandler.findByRoomId(messagePayload.room);
 
-      const newMessage = await this.chatHandler.create(messagePayload);
+      const newMessage = await this.chatHandler.create({ ...messagePayload, roomId: roomDetails?._id.toString() as string });
 
       const countConditions = {
-        room: messagePayload.room,
+        roomId: roomDetails?._id.toString(),
         isRead: false,
         sender: new mongoose.Types.ObjectId(messagePayload.sender),
       };

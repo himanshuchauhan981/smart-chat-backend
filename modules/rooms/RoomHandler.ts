@@ -4,7 +4,7 @@ import { NewRoom } from "../socket/interface";
 class RoomHandler {
   
   async create(payload: NewRoom) {
-    await RoomsModel.create(payload);
+    return RoomsModel.create(payload);
   };
 
   async findByRoomId(roomId: string) {
