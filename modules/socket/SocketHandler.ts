@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 import socketEvents from "../../constants/socketEvents";
 import { Chat } from "../../schemas/chats";
 import { GroupDetails } from "../../schemas/groupDetails";
@@ -7,6 +8,8 @@ import AuthHandler from "../auth/AuthHandler";
 import ChatHandler from "../chats/ChatHandler";
 import GroupChatHandler from "../group-chats/GroupChatHandler";
 import { GroupMembersPayload, ISocket, SendMessagePayload } from "./interface";
+import RoomHandler from "../rooms/RoomHandler";
+import { RoomType } from "../../schemas/rooms";
 
 
 class SocketHandler {
@@ -15,11 +18,13 @@ class SocketHandler {
   private authHandler: AuthHandler;
   private chatHandler: ChatHandler;
   private groupChatHandler: GroupChatHandler;
+  private roomHandler: RoomHandler;
 
   constructor() {
     this.authHandler = new AuthHandler();
     this.chatHandler = new ChatHandler();
     this.groupChatHandler = new GroupChatHandler();
+    this.roomHandler = new RoomHandler();
   }
 
   public joinSocket = async (userId: string, socket: any) => {
@@ -62,6 +67,20 @@ class SocketHandler {
   };
 
   joinPrivateRoom = async (socket: ISocket, io: any, room: string, senderId: string, receiverId: string, pageIndex: number, pageSize: number) => {
+    const existingRoom = await this.roomHandler.findByRoomId(room);
+
+    if(!existingRoom) {
+      const payload = {
+        roomId: room,
+        members: [
+          new mongoose.Types.ObjectId(senderId),
+          new mongoose.Types.ObjectId(senderId),
+        ],
+        type: RoomType.PRIVATE,
+      };
+      await this.roomHandler.create(payload);
+    }
+
     socket.join(room);
 
     const { data: { user } } = await this.authHandler.findUser(receiverId);

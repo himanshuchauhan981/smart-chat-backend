@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Socket } from "socket.io";
 interface SendMessagePayload {
   sender: string;
@@ -25,9 +26,16 @@ interface ISocket extends Socket {
   userId: string;
 };
 
+interface NewRoom {
+  roomId: string;
+  type: string;
+  members: mongoose.Types.ObjectId[],
+};
+
 export {
   SendMessagePayload,
   GroupMembersPayload,
   NewGroup,
   ISocket,
+  NewRoom,
 };
