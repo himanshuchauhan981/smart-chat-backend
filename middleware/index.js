@@ -1,1 +1,0 @@
-exports.validateAuth = require('./validateAuth');
