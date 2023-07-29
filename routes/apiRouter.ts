@@ -30,9 +30,9 @@ class ApiRoutes {
     this.router.get(API_ROUTES.FRIENDS, authValidation, FriendsController.friendsList);
 
     // Chat API
-    this.router.get(API_ROUTES.SPECIFIC_CHAT, authValidation, ChatController.specificChatMessages);
 
     this.router.get(API_ROUTES.PRIVATE_CHAT, authValidation, ChatController.privateChatList);
+    this.router.get(API_ROUTES.SPECIFIC_CHAT, authValidation, ChatController.specificChatMessages);
 
     this.router.get(API_ROUTES.GROUP_CHAT, authValidation, GroupChatController.groupList);
 

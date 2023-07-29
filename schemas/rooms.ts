@@ -17,6 +17,7 @@ export class Rooms extends DefaultField {
 	@prop({
 		required: true,
 		type: String,
+		index: true,
 	})
 	public roomId: string;
 
@@ -31,12 +32,14 @@ export class Rooms extends DefaultField {
 		type: [mongoose.Schema.Types.ObjectId],
 		ref: User,
 		required: true,
+		index: true,
 	}, PropType.ARRAY)
 	public members!: mongoose.Schema.Types.ObjectId[];
 
 	@prop({
 		required: false,
 		type: mongoose.Types.ObjectId,
+		ref: 'Chat',
 	})
 	public lastMessage: string;
 }

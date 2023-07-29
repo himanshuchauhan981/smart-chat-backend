@@ -14,7 +14,11 @@ class ChatController {
 
   public privateChatList = async (req: IRequest, res: IResponse, next: NextFunction) => {
     try{
-      const response = await this.chatHandler.privateChatList(req.user?.id as string);
+      const { query } = req;
+      const pageSize = parseInt(query.pageSize as string, 10);
+      const pageIndex = parseInt(query.pageIndex as string, 10);
+
+      const response = await this.chatHandler.privateChatList(pageIndex, pageSize, req.user?.id as string);
 
       res.status(response.status).send(response.data);
     }

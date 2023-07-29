@@ -74,7 +74,7 @@ class SocketHandler {
         roomId: room,
         members: [
           new mongoose.Types.ObjectId(senderId),
-          new mongoose.Types.ObjectId(senderId),
+          new mongoose.Types.ObjectId(receiverId),
         ],
         type: RoomType.PRIVATE,
       };
@@ -147,6 +147,8 @@ class SocketHandler {
 
         io.to(this.socketUser[messagePayload.receiver].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, receiverSocketData);
       }
+
+      await this.roomHandler.updateLastMessage(messagePayload.room, newMessage._id.toString());
     }
     else {
 

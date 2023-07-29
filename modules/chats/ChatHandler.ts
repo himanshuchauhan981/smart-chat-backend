@@ -4,79 +4,76 @@ import moment from "moment";
 import ChatModel from "../../schemas/chats";
 import { SendMessagePayload } from "../socket/interface";
 import { STATUS_CODE, RESPONSE } from "../../constants";
+import RoomsModel from "../../schemas/rooms";
 
 class ChatHandler {
-  async privateChatList(userId: string) {
+  async privateChatList(pageIndex: number, pageSize: number, userId: string) {
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
 
     const aggregateArray: any = [
-			{
-				$match: {
-					$or: [
-						{ sender: userObjectId },
-						{ receiver: userObjectId },
-					],
-				},
-			},
-			{
-				$project: {
-					sender: 1,
-					receiver: 1,
-					text: 1,
-					createdAt: 1,
-					room: 1,
-					unreadMessages: {
-						$cond: [
-							{
-								$and: [
-									{ $eq: ['$isRead', false] },
-									{
-										$eq: ['$receiver', userObjectId],
-									},
-								],
-							},
-							1,
-							0,
-						],
-					},
-				},
-			},
-			{
-				$group: {
-					_id: { id: '$room' },
-					text: { $last: '$text' },
-					receiver: { $last: '$receiver' },
-					sender: { $last: '$sender' },
-					unReadCount: { $sum: '$unreadMessages' },
-					createdAt: { $last: '$createdAt' },
-				},
-			},
-			{ $sort: { createdAt: -1 } },
-			{ $project: { _id: 0 } },
-		];
+      {
+        $match: {
+          type: "PRIVATE",
+          members: {
+            $in: [
+              userObjectId,
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          receiverId: {
+            $filter: {
+              input: "$members",
+              as: "item",
+              cond: {
+                $ne: [
+                  "$$item",
+                  userObjectId,
+                ],
+              },
+            },
+          },
+        },
+      },
+      { $unwind: "$receiverId" },
+      { $skip: pageIndex },
+      { $limit: pageSize },
+      {
+        $lookup: {
+          from: "users",
+          localField: "receiverId",
+          foreignField: "_id",
+          as: "receiver",
+        },
+      },
+      { $unwind: "$receiver" },
+      {
+        $lookup: {
+          from: 'chats',
+          localField: 'lastMessage',
+          foreignField: '_id',
+          as: 'privateChat',
+        }
+      },
+      {
+        $unwind: {
+          path: '$privateChat',
+          preserveNullAndEmptyArrays: true
+        },
+      },
+      {
+        $project: {
+          roomId: 1,
+          fullName: "$receiver.fullName",
+          message: '$privateChat.text'
+        },
+      },
+    ]
 
-    const populateOptions = [
-			{
-				path: 'receiver',
-				select: 'firstName lastName isActive',
-			},
-			{
-				path: 'sender',
-				select: 'firstName lastName isActive',
-			},
-		];
-
-    const privateChatsDocument = await ChatModel.aggregate(aggregateArray);
-
-    let privateChats = await ChatModel.populate(privateChatsDocument, populateOptions);
-
-    privateChats.forEach(item => {
-      if(item.receiver._id.toString() === userId) {
-
-        [item.receiver, item.sender] = [item.sender, item.receiver];
-      }
-    });
+    const privateChats = await RoomsModel.aggregate(aggregateArray);
 
     return { status: STATUS_CODE.SUCCESS, message: RESPONSE.SUCCESS, data: { privateChats } };
 
