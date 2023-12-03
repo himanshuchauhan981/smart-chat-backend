@@ -25,7 +25,9 @@ class NotificationHandler {
         type: payload.type
       });
 
-      await newNotification.save();
+      const notification = await newNotification.save();
+
+      return notification;
      }
     catch (error) {
       throw error;

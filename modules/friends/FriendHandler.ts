@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import {STATUS_CODE, RESPONSE } from "../../constants";
+import { STATUS_CODE, RESPONSE } from "../../constants";
 import FriendsModel, { RequestStatus } from "../../schemas/friends";
 import { AcceptRejectRequestPayload, AcceptRejectRequestUpdatePayload, NewFriendRequestPayload } from "./interface/input";
 import { AcceptRejectRequestResponse } from './interface/response';
@@ -10,6 +10,7 @@ import NotificationHandler from '../notifications/NotificationHandler';
 import { NotificationType } from '../../schemas/notifications';
 import { User } from '../../interfaces/Api';
 import { FriendsListResponse } from '../auth/interface/response';
+import SocketManager from '../../server/SocketManager';
 
 class FriendHandler {
   notificationHandler: NotificationHandler;
@@ -22,13 +23,13 @@ class FriendHandler {
     try {
       const existingUser = await UserModel.findOne(
         { email: payload.email, _id: { $ne: new mongoose.Types.ObjectId(user.id) } },
-        { _id: 1 }
+        { _id: 1, socketId: 1 }
       );
-  
-      if(!existingUser) {
+
+      if (!existingUser) {
         throw new CustomError(RESPONSE.INVALID_EMAIL, STATUS_CODE.NOT_FOUND);
       }
-  
+
       const requestCondition = {
         $and: [
           { isDeleted: false },
@@ -47,16 +48,16 @@ class FriendHandler {
           { status: { $ne: RequestStatus.REJECTED } }
         ],
       };
-  
+
       const existingFriendRequest = await FriendsModel.findOne(requestCondition, { _id: 1, requestedBy: 1, status: 1 });
-  
-      if(!existingFriendRequest) {
+
+      if (!existingFriendRequest) {
         const newFriendPayload = {
           friendId: existingUser._id,
           requestedBy: user.id,
           invitationMessage: payload.invitationMessage,
         };
-    
+
         await FriendsModel.create(newFriendPayload);
 
         const notificationPayload = {
@@ -65,21 +66,25 @@ class FriendHandler {
           senderName: user.fullName,
         };
 
-        await this.notificationHandler.create(notificationPayload, user.id);
-  
+        const newNotification = await this.notificationHandler.create(notificationPayload, user.id);
+
+        if (existingUser.socketId) {
+          SocketManager.sendNotification(existingUser.socketId.toString(), newNotification as any as Notification);
+        }
+
         return {
           message: RESPONSE.NEW_FRIEND_REQUEST,
           status: STATUS_CODE.SUCCESS
         };
       }
 
-      if(existingFriendRequest.status === RequestStatus.ACCEPTED) {
+      if (existingFriendRequest.status === RequestStatus.ACCEPTED) {
         throw new CustomError(RESPONSE.ACCEPTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
       }
-      else if(user.id !== existingFriendRequest.requestedBy.toString()) {
+      else if (user.id !== existingFriendRequest.requestedBy.toString()) {
         throw new CustomError(RESPONSE.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
       }
-  
+
       throw new CustomError(RESPONSE.EXISTED_FRIEND_REQUEST, STATUS_CODE.BAD_REQUEST);
     }
     catch (error) {
@@ -98,15 +103,15 @@ class FriendHandler {
       const options = { sort: { createdAt: -1 } };
 
       const populateOptions = { path: 'requestedBy', select: '_id fullName' };
-  
+
       const existingRequestList = await FriendsModel.find(conditions, projections, options).populate(populateOptions);
-  
+
       return {
         status: STATUS_CODE.SUCCESS,
         requestList: existingRequestList,
       };
     }
-    catch(err) {
+    catch (err) {
       throw err;
     }
   };
@@ -123,7 +128,7 @@ class FriendHandler {
         status: payload.status,
       };
 
-      if(payload.status === RequestStatus.ACCEPTED) {
+      if (payload.status === RequestStatus.ACCEPTED) {
         toUpdate.acceptedOn = new Date();
       }
       else toUpdate.rejectedOn = new Date();
@@ -133,11 +138,12 @@ class FriendHandler {
         toUpdate,
       );
 
-      if(!status.modifiedCount) {
+      if (!status.modifiedCount) {
         throw new CustomError(RESPONSE.INVALID_FRIEND_ID, STATUS_CODE.NOT_FOUND);
       }
 
-      const friendDetails = await UserModel.findById(userId, { fullName: 1 } );
+      const friendDetails = await UserModel.findById(userId, { fullName: 1 });
+      const requestedByDetails = await UserModel.findById(payload.friendId, { socketId: 1 });
 
       const notificationPayload = {
         type: NotificationType.accept_friend_request,
@@ -145,14 +151,18 @@ class FriendHandler {
         receiverName: friendDetails?.fullName,
       };
 
-      await this.notificationHandler.create(notificationPayload, userId);
+      const newNotification = await this.notificationHandler.create(notificationPayload, userId);
+
+      if(requestedByDetails?.socketId) {
+        SocketManager.sendNotification(requestedByDetails.socketId.toString(), newNotification as any as Notification);
+      }
 
       return {
         status: STATUS_CODE.SUCCESS,
-        message: RESPONSE.SUCCESS,
+        message: payload.status === RequestStatus.ACCEPTED ? RESPONSE.FRIEND_REQUEST_ACCEPTED: RESPONSE.FRIEND_REQUEST_REJECTED,
       };
     }
-    catch(err) {
+    catch (err) {
       throw err;
     }
   };
@@ -170,7 +180,7 @@ class FriendHandler {
         data: {}
       };
     }
-    catch(err) {
+    catch (err) {
       throw err;
     }
   }
@@ -179,7 +189,7 @@ class FriendHandler {
     try {
       const pageSize = parseInt(query.pageSize, 10);
       const pageIndex = pageSize * parseInt(query.pageIndex, 10);
-      
+
       const matchConditions = {
         $or: [
           { friendId: new mongoose.Types.ObjectId(userId) },
@@ -188,7 +198,7 @@ class FriendHandler {
         status: RequestStatus.ACCEPTED,
         isDeleted: false,
       };
-  
+
       const aggregateArray: any[] = [
         {
           $match: matchConditions,
@@ -222,7 +232,7 @@ class FriendHandler {
         count,
       };
     }
-    catch(err) {
+    catch (err) {
       throw err;
     }
   }

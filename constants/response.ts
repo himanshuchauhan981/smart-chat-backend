@@ -18,4 +18,6 @@ export const RESPONSE = {
 	ACCEPTED_FRIEND_REQUEST: 'This user is already your friend',
 	EXISTED_PENDING_REQUEST: 'You have already pending request to accept',
 	INVALID_FRIEND_ID: 'Invalid friend ID',
+	FRIEND_REQUEST_ACCEPTED: 'Friend request accepted successfully',
+	FRIEND_REQUEST_REJECTED: 'Friend request rejected successfully',
 };

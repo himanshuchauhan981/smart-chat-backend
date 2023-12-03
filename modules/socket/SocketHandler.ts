@@ -32,7 +32,7 @@ class SocketHandler {
 
     this.socketUser[userId] = socket;
 
-    const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.online) as User;
+    const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.online, socket.id) as User;
 
     const socketData = {
 			userId,
@@ -55,7 +55,7 @@ class SocketHandler {
     delete this.socketUser[userId];
 
     if(userId) {
-      const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.offline) as User;
+      const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.offline, '') as User;
 
       const socketData = {
         userId,
@@ -211,6 +211,10 @@ class SocketHandler {
 		};
 
 		io.to(groupId).emit(socketEvents.RECEIVE_MESSAGES, socketArgs);
+  };
+
+  sendNotification = async (io: any, userId: string, notification: Notification) => {
+    io.to(userId).emit(socketEvents.NEW_NOTIFICATION, notification);
   };
 };
 

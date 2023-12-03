@@ -68,7 +68,9 @@ class ChatHandler {
         $project: {
           roomId: 1,
           fullName: "$receiver.fullName",
-          message: '$privateChat.text'
+          message: '$privateChat.text',
+          receiverId: '$receiver._id',
+          isActive: '$receiver.isActive'
         },
       },
     ]

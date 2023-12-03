@@ -23,6 +23,9 @@ export class User extends DefaultField {
 	@prop({ required: true, type: String })
 	public password: string;
 
+	@prop({ required: false, type: String })
+	public socketId: string;
+
 	@prop({
 		default: 'Hey there. I am using smart chat',
 		type: String

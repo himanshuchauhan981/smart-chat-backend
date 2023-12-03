@@ -88,10 +88,11 @@ class AuthHandler {
     }
 	}
 
-  updateChatStatus(userId: string, status: string) {
+  updateChatStatus(userId: string, status: string, socketId: string) {
     let updatePayload: any = {};
 
     updatePayload.isActive = status;
+    updatePayload.socketId = socketId;
     return UserModel.findByIdAndUpdate(userId, updatePayload, { new: true });
   }
 

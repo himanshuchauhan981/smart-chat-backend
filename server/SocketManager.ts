@@ -10,8 +10,8 @@ class SocketManager {
   static socketHandler: SocketHandler;
 
   constructor(server: any) {
-    SocketManager.io = SocketIO(server, { cors: { origin: '*'} });
-    SocketManager.socketHandler = new SocketHandler();``
+    SocketManager.io = SocketIO(server, { cors: { origin: '*' } });
+    SocketManager.socketHandler = new SocketHandler(); ``
   }
 
   public init(): void {
@@ -48,6 +48,10 @@ class SocketManager {
   static addGroupToGroupList(groupMembers: GroupMembersPayload[], groupData: GroupDetails) {
     this.socketHandler.addGroupToGroupList(SocketManager.io, groupMembers, groupData);
   }
+
+  static sendNotification(userId: string, notification: Notification) {
+    this.socketHandler.sendNotification(SocketManager.io, userId, notification);
+  };
 }
 
 export default SocketManager;
