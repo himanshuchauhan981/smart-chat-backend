@@ -71,7 +71,6 @@ class SocketHandler {
 
     if(!existingRoom) {
       const payload = {
-        roomId: room,
         members: [
           new mongoose.Types.ObjectId(senderId),
           new mongoose.Types.ObjectId(receiverId),

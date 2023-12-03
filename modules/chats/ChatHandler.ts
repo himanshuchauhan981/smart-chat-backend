@@ -4,9 +4,10 @@ import moment from "moment";
 import ChatModel from "../../schemas/chats";
 import { SendMessagePayload } from "../socket/interface";
 import { STATUS_CODE, RESPONSE } from "../../constants";
-import RoomsModel from "../../schemas/rooms";
+import RoomsModel, { RoomType } from "../../schemas/rooms";
 
 class ChatHandler {
+
   async privateChatList(pageIndex: number, pageSize: number, userId: string) {
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -14,7 +15,7 @@ class ChatHandler {
     const aggregateArray: any = [
       {
         $match: {
-          type: "PRIVATE",
+          type: RoomType.PRIVATE,
           members: {
             $in: [
               userObjectId,
@@ -83,6 +84,7 @@ class ChatHandler {
 
   async privateChatMessages(roomId: string, senderId: string, pageIndex: number, pageSize: number) {
     pageIndex = pageIndex * pageSize;
+
     const aggregateArray: any = [
       { $match: { roomId: new mongoose.Types.ObjectId(roomId) } },
       {

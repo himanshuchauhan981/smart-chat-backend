@@ -15,13 +15,6 @@ export enum RoomType {
 export class Rooms extends DefaultField {
 
 	@prop({
-		required: true,
-		type: String,
-		index: true,
-	})
-	public roomId: string;
-
-	@prop({
 		enum: RoomType,
 		type: String,
 		required: true,

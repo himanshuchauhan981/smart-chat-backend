@@ -28,7 +28,6 @@ interface ISocket extends Socket {
 };
 
 interface NewRoom {
-  roomId: string;
   type: string;
   members: mongoose.Types.ObjectId[],
 };
