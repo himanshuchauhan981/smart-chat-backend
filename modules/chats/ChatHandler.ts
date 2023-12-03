@@ -69,7 +69,8 @@ class ChatHandler {
         $project: {
           roomId: 1,
           fullName: "$receiver.fullName",
-          message: '$privateChat.text',
+          lastMessage: '$privateChat.text',
+          lastMessageAt: { $toLong: '$privateChat.createdAt' },
           receiverId: '$receiver._id',
           isActive: '$receiver.isActive'
         },
@@ -144,7 +145,7 @@ class ChatHandler {
       { path: 'sender', select: 'firstName lastName isActive' },
       { path: 'receiver', select: 'firstName lastName isActive' },
     ];
-    
+
     const newMessage = await ChatModel.create(payload);
 
     return newMessage.populate(populateOptions);
@@ -159,7 +160,7 @@ class ChatHandler {
   }
 
   async deleteMessage(messageId: string, updatePayload: any): Promise<void> {
-    await ChatModel.findByIdAndUpdate(messageId, {$set: updatePayload});
+    await ChatModel.findByIdAndUpdate(messageId, { $set: updatePayload });
   }
 
   checkForNewWindowMessage(room: string) {

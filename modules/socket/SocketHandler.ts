@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import moment from 'moment';
 
 import socketEvents from "../../constants/socketEvents";
 import { Chat } from "../../schemas/chats";
@@ -111,7 +112,7 @@ class SocketHandler {
 				createdAt: roomMessages.length ? roomMessages[roomMessages.length -1]?.createdAt: null,
       };
 
-      io.to(senderSocket.id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, senderSocketData);
+      io.to(user?.socketId).emit(socketEvents.PRIVATE_MESSAGES_COUNT, senderSocketData);
     }
   };
 
@@ -135,18 +136,17 @@ class SocketHandler {
 
       if(receiverSocket) {
 
-        const receiverSocketData = {
+        const socketData = {
           newMessagesCount: count,
-          id: messagePayload.sender,
-          createdAt: newMessage.createdAt,
-          text: messagePayload.text,
-          sender: newMessage.sender,
-          receiver: newMessage.receiver,
+          lastMessage: newMessage.text,
+          lastMessageAt: moment(newMessage.createdAt).valueOf(),
+          roomId: newMessage.roomId,
         };
 
-        io.to(this.socketUser[messagePayload.receiver].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, receiverSocketData);
+        io.to(this.socketUser[messagePayload.receiver].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
+        io.to(this.socketUser[messagePayload.sender].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
       }
-
+      
       await this.roomHandler.updateLastMessage(messagePayload.room, newMessage._id.toString());
     }
     else {

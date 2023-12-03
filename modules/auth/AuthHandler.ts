@@ -97,7 +97,7 @@ class AuthHandler {
   }
 
   async findUser(userId: string) {
-    const projections = { fullName: 1 };
+    const projections = { fullName: 1, socketId: 1 };
     
     const user = await UserModel.findById(userId, projections);
     return {
