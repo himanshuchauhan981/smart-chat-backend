@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PropType, Severity, getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
+import { PropType, getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
 import { User } from "./users";
 import DefaultField from "./defaultFields";
@@ -17,17 +17,22 @@ class File {
 		type: String,
 		required: true
 	})
-	url?: string;
+	url: string;
 
 	@prop({
 		type: String,
 		required: true,
 	})
-	name?: string;
+	name: string;
+
+	@prop({
+		type: Number,
+		required: true,
+	})
+	size: number;
 };
 @modelOptions({
-	schemaOptions: { timestamps: true, versionKey: false, strict: false },
-	options: { allowMixed: Severity.ALLOW }
+	schemaOptions: { timestamps: true, versionKey: false },
 })
 export class Chat extends DefaultField {
 
