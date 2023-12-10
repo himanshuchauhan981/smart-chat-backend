@@ -9,7 +9,7 @@ class RoomHandler {
   };
 
   async findByRoomId(roomId: string) {
-    return RoomsModel.findOne({ roomId: roomId });
+    return RoomsModel.findById(roomId);
   };
 
   async updateLastMessage(roomId: string, messageId: string) {

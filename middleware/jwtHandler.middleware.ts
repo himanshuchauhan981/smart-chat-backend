@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
-import response from "../constants/response";
+import { RESPONSE } from "../constants/response";
 
-import STATUS_CODE from "../constants/statusCode";
+import { STATUS_CODE } from "../constants/statusCode";
 import { IRequest, IResponse, User } from "../interfaces/Api";
 import JWTService from "../utils/jwt.service";
 import UserModel from "../schemas/users";
@@ -13,7 +13,7 @@ async function authValidation(req: IRequest, res: IResponse, next: NextFunction)
     let jwt = req.headers.authorization as string;
 
     if(!jwt) {
-      res.status(STATUS_CODE.UNAUTHORIZED).json({ message: response.REQUIRED_TOKEN });
+      res.status(STATUS_CODE.UNAUTHORIZED).json({ message: RESPONSE.REQUIRED_TOKEN });
     }
 
     if(jwt?.toLocaleLowerCase().startsWith('bearer')) {
@@ -33,10 +33,10 @@ async function authValidation(req: IRequest, res: IResponse, next: NextFunction)
   }
   catch(err: any) {
     if(err.name === 'TokenExpiredError') {
-      res.status(STATUS_CODE.UNAUTHORIZED).json({ message: response.EXPIRED_TOKEN });
+      res.status(STATUS_CODE.UNAUTHORIZED).json({ message: RESPONSE.EXPIRED_TOKEN });
     }
 
-    res.status(STATUS_CODE.SERVER_ERROR).json({ message: response.FAILED_TOKEN_VALIDATION });
+    res.status(STATUS_CODE.SERVER_ERROR).json({ message: RESPONSE.FAILED_TOKEN_VALIDATION });
   }
 }
 

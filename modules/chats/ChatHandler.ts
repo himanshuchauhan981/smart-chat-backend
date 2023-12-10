@@ -116,6 +116,8 @@ class ChatHandler {
           isRead: 1,
           fromDelete: 1,
           toDelete: 1,
+          type: 1,
+          file: 1,
         },
       },
       { $sort: { createdAt: -1 } },

@@ -1,11 +1,19 @@
 import mongoose from "mongoose";
 import { Socket } from "socket.io";
+
+interface File {
+  url?: string;
+  name?: string;
+};
+
 interface SendMessagePayload {
   sender: string;
   receiver: string;
-  text: string;
+  text?: string;
+  type: string;
   room: string;
   roomId: string;
+  file?: File[];
 }
 
 interface GroupMembersPayload {

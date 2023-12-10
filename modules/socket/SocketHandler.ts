@@ -30,24 +30,23 @@ class SocketHandler {
 
   public joinSocket = async (userId: string, socket: any) => {
     socket.userId = userId;
-
     this.socketUser[userId] = socket;
 
     const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.online, socket.id) as User;
 
     const socketData = {
-			userId,
-			status: userChatStatus.isActive,
-		};
+      userId,
+      status: userChatStatus.isActive,
+    };
 
     // const userData = {
-		// 	firstName: userChatStatus.firstName,
-		// 	lastName: userChatStatus.lastName,
-		// };
+    // 	firstName: userChatStatus.firstName,
+    // 	lastName: userChatStatus.lastName,
+    // };
 
     socket.broadcast.emit(socketEvents.ONLINE_STATUS, socketData);
 
-		// this.socketUser[userChatStatus?._id.toString()].emit(socketEvents.SOCKET_USER_DATA, userData);
+    // this.socketUser[userChatStatus?._id.toString()].emit(socketEvents.SOCKET_USER_DATA, userData);
   }
 
   removeUser = async (socket: ISocket, io: any) => {
@@ -55,7 +54,7 @@ class SocketHandler {
 
     delete this.socketUser[userId];
 
-    if(userId) {
+    if (userId) {
       const userChatStatus = await this.authHandler.updateChatStatus(userId, UserChatStatus.offline, '') as User;
 
       const socketData = {
@@ -70,7 +69,7 @@ class SocketHandler {
   joinPrivateRoom = async (socket: ISocket, io: any, room: string, senderId: string, receiverId: string, pageIndex: number, pageSize: number) => {
     let existingRoom = await this.roomHandler.findByRoomId(room);
 
-    if(!existingRoom) {
+    if (!existingRoom) {
       const payload = {
         members: [
           new mongoose.Types.ObjectId(senderId),
@@ -94,7 +93,6 @@ class SocketHandler {
     const count = await this.chatHandler.countDocuments(countConditions);
 
     const socketReceiveMessages = {
-      receiverDetails: user,
       room,
       roomMessages,
       count,
@@ -104,12 +102,15 @@ class SocketHandler {
 
     const senderSocket = this.socketUser[senderId];
 
-    if(senderSocket) {
+    socket.emit(socketEvents.SET_RECEIVER_DETAILS, user);
+
+    if (senderSocket) {
       const senderSocketData = {
         newMessageCount: 0,
         id: receiverId,
-				text: roomMessages.length ? roomMessages[roomMessages.length - 1]?.text: null,
-				createdAt: roomMessages.length ? roomMessages[roomMessages.length -1]?.createdAt: null,
+        text: roomMessages.length ? roomMessages[roomMessages.length - 1]?.text : null,
+        createdAt: roomMessages.length ? roomMessages[roomMessages.length - 1]?.createdAt : null,
+        receiverDetails: user,
       };
 
       io.to(user?.socketId).emit(socketEvents.PRIVATE_MESSAGES_COUNT, senderSocketData);
@@ -117,7 +118,7 @@ class SocketHandler {
   };
 
   sendMessage = async (io: any, messagePayload: SendMessagePayload) => {
-    if(messagePayload.receiver) {
+    if (messagePayload.receiver) {
       const roomDetails = await this.roomHandler.findByRoomId(messagePayload.room);
 
       const newMessage = await this.chatHandler.create({ ...messagePayload, roomId: roomDetails?._id.toString() as string });
@@ -134,7 +135,7 @@ class SocketHandler {
 
       const receiverSocket = this.socketUser[messagePayload.receiver];
 
-      if(receiverSocket) {
+      if (receiverSocket) {
 
         const socketData = {
           newMessagesCount: count,
@@ -146,7 +147,7 @@ class SocketHandler {
         io.to(this.socketUser[messagePayload.receiver].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
         io.to(this.socketUser[messagePayload.sender].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
       }
-      
+
       await this.roomHandler.updateLastMessage(messagePayload.room, newMessage._id.toString());
     }
     else {
@@ -158,13 +159,13 @@ class SocketHandler {
       io.to(messagePayload.room).emit(socketEvents.RECEIVE_NEW_MESSAGE, { newMessage });
 
       const receiverSocketData = {
-				newMessagesCount: count,
-				id: newMessage.sender._id,
-				createdDate: newMessage.createdAt,
-				text: newMessage.text,
-			};
+        newMessagesCount: count,
+        id: newMessage.sender._id,
+        createdDate: newMessage.createdAt,
+        text: newMessage.text,
+      };
 
-			io.to(messagePayload.room).emit(socketEvents.GROUP_MESSAGES_COUNT,receiverSocketData);
+      io.to(messagePayload.room).emit(socketEvents.GROUP_MESSAGES_COUNT, receiverSocketData);
     }
   };
 
@@ -190,8 +191,8 @@ class SocketHandler {
 
   addGroupToGroupList = async (io: any, groupMembers: GroupMembersPayload[], groupData: GroupDetails) => {
 
-    groupMembers.forEach(item =>{
-      if(item.userId in this.socketUser) {
+    groupMembers.forEach(item => {
+      if (item.userId in this.socketUser) {
         io.to(item.userId).emit(socketEvents.ADD_GROUP_TO_GROUPLIST, groupData);
       }
     });
@@ -204,12 +205,12 @@ class SocketHandler {
     const roomMessages = await this.groupChatHandler.groupChatList(groupId);
 
     const socketArgs = {
-			receiverDetails: { name: groupDetails?.name, _id: null },
-			roomID: groupId,
-			roomMessages,
-		};
+      receiverDetails: { name: groupDetails?.name, _id: null },
+      roomID: groupId,
+      roomMessages,
+    };
 
-		io.to(groupId).emit(socketEvents.RECEIVE_MESSAGES, socketArgs);
+    io.to(groupId).emit(socketEvents.RECEIVE_MESSAGES, socketArgs);
   };
 
   sendNotification = async (io: any, userId: string, notification: Notification) => {

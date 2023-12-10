@@ -5,6 +5,7 @@ export const RESPONSE = {
 	EXISTING_EMAIL: 'Email already exists',
 	INVALID_CREDENTIALS: 'Invalid username or password',
 	NO_USER_FOUND: 'No user found',
+	USER_UPDATE_SUCCESS: 'User updated successfully',
 	INVALID_TOKEN: 'Invalid token',
 	NEW_GROUP: 'Group created successfully',
 	ADD_NEW_MEMBERS: 'New members added successfully',

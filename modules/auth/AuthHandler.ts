@@ -2,12 +2,11 @@ import bcyrpt from "bcryptjs";
 import moment from "moment";
 import mongoose, { PipelineStage } from "mongoose";
 
-import { LoginInput, SignUpInput } from "./interface/Input";
+import { LoginInput, SignUpInput, UpdateUserInput } from "./interface/Input";
 import UserModel, { User } from "../../schemas/users";
 import CustomError from "../../exception/CustomError";
-import { RESPONSE } from "../../constants";
-import { LoginResponse, SignUpResponse } from "./interface/response";
-import { STATUS_CODE } from "../../constants";
+import { LoginResponse, SignUpResponse, UpdateUserResponse } from "./interface/response";
+import { STATUS_CODE, RESPONSE } from "../../constants";
 import JWTService from "../../utils/jwt.service";
 
 class AuthHandler {
@@ -97,7 +96,7 @@ class AuthHandler {
   }
 
   async findUser(userId: string) {
-    const projections = { fullName: 1, socketId: 1 };
+    const projections = { fullName: 1, socketId: 1, userStatus: 1, status: '$isActive' };
     
     const user = await UserModel.findById(userId, projections);
     return {
@@ -105,6 +104,25 @@ class AuthHandler {
       message: RESPONSE.SUCCESS,
       data: { user }
     };    
+  }
+
+  async updateUser(userId: string, payload: UpdateUserInput): Promise<UpdateUserResponse> {
+    let toUpdate: UpdateUserInput = {};
+
+    if(payload.fullName) {
+      toUpdate.fullName = payload.fullName;
+    }
+
+    if(payload.userStatus) {
+      toUpdate.userStatus = payload.userStatus;
+    }
+
+    await UserModel.findByIdAndUpdate(userId, toUpdate);
+    
+    return {
+      status: STATUS_CODE.SUCCESS,
+      message: RESPONSE.USER_UPDATE_SUCCESS,
+    };
   }
 
   async findAllUsers(search: string, userId: string) {
@@ -143,7 +161,7 @@ class AuthHandler {
 
       const userList = await UserModel.aggregate(aggregationPipeline);
   
-      const count = await UserModel.count(query);
+      const count = await UserModel.countDocuments(query);
   
       return {
         status: STATUS_CODE.SUCCESS,

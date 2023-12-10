@@ -12,6 +12,11 @@ interface SignUpInput {
   email: string;
 }
 
+interface UpdateUserInput {
+  fullName?: string;
+  userStatus?: string;
+};
+
 interface FriendListQueries extends PaginationQuery {}
 
-export { LoginInput, SignUpInput, FriendListQueries };
+export { LoginInput, SignUpInput, FriendListQueries, UpdateUserInput };

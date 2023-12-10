@@ -23,6 +23,8 @@ interface LoginResponse extends ApiResponse {
 
 interface SignUpResponse extends ApiResponse {}
 
+interface UpdateUserResponse extends ApiResponse {};
+
 interface FriendsListResponse extends ApiResponse {
   friends: Friends[];
   count: number;
@@ -32,5 +34,6 @@ export {
   Friends,
   LoginResponse,
   SignUpResponse,
-  FriendsListResponse
+  FriendsListResponse,
+  UpdateUserResponse,
 };

@@ -16,14 +16,15 @@ export class Database {
       dbName: db,
     };
 
-    mongoose.connect(mongoURL, options, (error) => {
-      if(error) {
-        throw error;
-      }
-      else {
+
+    mongoose
+      .connect(mongoURL, options)
+      .then(() => {
         console.log('\x1b[33m%s\x1b[0m', 'Connected to Mongo Server');
-      }
-    });
+      })
+      .catch(error => {
+        throw(error);
+      });
   }
 }
 

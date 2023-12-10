@@ -17,7 +17,7 @@ class AuthController {
 
       res.status(response.status).json(response);
     }
-    catch(err) {
+    catch (err) {
       next(err);
     }
   }
@@ -29,21 +29,21 @@ class AuthController {
 
       res.status(response.status).json({ message: response.message, status: response.status });
     }
-    catch(err) {
+    catch (err) {
       next(err);
     }
   }
 
   public findAllUsers = async (req: IRequest, res: IResponse, next: NextFunction) => {
-    try{
+    try {
       const search = req.query.search as string;
-      const userId =req.user?.id as string;
+      const userId = req.user?.id as string;
 
       const response = await this.authHandler.findAllUsers(search, userId);
 
       res.status(response.status).json(response.data);
     }
-    catch(err) {
+    catch (err) {
       next(err);
     }
   }
@@ -55,7 +55,20 @@ class AuthController {
       const response = await this.authHandler.findUser(user?.id as string);
       res.status(response.status).json(response.data);
     }
-    catch(err) {
+    catch (err) {
+      next(err);
+    }
+  };
+
+  public updateUser = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    try {
+      const user = req.user;
+      const payload = req.body;
+
+      const response = await this.authHandler.updateUser(user?.id as string, payload);
+      res.status(response.status).json({ status: response.status, message: response.message });
+    }
+    catch (err) {
       next(err);
     }
   };

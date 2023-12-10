@@ -17,10 +17,13 @@ class ApiRoutes {
 
   public prepareRoutes(): Router {
 
-    // User Auth API
+    // Auth API
     this.router.post(API_ROUTES.SIGNUP, AuthController.signup);
     this.router.post(API_ROUTES.LOGIN, AuthController.login);
+
+    // User API
     this.router.get(API_ROUTES.SPECIFIC_USER, authValidation, AuthController.specificUser);
+    this.router.patch(API_ROUTES.SPECIFIC_USER, authValidation, AuthController.updateUser);
 
     // Friends Request API
     this.router.post(API_ROUTES.FRIEND_REQUEST, authValidation, FriendsController.newRequest);
