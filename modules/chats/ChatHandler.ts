@@ -70,6 +70,8 @@ class ChatHandler {
           roomId: 1,
           fullName: "$receiver.fullName",
           lastMessage: '$privateChat.text',
+          file: '$privateChat.file',
+          type: '$privateChat.type',
           lastMessageAt: { $toLong: '$privateChat.createdAt' },
           receiverId: '$receiver._id',
           isActive: '$receiver.isActive'

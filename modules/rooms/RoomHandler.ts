@@ -13,8 +13,8 @@ class RoomHandler {
   };
 
   async updateLastMessage(roomId: string, messageId: string) {
-    return RoomsModel.findOneAndUpdate(
-        { roomId: roomId },
+    return RoomsModel.findByIdAndUpdate(
+        roomId,
         { $set: { lastMessage: new mongoose.Types.ObjectId(messageId) } },
         { new: true }
       );

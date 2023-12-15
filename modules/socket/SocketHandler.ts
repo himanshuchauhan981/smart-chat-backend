@@ -89,13 +89,14 @@ class SocketHandler {
 
     const roomMessages = await this.chatHandler.privateChatMessages(existingRoom._id.toString(), senderId, pageIndex, pageSize);
 
-    const countConditions = { room };
+    const countConditions = { roomId: room };
     const count = await this.chatHandler.countDocuments(countConditions);
 
     const socketReceiveMessages = {
       room,
       roomMessages,
       count,
+      receiverId: user?._id,
     };
 
     io.to(room).emit(socketEvents.RECEIVE_MESSAGES, socketReceiveMessages);
@@ -118,6 +119,7 @@ class SocketHandler {
   };
 
   sendMessage = async (io: any, messagePayload: SendMessagePayload) => {
+
     if (messagePayload.receiver) {
       const roomDetails = await this.roomHandler.findByRoomId(messagePayload.room);
 
@@ -135,18 +137,16 @@ class SocketHandler {
 
       const receiverSocket = this.socketUser[messagePayload.receiver];
 
-      if (receiverSocket) {
+      const socketData = {
+        newMessagesCount: count,
+        lastMessage: newMessage.text,
+        lastMessageAt: moment(newMessage.createdAt).valueOf(),
+        roomId: newMessage.roomId,
+        type: newMessage.type,
+      };
 
-        const socketData = {
-          newMessagesCount: count,
-          lastMessage: newMessage.text,
-          lastMessageAt: moment(newMessage.createdAt).valueOf(),
-          roomId: newMessage.roomId,
-        };
-
-        io.to(this.socketUser[messagePayload.receiver].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
-        io.to(this.socketUser[messagePayload.sender].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
-      }
+      io.to(receiverSocket.id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
+      io.to(this.socketUser[messagePayload.sender].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
 
       await this.roomHandler.updateLastMessage(messagePayload.room, newMessage._id.toString());
     }
