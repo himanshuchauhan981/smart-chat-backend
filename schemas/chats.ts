@@ -7,6 +7,8 @@ import DefaultField from "./defaultFields";
 export enum ChatType {
 	TEXT = 'TEXT',
 	DOCUMENT = 'DOCUMENT',
+	IMAGE = 'IMAGE',
+	TEXT_WITH_ATTACHMENT = 'TEXT_WITH_ATTACHMENT',
 }
 
 @modelOptions({

@@ -145,7 +145,10 @@ class SocketHandler {
         type: newMessage.type,
       };
 
-      io.to(receiverSocket.id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
+      if(receiverSocket && receiverSocket.id) {
+        io.to(receiverSocket.id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
+      }
+
       io.to(this.socketUser[messagePayload.sender].id).emit(socketEvents.PRIVATE_MESSAGES_COUNT, socketData);
 
       await this.roomHandler.updateLastMessage(messagePayload.room, newMessage._id.toString());
